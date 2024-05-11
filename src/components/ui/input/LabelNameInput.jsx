@@ -1,11 +1,11 @@
-import { useState, forwardRef } from 'react'
+import { useState } from 'react'
 import PhoneInput from 'react-phone-number-input/input'
 // import { parsePhoneNumber } from 'react-phone-number-input'
 
 // import PhoneInput from './PhoneInput.jsx'
 /* eslint-disable react/prop-types */
 // eslint-disable-next-line no-unused-vars
-const LabelNameInput = forwardRef(function LabelNameInput({ name, type, ...props }, ref) {
+export default function LabelNameInput({ name, type, ...props }) {
 
     const [enteredPhoneNumber, setEnteredPhoneNumber] = useState()
     let checkBox = 0
@@ -38,6 +38,13 @@ const LabelNameInput = forwardRef(function LabelNameInput({ name, type, ...props
         checkBox = 1
     }
 
+    console.log(lowerCaseName())
+
+    const checkHandler = (event) => {
+        event.preventDefault()
+        event.stopImmediatePropagation()
+      }
+
     return (
         <>
             <section className={`${checkBox === 1 ? 'md:w-1/4' : 'w-full md:w-1/2'}  px-3 mb-6 md:mb-0`}>
@@ -48,12 +55,13 @@ const LabelNameInput = forwardRef(function LabelNameInput({ name, type, ...props
                     {
                         type != 'tel' ? 
                             <input 
-                            className={`${checkBox === 1 ? '' : 'w-full appearance-none'} block bg-gray-200 text-gray-700 border border-red-500 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`} 
-                            id={lowerCaseName()}
-                            name={lowerCaseName()} 
-                            type={type} 
-                            ref={ref}
-                            {...props}
+                                className={`${checkBox === 1 ? '' : 'w-full appearance-none'} block bg-gray-200 text-gray-700 border border-red-500 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`} 
+                                id={lowerCaseName()}
+                                name={lowerCaseName()} 
+                                type={type} 
+                                autoComplete={type != 'checkBox' ? type : lowerCaseName()}
+                                onChange={checkHandler} 
+                                {...props}
                             />
                             :
                             <PhoneInput
@@ -62,16 +70,10 @@ const LabelNameInput = forwardRef(function LabelNameInput({ name, type, ...props
                                 value={enteredPhoneNumber}
                                 onChange={setEnteredPhoneNumber} 
                             />
-                            // <input 
-                            //     type='tel' 
-                            //     className='w-full appearance-none block bg-gray-200 text-gray-700 border border-red-500 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white'
-                            // />
                     }
                 </label>
                 {!checkBox && <p className="text-red-500 text-xs italic">Please fill out this field.</p>}
             </section>
         </>
     )
-})
-
-export default LabelNameInput
+}

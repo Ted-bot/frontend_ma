@@ -7,6 +7,7 @@ export default function SignUpForm() {
 
     const [checkedMale, setCheckedMale] = useState(false)
     const [checkedFemale, setCheckedFemale] = useState(false)
+    // const [enteredInput, setEnteredInput] = useState({})
 
     const typeText = 'text'
     const typeEmail = 'email'
@@ -23,6 +24,7 @@ export default function SignUpForm() {
       }
 
     const checkBoxHandle = (e) => {
+        e.preventDefault()
         if(e.target.id !== 'male'){
             setCheckedFemale(true)
             setCheckedMale(false)
@@ -38,38 +40,35 @@ export default function SignUpForm() {
         titleTextArea: 'Message',
         descriptionToJoinTextArea: 'What caught your interest to join our training sessions',
         setItems : [
-            { name: 'Firstname', type: typeText, placeholder: 'first name'},
-            { name: 'Lastname', type: typeText, placeholder: 'last name'},
+            { name: 'FirstName', type: typeText, placeholder: 'first name'},
+            { name: 'LastName', type: typeText, placeholder: 'last name'},
             { name: 'Email', type: typeEmail, placeholder: 'email'},
             { name: 'Male', type: typeCheckBox, defaultChecked: checkedMale, onChange: checkBoxHandle },
-            { name: 'female', type: typeCheckBox, defaultChecked: checkedFemale, onChange: checkBoxHandle },
-            { name: 'Date of Birth', type: typeDate},            
+            { name: 'Female', type: typeCheckBox, defaultChecked: checkedFemale, onChange: checkBoxHandle },
+            { name: 'Birthday', type: typeDate},            
             { name: 'PhoneNumber', type: typePhone, placeholder: 'phone number'}                ,
-            { name: 'New Password', type: typePassword, placeholder: 'passord'}
+            { name: 'Password', type: typePassword, placeholder: 'passord'}
         ]
     }
-    
+
     function handleSubmit(event) {
         event.preventDefault()
-
         const fd = new FormData(event.target)
-        const userData = Object.fromEntries(fd.entries())
+        const enteredInput = Object.fromEntries(fd.entries())
 
-        console.log(userData)
-
-        fetch("http://localhost/api/register", { 
+        fetch("/api/register", { 
             method: "POST",
             headers: {
-                "Access-Control-Allow-Origin": "*",
                 "Content-Type":"application/json" 
             },
-            body: JSON.stringify({userData})
+            body: JSON.stringify({enteredInput})
         })
         .then((response) => {
-            return JSON.stringify({response})
+            return response.json()
         })
-        .then((resData) => {
-            console.log(resData)
+        .then((response) => {
+            console.log({ data: response })
+            return response
         })
     }
 
@@ -79,18 +78,15 @@ export default function SignUpForm() {
 
                 <h1 className="pt-3 pb-6 text-2xl">{InterfaceConfiguration.title}</h1>
 
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmit} name='sign-up' id='sign-up'>
 
                     <section className="flex flex-wrap -mx-3 mb-6">
-                       <SignUpInterface 
-                            array={InterfaceConfiguration.setItems} 
-                        />
-                        
+                       <SignUpInterface array={InterfaceConfiguration.setItems} />                        
                     </section>
 
                     <label className="w-full">
                         {InterfaceConfiguration.titleTextArea}
-                        <textarea name="postContent" rows={4} cols={40} style={stylesTextArea} placeholder={InterfaceConfiguration.descriptionToJoinTextArea}/>
+                        <textarea name="conversion" rows={4} cols={40} style={stylesTextArea} placeholder={InterfaceConfiguration.descriptionToJoinTextArea}/>
                     </label>
 
                     <button 

@@ -4,10 +4,13 @@ import svgr from "vite-plugin-svgr"
 
 export default defineConfig({
   server: {
-    cors: false,
+    cors: {
+      methods: ["GET", "POST", "PUT", "PATCH", "OPTIONS", "DELETE"],
+      preflightContinue: false
+    },
     proxy: {
-      "/api": {
-        target: "http://locahost:80"
+      "/api":{
+        target: "http://caddy:80"
       }
     }
   },
