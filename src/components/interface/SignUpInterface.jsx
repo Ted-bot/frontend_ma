@@ -7,10 +7,7 @@ export default function CreateInterfaceForm({array}) {
         <LabelNameInput 
             name={item.name}
             type={item.type}
-            key={Math.floor(Math.random() * 1333)}
-            // ref={inputRef.current[index]}
-            // onChange={(event) => inputHandler(item.name, event)}
-            // value={storeUserInput[item.name]}
+            key={item.id}
             {...item}
         />
         ))
