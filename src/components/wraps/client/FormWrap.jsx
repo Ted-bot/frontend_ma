@@ -10,7 +10,6 @@ export default function FormWrap({children}){
                         <img src="/img/signUp_trans_ini.png" alt="" className="w-[32rem]" />
                     </section> 
                 </section>
-                {/* //bg-gradient-to-r from-orange-300 */}
                 <section className="w-full px-3 md:px-0 md:w-1/2 md:flex md:justify-end">
                     <section className="flex justify-center w-full">
                         {children}

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import SignUpInterface from '../interface/SignUpInterface.jsx'
+// import {formatPhoneNumberIntl} from 'react-phone-number-input/input'
 
 const typeText = 'text'
 const typeEmail = 'email'
@@ -13,10 +14,10 @@ function getInputValues(){
 
     if(!storedValues){
         return {
-            gender: '',
             firstName: '',
             lastName: '',
             email: '',
+            gender: '',
             dateOfBirth: '',
             phone: '',
             conversion: '',
@@ -29,7 +30,7 @@ function getInputValues(){
 export default function SignUpForm() {
 
     const re = /^[A-Za-z]+$/
-    
+
     const [genderStatusRequired, setGenderStatusRequired] = useState(true)
     const [enteredInput, setEnteredInput] = useState(getInputValues)
     const [enteredInputIsInvalid, setEnteredInputIsInvalid] = useState({
@@ -43,19 +44,11 @@ export default function SignUpForm() {
         password: false,
     })
 
-    const stylesTextArea={
-        width: "100%",
-        paddingRight: '10px', 
-        paddingLeft: '10px', 
-        paddingTop: '3px'
-    }
-
-
     function inputHandle(identifier, value){
 
         if(identifier == 'gender' && value == 'male' || value == 'female')
             {
-                genderStatusRequired == true ? setGenderStatusRequired(false) : ''
+                genderStatusRequired === true ? setGenderStatusRequired(false) : ''
                 setEnteredInputIsInvalid((prevValues) => ({
                     ...prevValues,
                     [identifier] : value ? false : true
@@ -96,14 +89,11 @@ export default function SignUpForm() {
 
         if(identifier == 'password' || identifier == 'phone' || identifier == 'conversion')
             {
-                console.log(value)
                 setEnteredInputIsInvalid((prevValues) => ({
                     ...prevValues,
                     [identifier] : (value == '') ? true : false
                 }))
             }
-
-            console.log(enteredInputIsInvalid.password)
     }
 
     function updateEnteredInputState(identifier, value){
@@ -128,60 +118,66 @@ export default function SignUpForm() {
             { name: 'Male', id: 'male', type: typeCheckBox, checked: (enteredInput.gender == 'male' ? true : false), value: 'male', error: enteredInputIsInvalid.gender, required: genderStatusRequired, onChange: (e) => inputHandle('gender', e.target.value), onBlur : (e) => inputBlurHandle('gender', e.target.value)},
             { name: 'Female', id: 'female', type: typeCheckBox, checked: (enteredInput.gender == 'female' ? true : false), value: 'female', error: enteredInputIsInvalid.gender, required: genderStatusRequired, onChange: (e) => inputHandle('gender', e.target.value), onBlur : (e) => inputBlurHandle('gender', e.target.value)},
             { name: 'DateOfBirth', id: 'birthday', type: typeDate, value: enteredInput.dateOfBirth, error: enteredInputIsInvalid.dateOfBirth, required:true, onChange: (e) => inputHandle('dateOfBirth', e.target.value), onBlur : (e) => inputBlurHandle('dateOfBirth', e.target.value)},            
-            { name: 'PhoneNumber', id: 'phonenumber', type: typePhone, placeholder: 'phone number', value: enteredInput.phone, error: enteredInputIsInvalid.phone, required:true, onChange: (value) => inputHandle('phone', value), onBlur : (e) => inputBlurHandle('phone', e.target.value)},
-            { name: 'Password', id: 'password', type: typePassword, placeholder: 'passord', onBlur : (e) => inputBlurHandle('password', e.target.value), error: enteredInputIsInvalid.password,required: true}
+            { name: 'Phone', id: 'phonenumber', type: typePhone, placeholder: 'phone number', value: enteredInput.phone, error: enteredInputIsInvalid.phone, required:true, onChange: (value) => inputHandle('phone', value), onBlur : (e) => inputBlurHandle('phone', e.target.value)},
+            { name: 'Password', id: 'password', type: typePassword, placeholder: 'passord', error: enteredInputIsInvalid.password,required: true, onBlur : (e) => inputBlurHandle('password', e.target.value)}
         ]
     }
 
     function handleSubmit(event) {
         event.preventDefault()
+
+        let InvalidInputFound = false
+
+        const firstName = 'firstName'
+        const lastName = 'lastName'
+        const dateOfBirth = 'dateOfBirth'
+        const male = 'male'
+        const female = 'female'
          
         const fd = new FormData(event.target)
         const FormEntries = Object.fromEntries(fd.entries())
 
-        console.log(FormEntries)
-        // let newValue = false
-        // enteredInputIsInvalid.map((key, value) => {
+        let newUserData = {
+            password: FormEntries.password
+        }        
+        
+        for (const key in enteredInputIsInvalid)
+        {
+            if(enteredInputIsInvalid[key] === true)
+            {
+                return InvalidInputFound = true;
+            }
+        }
+
+        if(InvalidInputFound){
+            return
+        }    
+
+        for (const key in enteredInput) {
             
-        // })
-        
-        
-        // for (const key in FormEntries){
-        //     switch (key) {
-        //         case 'firstname':
-        //             new re.test()
-        //             break
-        //         case :
-        //             break
-        //     }
-        // }
-        // let newUserData = {}        
+            let newKey = ''
 
-        // for (const key in FormEntries) {
-            
-        //     let newKey = ''
+            switch (key){
+                case firstName:
+                    newKey = 'first_name'
+                    break
+                case lastName:
+                    newKey = 'last_name'
+                    break
+                case dateOfBirth:
+                    newKey = 'date_of_birth'
+                    break
+                case male || female :
+                    newKey = 'gender'
+                    break
+                default:
+                    newKey = key
+            }
 
-        //     switch (key){
-        //         case 'firstname':
-        //             newKey = 'first_name'
-        //             break
-        //         case 'lastname' :
-        //             newKey = 'last_name'
-        //             break
-        //         case 'dateofbirth' :
-        //             newKey = 'date_of_birth'
-        //             break
-        //         case 'male' || 'female' :
-        //             newKey = 'gender'
-        //             break
-        //         default:
-        //             newKey = key
-        //     }
+            newUserData[newKey] = enteredInput[key];
+        }
 
-        //     newUserData[newKey] = FormEntries[key];
-        // }
-
-        
+        console.log(newUserData)
 
         // fetch("/api/register", { 
         //     method: "POST",
@@ -221,8 +217,7 @@ export default function SignUpForm() {
                             name="conversion" 
                             rows={4} 
                             cols={40} 
-                            style={stylesTextArea}
-                            className={`${enteredInputIsInvalid.conversion && 'border-red-500'} border rounded`}
+                            className={`${enteredInputIsInvalid.conversion && 'border-red-500'} border rounded px-2 pt-1 w-full`}
                             onChange={(e) => inputHandle('conversion', e.target.value)} 
                             value={enteredInput.conversion} 
                             placeholder={InterfaceConfiguration.descriptionToJoinTextArea}

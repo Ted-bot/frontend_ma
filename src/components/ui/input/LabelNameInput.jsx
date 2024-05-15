@@ -3,7 +3,6 @@ import PhoneInput from 'react-phone-number-input/input'
 /* eslint-disable react/prop-types */
 // eslint-disable-next-line no-unused-vars
 export default function LabelNameInput({ name, type, error,...props }) {
-
     let checkBox = 0
 
     const lowerCaseName = () => {
