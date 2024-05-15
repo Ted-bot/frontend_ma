@@ -1,4 +1,5 @@
 import PhoneInput from 'react-phone-number-input/input'
+import Select from 'react-select'
 
 /* eslint-disable react/prop-types */
 // eslint-disable-next-line no-unused-vars
@@ -13,7 +14,10 @@ export default function LabelNameInput({
     onChangeState,
     onChangeCity,
     ...props }) {
+
     let checkBox = 0
+    let optionStateList = {}
+    let optionCitiesList = {}
 
     const lowerCaseName = () => {
         let mutationString = name.toLowerCase();
@@ -22,6 +26,20 @@ export default function LabelNameInput({
 
     if(type === 'checkbox'){
         checkBox = 1
+    }
+
+    if(type === 'location'){
+        optionStateList = stateList.map((state) => ({
+            label: state.name,
+            value: state.id
+        }))
+        
+        optionCitiesList = cityList.map((state) => ({
+            label: state.name,
+            value: state.id
+        }))
+
+        console.log({newlist: optionStateList})
     }
 
     return (
@@ -48,32 +66,23 @@ export default function LabelNameInput({
                                 {...props}
                             />
                         :
-                        <section className='flex flex-wrap w-full justify-evenly'>
-                            <select
-                                className={`w-2/5 ${error && 'border-red-500'} block bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`}  
-                                onChange={onChangeState}
-                                value={selectedStateIndexNr}
-                                required
-                            >
-                                {stateList.map((item, index) => (
-                                <option key={index} value={index}>
-                                    {item.name}
-                                </option>
-                                ))}
-                            </select>
+                        <section className='flex flex-col flex-wrap w-full justify-evenly'>
 
-                            <select
-                                className={`w-2/5 ${error && 'border-red-500'} block bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`}  
+                            <Select 
+                                className={`w-full ${error && 'border-red-500'} block text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`}  
+                                onChange={onChangeState}
+                                inputId={selectedStateIndexNr}
+                                options={optionStateList}
+                                placeholder='select state ...'
+                            />
+
+                            <Select 
+                                className={`w-full ${error && 'border-red-500'} block text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`}  
                                 onChange={onChangeCity}
-                                value={selectedCityIndexNr}
-                                required
-                            >
-                                {cityList.map((item, index) => (
-                                <option key={index} value={index}>
-                                    {item.name}
-                                </option>
-                                ))}
-                            </select>
+                                inputId={selectedCityIndexNr}
+                                options={optionCitiesList}
+                                placeholder='select city ...'
+                            />
                         </ section>
                     }
                 </label>
