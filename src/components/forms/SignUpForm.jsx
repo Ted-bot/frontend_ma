@@ -1,6 +1,10 @@
 import { useState, useEffect } from 'react'
 import SignUpInterface from '../interface/SignUpInterface.jsx'
-// import {formatPhoneNumberIntl} from 'react-phone-number-input/input'
+// import {
+//     GetCountries,
+//     GetState,
+//     GetCity,
+//   } from "react-country-state-city";
 
 const typeText = 'text'
 const typeEmail = 'email'
@@ -8,6 +12,7 @@ const typePassword = 'password'
 const typePhone = 'tel'
 const typeDate = 'date'
 const typeCheckBox = 'checkbox'
+const typeLocation = 'location'
 
 function getInputValues(){
     const storedValues = localStorage.getItem('newuser')
@@ -18,6 +23,7 @@ function getInputValues(){
             lastName: '',
             email: '',
             gender: '',
+            city: '',
             dateOfBirth: '',
             phone: '',
             conversion: '',
@@ -38,11 +44,23 @@ export default function SignUpForm() {
         firstName: false,
         lastName: false,
         email: false,
+        city: false,
         dateOfBirth: false,
         phone: false,
         conversion: false,
         password: false,
     })
+
+    // const [ stateId, setStateId ] = useState(null)
+    // const [ cityId, setCityId ] = useState(null)
+
+    // const [countryid, setCountryid] = useState(0);
+    // const [stateid, setStateid] = useState(0);
+    // const [cityid, setCityid] = useState(0);
+
+    // const [countriesList, setCountriesList] = useState([]);
+    // const [stateList, setStateList] = useState([]);
+    // const [cityList, setCityList] = useState([]);
 
     function inputHandle(identifier, value){
 
@@ -53,6 +71,11 @@ export default function SignUpForm() {
                     ...prevValues,
                     [identifier] : value ? false : true
                 }))
+            }
+
+        if(identifier == 'city')
+            {
+               return updateEnteredInputState(identifier, value.name)
             }
 
         updateEnteredInputState(identifier, value)
@@ -118,6 +141,7 @@ export default function SignUpForm() {
             { name: 'Male', id: 'male', type: typeCheckBox, checked: (enteredInput.gender == 'male' ? true : false), value: 'male', error: enteredInputIsInvalid.gender, required: genderStatusRequired, onChange: (e) => inputHandle('gender', e.target.value), onBlur : (e) => inputBlurHandle('gender', e.target.value)},
             { name: 'Female', id: 'female', type: typeCheckBox, checked: (enteredInput.gender == 'female' ? true : false), value: 'female', error: enteredInputIsInvalid.gender, required: genderStatusRequired, onChange: (e) => inputHandle('gender', e.target.value), onBlur : (e) => inputBlurHandle('gender', e.target.value)},
             { name: 'DateOfBirth', id: 'birthday', type: typeDate, value: enteredInput.dateOfBirth, error: enteredInputIsInvalid.dateOfBirth, required:true, onChange: (e) => inputHandle('dateOfBirth', e.target.value), onBlur : (e) => inputBlurHandle('dateOfBirth', e.target.value)},            
+            { name: 'Location', id: 'location', type: typeLocation, value: enteredInput.city, error: enteredInputIsInvalid.city, required:true , onChange: (e) => inputHandle('city', e), onBlur : (e) => inputBlurHandle('city', e.target.value)},
             { name: 'Phone', id: 'phonenumber', type: typePhone, placeholder: 'phone number', value: enteredInput.phone, error: enteredInputIsInvalid.phone, required:true, onChange: (value) => inputHandle('phone', value), onBlur : (e) => inputBlurHandle('phone', e.target.value)},
             { name: 'Password', id: 'password', type: typePassword, placeholder: 'passord', error: enteredInputIsInvalid.password,required: true, onBlur : (e) => inputBlurHandle('password', e.target.value)}
         ]
@@ -133,9 +157,12 @@ export default function SignUpForm() {
         const dateOfBirth = 'dateOfBirth'
         const male = 'male'
         const female = 'female'
+        const phone = 'phone'
          
         const fd = new FormData(event.target)
         const FormEntries = Object.fromEntries(fd.entries())
+
+        // console.log(FormEntries)
 
         let newUserData = {
             password: FormEntries.password
@@ -170,6 +197,9 @@ export default function SignUpForm() {
                 case male || female :
                     newKey = 'gender'
                     break
+                case phone :
+                    newKey = 'phone_number'
+                    break
                 default:
                     newKey = key
             }
@@ -177,7 +207,7 @@ export default function SignUpForm() {
             newUserData[newKey] = enteredInput[key];
         }
 
-        console.log(newUserData)
+        // // console.log({newUserDate: newUserData})
 
         // fetch("/api/register", { 
         //     method: "POST",
@@ -198,6 +228,14 @@ export default function SignUpForm() {
     useEffect(() => {
        localStorage.setItem('newuser', JSON.stringify(enteredInput))
     }, [enteredInput]);
+
+    // useEffect(() => {
+    //     GetCountries().then((result) => {
+    //       setCountriesList(result);
+    //     });
+    
+        
+    //   }, []);
 
     return (
         <>
