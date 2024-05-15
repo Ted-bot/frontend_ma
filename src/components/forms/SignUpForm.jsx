@@ -23,6 +23,7 @@ function getInputValues(){
             email: '',
             gender: '',
             city: '',
+            city_id: '',
             city_list_nr:'',
             state:'',
             state_id:'',
@@ -72,8 +73,10 @@ export default function SignUpForm() {
 
         if(identifier == 'state')
             {
-                const state = stateList[value.target.value]; //here you will get full state object.
-                updateEnteredInputState('state_list_nr', value.target.value)
+                console.log({state: value.label})
+                const selecteState = stateList.findIndex((state) => (state.id === value.value))
+                const state = stateList[selecteState]; //here you will get full state object.
+                updateEnteredInputState('state_list_nr', selecteState)
                 updateEnteredInputState('state_id', state.id)       
                 updateEnteredInputState(identifier, state.name)
                 return
@@ -81,10 +84,12 @@ export default function SignUpForm() {
 
         if(identifier == 'city')
             {
-                const city = cityList[value.target.value]
-                console.log({state_name: city.name, state_id: value.target.value})
+                const selectedCity = cityList.findIndex((city) => (city.id === value.value))
+                const city = cityList[selectedCity]
+                console.log(city)
                 updateEnteredInputState(identifier, city.name)
-                updateEnteredInputState('city_list_nr', value.target.value)
+                updateEnteredInputState('city_id', city.value)
+                updateEnteredInputState('city_list_nr', value.value)
                 return
             }
 
@@ -151,9 +156,9 @@ export default function SignUpForm() {
             { name: 'Male', id: 'male', type: typeCheckBox, checked: (enteredInput.gender == 'male' ? true : false), value: 'male', error: enteredInputIsInvalid.gender, required: genderStatusRequired, onChange: (e) => inputHandle('gender', e.target.value), onBlur : (e) => inputBlurHandle('gender', e.target.value)},
             { name: 'Female', id: 'female', type: typeCheckBox, checked: (enteredInput.gender == 'female' ? true : false), value: 'female', error: enteredInputIsInvalid.gender, required: genderStatusRequired, onChange: (e) => inputHandle('gender', e.target.value), onBlur : (e) => inputBlurHandle('gender', e.target.value)},
             { name: 'DateOfBirth', id: 'birthday', type: typeDate, value: enteredInput.dateOfBirth, error: enteredInputIsInvalid.dateOfBirth, required:true, onChange: (e) => inputHandle('dateOfBirth', e.target.value), onBlur : (e) => inputBlurHandle('dateOfBirth', e.target.value)},            
-            { name: 'Location', id: 'location', type: typeLocation, value: enteredInput.city, cityList, stateList, stateId: enteredInput.state_id, selectedStateIndexNr: enteredInput.state_list_nr, selectedCityIndexNr: enteredInput.city_list_nr, error: enteredInputIsInvalid.city, required:true , onChangeState: (e) => inputHandle('state', e), onChangeCity: (e) => inputHandle('city', e), onBlur : (e) => inputBlurHandle('city', e.target.value)},
             { name: 'Phone', id: 'phonenumber', type: typePhone, placeholder: 'phone number', value: enteredInput.phone, error: enteredInputIsInvalid.phone, required:true, onChange: (value) => inputHandle('phone', value), onBlur : (e) => inputBlurHandle('phone', e.target.value)},
-            { name: 'Password', id: 'password', type: typePassword, placeholder: 'passord', error: enteredInputIsInvalid.password,required: true, onBlur : (e) => inputBlurHandle('password', e.target.value)}
+            { name: 'Password', id: 'password', type: typePassword, placeholder: 'passord', error: enteredInputIsInvalid.password,required: true, onBlur : (e) => inputBlurHandle('password', e.target.value)},
+            { name: 'Location', id: 'location', type: typeLocation, value: enteredInput.city, cityList, stateList, stateId: enteredInput.state_id, selectedStateIndexNr: enteredInput.state_id, selectedCityIndexNr: enteredInput.city_id, error: enteredInputIsInvalid.city, required:true , onChangeState: (e) => inputHandle('state', e), onChangeCity: (e) => inputHandle('city', e), onBlur : (e) => inputBlurHandle('city', e.target.value)},
         ]
     }
 
@@ -222,8 +227,6 @@ export default function SignUpForm() {
             newUserData[newKey] = enteredInput[key];
         }
 
-        console.log({newUserDate: newUserData})
-
         fetch("/api/register", { 
             method: "POST",
             headers: {
@@ -255,13 +258,9 @@ export default function SignUpForm() {
     }, [singleRequest])
 
     useEffect(() => {
-        if(enteredInput.state_id){
             GetCity(countryid,enteredInput.state_id).then((result) => {
-                // console.log({stateId: stateId})
-                // console.log({getCity: result})
                  setCityList(result)
              })
-        }
       }, [enteredInput.state_id])
 
     return (
