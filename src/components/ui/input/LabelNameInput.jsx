@@ -1,24 +1,19 @@
-import { useState, useEffect } from 'react'
-
 import PhoneInput from 'react-phone-number-input/input'
-
-import {
-    GetState,
-    GetCity
-  } from "react-country-state-city";
 
 /* eslint-disable react/prop-types */
 // eslint-disable-next-line no-unused-vars
-export default function LabelNameInput({ name, type, error, ...props }) {
+export default function LabelNameInput({ 
+    name, 
+    type, 
+    error, 
+    cityList, 
+    stateList,
+    selectedStateIndexNr, 
+    selectedCityIndexNr, 
+    onChangeState,
+    onChangeCity,
+    ...props }) {
     let checkBox = 0
-    const [singleRequest, setSingleRequest] = useState(true)
-    const countryid = 156
-
-    const [stateId, setStateId] = useState(0)
-    const [selectedStateIndexNr, setSelectedStateIndexNr] = useState(0)
-    const [selectedCityIndexNr, setSelectedCityIndexNr] = useState(0)
-    const [stateList, setStateList] = useState([])
-    const [cityList, setCityList] = useState([])
 
     const lowerCaseName = () => {
         let mutationString = name.toLowerCase();
@@ -28,25 +23,6 @@ export default function LabelNameInput({ name, type, error, ...props }) {
     if(type === 'checkbox'){
         checkBox = 1
     }
-
-    useEffect(() => {
-        if(singleRequest){
-            setSingleRequest(false)
-            GetState(countryid).then((result) => {
-                setStateList(result)
-            })
-        }
-    })
-
-    useEffect(() => {
-        if(stateId){
-            GetCity(countryid,stateId).then((result) => {
-                // console.log({stateId: stateId})
-                // console.log({getCity: result})
-                 setCityList(result)
-             })
-        }
-      }, [stateId])
 
     return (
         <>
@@ -74,14 +50,8 @@ export default function LabelNameInput({ name, type, error, ...props }) {
                         :
                         <section className='flex flex-wrap w-full justify-evenly'>
                             <select
-                                className={`w-2/5 z-50 ${error && 'border-red-500'} block bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`}  
-                                onChange={(e) => {
-                                    const state = stateList[e.target.value]; //here you will get full state object.
-                                    // console.log({"selected_State ":state.name})
-                                    setStateId(state.id)
-                                    setSelectedStateIndexNr(e.target.value)
-                                    }
-                                }
+                                className={`w-2/5 ${error && 'border-red-500'} block bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`}  
+                                onChange={onChangeState}
                                 value={selectedStateIndexNr}
                                 required
                             >
@@ -93,10 +63,8 @@ export default function LabelNameInput({ name, type, error, ...props }) {
                             </select>
 
                             <select
-                                className={`w-2/5 z-50 ${error && 'border-red-500'} block bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`}  
-                                onChange={(e) => {
-                                    setSelectedCityIndexNr(e.target.value)
-                                }}
+                                className={`w-2/5 ${error && 'border-red-500'} block bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`}  
+                                onChange={onChangeCity}
                                 value={selectedCityIndexNr}
                                 required
                             >

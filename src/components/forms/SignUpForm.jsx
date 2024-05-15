@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react'
 import SignUpInterface from '../interface/SignUpInterface.jsx'
-// import {
-//     GetCountries,
-//     GetState,
-//     GetCity,
-//   } from "react-country-state-city";
+import {
+    GetState,
+    GetCity
+  } from "react-country-state-city";
 
 const typeText = 'text'
 const typeEmail = 'email'
@@ -24,6 +23,10 @@ function getInputValues(){
             email: '',
             gender: '',
             city: '',
+            city_list_nr:'',
+            state:'',
+            state_id:'',
+            state_list_nr:'',
             dateOfBirth: '',
             phone: '',
             conversion: '',
@@ -35,6 +38,7 @@ function getInputValues(){
 
 export default function SignUpForm() {
 
+    const countryid = 156
     const re = /^[A-Za-z]+$/
 
     const [genderStatusRequired, setGenderStatusRequired] = useState(true)
@@ -51,16 +55,9 @@ export default function SignUpForm() {
         password: false,
     })
 
-    // const [ stateId, setStateId ] = useState(null)
-    // const [ cityId, setCityId ] = useState(null)
-
-    // const [countryid, setCountryid] = useState(0);
-    // const [stateid, setStateid] = useState(0);
-    // const [cityid, setCityid] = useState(0);
-
-    // const [countriesList, setCountriesList] = useState([]);
-    // const [stateList, setStateList] = useState([]);
-    // const [cityList, setCityList] = useState([]);
+    const [singleRequest, setSingleRequest] = useState(true)
+    const [stateList, setStateList] = useState([])
+    const [cityList, setCityList] = useState([])
 
     function inputHandle(identifier, value){
 
@@ -73,9 +70,22 @@ export default function SignUpForm() {
                 }))
             }
 
+        if(identifier == 'state')
+            {
+                const state = stateList[value.target.value]; //here you will get full state object.
+                updateEnteredInputState('state_list_nr', value.target.value)
+                updateEnteredInputState('state_id', state.id)       
+                updateEnteredInputState(identifier, state.name)
+                return
+            }
+
         if(identifier == 'city')
             {
-               return updateEnteredInputState(identifier, value.name)
+                const city = cityList[value.target.value]
+                console.log({state_name: city.name, state_id: value.target.value})
+                updateEnteredInputState(identifier, city.name)
+                updateEnteredInputState('city_list_nr', value.target.value)
+                return
             }
 
         updateEnteredInputState(identifier, value)
@@ -141,7 +151,7 @@ export default function SignUpForm() {
             { name: 'Male', id: 'male', type: typeCheckBox, checked: (enteredInput.gender == 'male' ? true : false), value: 'male', error: enteredInputIsInvalid.gender, required: genderStatusRequired, onChange: (e) => inputHandle('gender', e.target.value), onBlur : (e) => inputBlurHandle('gender', e.target.value)},
             { name: 'Female', id: 'female', type: typeCheckBox, checked: (enteredInput.gender == 'female' ? true : false), value: 'female', error: enteredInputIsInvalid.gender, required: genderStatusRequired, onChange: (e) => inputHandle('gender', e.target.value), onBlur : (e) => inputBlurHandle('gender', e.target.value)},
             { name: 'DateOfBirth', id: 'birthday', type: typeDate, value: enteredInput.dateOfBirth, error: enteredInputIsInvalid.dateOfBirth, required:true, onChange: (e) => inputHandle('dateOfBirth', e.target.value), onBlur : (e) => inputBlurHandle('dateOfBirth', e.target.value)},            
-            { name: 'Location', id: 'location', type: typeLocation, value: enteredInput.city, error: enteredInputIsInvalid.city, required:true , onChange: (e) => inputHandle('city', e), onBlur : (e) => inputBlurHandle('city', e.target.value)},
+            { name: 'Location', id: 'location', type: typeLocation, value: enteredInput.city, cityList, stateList, stateId: enteredInput.state_id, selectedStateIndexNr: enteredInput.state_list_nr, selectedCityIndexNr: enteredInput.city_list_nr, error: enteredInputIsInvalid.city, required:true , onChangeState: (e) => inputHandle('state', e), onChangeCity: (e) => inputHandle('city', e), onBlur : (e) => inputBlurHandle('city', e.target.value)},
             { name: 'Phone', id: 'phonenumber', type: typePhone, placeholder: 'phone number', value: enteredInput.phone, error: enteredInputIsInvalid.phone, required:true, onChange: (value) => inputHandle('phone', value), onBlur : (e) => inputBlurHandle('phone', e.target.value)},
             { name: 'Password', id: 'password', type: typePassword, placeholder: 'passord', error: enteredInputIsInvalid.password,required: true, onBlur : (e) => inputBlurHandle('password', e.target.value)}
         ]
@@ -150,20 +160,18 @@ export default function SignUpForm() {
     function handleSubmit(event) {
         event.preventDefault()
 
-        let InvalidInputFound = false
-
         const firstName = 'firstName'
         const lastName = 'lastName'
         const dateOfBirth = 'dateOfBirth'
         const male = 'male'
         const female = 'female'
         const phone = 'phone'
-         
+        const city = 'city'
+        
         const fd = new FormData(event.target)
         const FormEntries = Object.fromEntries(fd.entries())
-
-        // console.log(FormEntries)
-
+        
+        let InvalidInputFound = false
         let newUserData = {
             password: FormEntries.password
         }        
@@ -200,42 +208,61 @@ export default function SignUpForm() {
                 case phone :
                     newKey = 'phone_number'
                     break
+                case city :
+                    newKey = 'location'
+                    break
                 default:
                     newKey = key
+            }
+
+            if(key === 'city_list_nr' || key === 'state_id' || key === 'state_list_nr' || key === 'state'){
+                continue
             }
 
             newUserData[newKey] = enteredInput[key];
         }
 
-        // // console.log({newUserDate: newUserData})
+        console.log({newUserDate: newUserData})
 
-        // fetch("/api/register", { 
-        //     method: "POST",
-        //     headers: {
-        //         "Content-Type":"application/json" 
-        //     },
-        //     body: JSON.stringify({newUserData})
-        // })
-        // .then((response) => {
-        //     return response.json()
-        // })
-        // .then((response) => {
-        //     console.log({ data: response })
-        //     return response
-        // })
+        fetch("/api/register", { 
+            method: "POST",
+            headers: {
+                "Content-Type":"application/json" 
+            },
+            body: JSON.stringify({newUserData})
+        })
+        .then((response) => {
+            return response.json()
+        })
+        .then((response) => {
+            console.log({ data: response })
+            return response
+        })
     }
 
     useEffect(() => {
        localStorage.setItem('newuser', JSON.stringify(enteredInput))
     }, [enteredInput]);
 
-    // useEffect(() => {
-    //     GetCountries().then((result) => {
-    //       setCountriesList(result);
-    //     });
-    
-        
-    //   }, []);
+    useEffect(() => {
+        if(singleRequest){
+            setSingleRequest(false)
+            GetState(countryid).then((result) => {
+                setStateList(result)
+            })
+
+        }
+    }, [singleRequest])
+
+    useEffect(() => {
+        if(enteredInput.state_id){
+            GetCity(countryid,enteredInput.state_id).then((result) => {
+                // console.log({stateId: stateId})
+                // console.log({getCity: result})
+                 setCityList(result)
+             })
+        }
+      }, [enteredInput.state_id])
 
     return (
         <>
