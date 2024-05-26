@@ -1,6 +1,6 @@
 import LabelNameInput from '../ui/input/LabelNameInput.jsx'
 
-export default function Login() {
+export default function LoginForm() {
 
     const typeEmail = 'email'
     const typePassword = 'password'

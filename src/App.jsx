@@ -7,6 +7,7 @@ import './App.css'
 import RootLayout from './pages/Root.jsx'
 import HomePage from './pages/HomePage.jsx'
 import SignUpPage from './pages/SignUpPage.jsx'
+import LoginPage from './pages/LoginPage.jsx'
 
 function App() {
   // const [count, setCount] = useState(0)
@@ -17,6 +18,7 @@ function App() {
       children: [
         { path: '/', element: <HomePage /> },
         { path: '/sign-up', element: <SignUpPage /> },
+        { path: '/login', element: <LoginPage /> },
       ]  
     }
   ])
