@@ -38,9 +38,6 @@ export default function LabelNameInput({
         }))
     }
 
-    console.log(optionCitiesList)
-    console.log(optionStateList)
-
     return (
         <>
             <section className={`${checkBox === 1 ? 'flex md:w-1/4' : 'w-full md:w-1/2'} lg:justify-center px-3 mb-6 md:mb-0`}>

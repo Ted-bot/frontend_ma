@@ -78,7 +78,6 @@ export default function SignUpForm() {
                 updateEnteredInputState('state_id', state.id)       
                 updateEnteredInputState(identifier, state.name)
                 GetCity(countryid,state.id).then((result) => {
-                    console.log({setCities: result})
                     setCityList(result)
                 })
                 return
@@ -86,15 +85,12 @@ export default function SignUpForm() {
 
         if(identifier == 'city')
             {
-                console.log({passes_value: event.target.value})
                 const city = cityList[event.target.value]
-                console.log({city_object: city})
                 updateEnteredInputState(identifier, city.name)
                 updateEnteredInputState('city_id', city.id)
                 updateEnteredInputState('city_list_nr', event.target.value)
                 return
             }
-            // console.log({ [identifier] : event.target.value})
         updateEnteredInputState(identifier, event)
     }
 
@@ -118,13 +114,12 @@ export default function SignUpForm() {
         if(identifier == 'dateOfBirth' )
             {
                 const currentYear = new Date().getFullYear();
-                const year = event.split("-")[0]
-                const age = currentYear - year
-                console.log({year:year, age:age})
+                const yearOfBirth = event.split("-")[0]
+                const age = currentYear - yearOfBirth
 
                 setEnteredInputIsInvalid((prevValues) => ({
                     ...prevValues,
-                    [identifier] : (age < 7 || age > 60) ? true : false
+                    [identifier] : (age < 6) || (age > 60) ? true : false
                 }))
             }
 
@@ -157,7 +152,7 @@ export default function SignUpForm() {
             { name: 'Email', id: 'email', type: typeEmail, placeholder: 'email', value: enteredInput.email, error: errors.email, invalid: enteredInputIsInvalid.email, required:true, onChange: (e) => inputHandle('email', e.target.value), onBlur : (e) => inputBlurHandle('email', e.target.value)},
             { name: 'Male', id: 'male', type: typeCheckBox, checked: (enteredInput.gender == 'male' ? true : false), value: 'male', required: genderStatusRequired, error: errors.male, onChange: (e) => inputHandle('gender', e.target.value)},
             { name: 'Female', id: 'female', type: typeCheckBox, checked: (enteredInput.gender == 'female' ? true : false), value: 'female', required: genderStatusRequired, error: errors.female, onChange: (e) => inputHandle('gender', e.target.value)},
-            { name: 'DateOfBirth', id: 'date_of_birth', type: typeDate, value: enteredInput.dateOfBirth, error: errors.dateOfBirth, required:true, onChange: (e) => inputHandle('dateOfBirth', e.target.value), onBlur : (e) => inputBlurHandle('dateOfBirth', e.target.value)},            
+            { name: 'DateOfBirth', id: 'date_of_birth', type: typeDate, value: enteredInput.dateOfBirth, invalid: enteredInputIsInvalid.dateOfBirth, error: errors.dateOfBirth, required:true, onChange: (e) => inputHandle('dateOfBirth', e.target.value), onBlur : (e) => inputBlurHandle('dateOfBirth', e.target.value)},            
             { name: 'PhoneNumber', id: 'phone_number', type: typePhone, placeholder: 'phone number', value: enteredInput.phoneNumber, error: errors.phoneNumber, invalid: enteredInputIsInvalid.phone, required:true, onChange: (value) => inputHandle('phoneNumber', value), onBlur : (e) => inputBlurHandle('phone', e.target.value)},
             { name: 'Password', id: 'password', type: typePassword, placeholder: 'passord', error: errors.password, required: true, onBlur : (e) => inputBlurHandle('password', e.target.value)},
             { name: 'Location', id: 'location', type: typeLocation, value: enteredInput.city, cityList, stateList, stateId: enteredInput.state_id, error: errors.location, invalid: enteredInputIsInvalid.city, required:true , onChangeState: (e) => inputHandle('state', e), onChangeCity: (e) => inputHandle('city', e), onBlur : (e) => inputBlurHandle('city', e.target.value)},
@@ -165,7 +160,6 @@ export default function SignUpForm() {
     }
 
     const postRequest = async (data) => {
-        console.log({req_input:data})
         try {
             const response = await fetch("/api/v2/register",{ 
                 method: "POST",
@@ -177,13 +171,8 @@ export default function SignUpForm() {
         
             if(response.ok)
             {
-                console.log({give_some_response:response})
-                console.log('done')
                 localStorage.removeItem("newuser")
                 const reqResults = await response.json()
-                console.log({total_response:reqResults})
-                const contentParse = JSON.parse(reqResults.token.content)
-                console.log({token_only: contentParse.token})
                 localStorage.setItem('auth', JSON.stringify(reqResults))
                 navigate('/', {replace: true})
             } else { //if(response.status >= 400 && response.status <= 600)
@@ -192,7 +181,10 @@ export default function SignUpForm() {
             }
         } catch (error) {
 
-            if(error.backendReport != undefined && Array.isArray(error.backendReport.errors) && error.backendReport.errors.sql_state == null)
+            if(error.backendReport != undefined && 
+                Array.isArray(error.backendReport.errors) && 
+                error.backendReport.errors.sql_state == null
+            )
             {
                 error.backendReport.errors.map((item) => {
                     console.log({test: item})
@@ -222,10 +214,11 @@ export default function SignUpForm() {
         
         const pw = event.target.password.value
         const requestData = reconstructPostInput(enteredInput, pw)
-        console.log(requestData)
         foundInvalidInputData(enteredInputIsInvalid)
         postRequest(requestData)
     }
+
+    console.log({dateOfbirth_valid:enteredInputIsInvalid.dateOfBirth})
 
     return (
         <>
