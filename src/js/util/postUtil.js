@@ -69,6 +69,7 @@ export function CamelCaseToSnakeCase(string)
 
 export function camelCaseToLoWithSpace(data)
 {
+    console.log(data)
     const firstName = 'FirstName'
     const lastName = 'LastName'
     const dateOfBirth = 'DateOfBirth'
@@ -76,35 +77,32 @@ export function camelCaseToLoWithSpace(data)
     const female = 'Female'
     const phone = 'PhoneNumber'
     const city = 'City'
-
-    for (const key in data) {
             
-            let newKey = ''
+    let newKey = ''
 
-            switch (key){
-                case firstName:
-                    newKey = 'first name'
-                    break
-                case lastName:
-                    newKey = 'last name'
-                    break
-                case dateOfBirth:
-                    newKey = 'date of birth'
-                    break
-                case male || female :
-                    newKey = 'gender'
-                    break
-                case phone :
-                    newKey = 'phone number'
-                    break
-                case city :
-                    newKey = 'location'
-                    break
-                default:
-                    newKey = key
-            }
-          return { [data[key]] : newKey }
+    switch (data){
+        case firstName:
+            newKey = 'first name'
+            break
+        case lastName:
+            newKey = 'last name'
+            break
+        case dateOfBirth:
+            newKey = 'date of birth'
+            break
+        case male || female :
+            newKey = 'gender'
+            break
+        case phone :
+            newKey = 'phone number'
+            break
+        case city :
+            newKey = 'location'
+            break
+        default:
+            newKey = data
     }
+    return newKey
 }
 
 export {prepRequestFields, inputValidList}

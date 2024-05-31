@@ -1,20 +1,21 @@
 import { useState } from 'react'
-import { NavLink } from 'react-router-dom'
-import classes from './MainNavigation.module.css'
+import { NavLink, Form, useRouteLoaderData } from 'react-router-dom'
+// import classes from './MainNavigation.module.css'
 
 function MainNavigation() {
+    const token = useRouteLoaderData('root')
 
     const [openNav, setOpenNav] = useState(false);
-    const [openAvatarDropdown, setOpenAvatarDropdown] = useState(false);
+    // const [openAvatarDropdown, setOpenAvatarDropdown] = useState(false);
 
     const toggleNav = () => {
         setOpenNav(!openNav);
-        setOpenAvatarDropdown(false);
+        // setOpenAvatarDropdown(false);
     };
 
-    const toggleAvatarDropdown = () => {
-        setOpenAvatarDropdown(!openAvatarDropdown);
-    };
+    // const toggleAvatarDropdown = () => {
+    //     setOpenAvatarDropdown(!openAvatarDropdown);
+    // };
 
     const [colorChange, setColorchange] = useState(false);
 
@@ -54,14 +55,33 @@ function MainNavigation() {
                 >
                     Services
                 </NavLink> */}
-                <NavLink
-                    to="/sign-up"
-                    className={({ isActive, isPending }) =>
-                        isPending ? "pending" : isActive ? "text-cyan-200 underline decoration-solid underline-offset-8 decoration-2 decoration-cyan-200" : ""
-                    }
-                >
-                    Registration
-                </NavLink>
+                {token &&
+                    <Form action="/logout" method="post">
+                        <button>
+                            logout
+                        </button>
+                    </Form>
+                }
+                {!token &&
+                    <>
+                        <NavLink
+                            to="/sign-up"
+                            className={({ isActive, isPending }) =>
+                                isPending ? "pending" : isActive ? "text-cyan-200 underline decoration-solid underline-offset-8 decoration-2 decoration-cyan-200" : ""
+                            }
+                        >
+                            Registration
+                        </NavLink>
+                        <NavLink
+                        to="/login"
+                        className={({ isActive, isPending }) =>
+                            isPending ? "pending" : isActive ? "text-cyan-200 underline decoration-solid underline-offset-8 decoration-2 decoration-cyan-200" : ""
+                        }
+                        >
+                            login
+                        </NavLink>
+                    </>
+                }
             </>
         );
     };
@@ -114,8 +134,7 @@ function MainNavigation() {
                         {navList()}
                     </nav>
                     <section
-                        className={`${openNav ? '' : 'hidden'
-                            } mt-4 bg-gradient-to-r from-violet-500 to-opacity-90 flex flex-col gap-4 p-6  rounded text-cyan-400`}
+                        className={`${openNav ? '' : 'hidden'} mt-4 bg-gradient-to-r from-violet-500 to-opacity-90 flex flex-col gap-4 p-6  rounded text-cyan-400`}
                     >
                         {navList()}
                     </section>

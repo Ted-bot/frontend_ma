@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom'
 import SignUpInterface from '../interface/SignUpInterface.jsx'
-import { PostError } from '../js/error/PostError.js'
-import { reconstructPostInput, foundInvalidInputData, prepRequestFields, inputValidList } from '../js/util/postUtil.js'
+import { PostError } from '../../js/error/PostError.js'
+import { reconstructPostInput, foundInvalidInputData, prepRequestFields, inputValidList } from '../../js/util/postUtil.js'
 import { GetState, GetCity } from "react-country-state-city";
 
 const typeText = 'text'
@@ -23,13 +23,15 @@ function getInputValues(){
     return JSON.parse(storedValues) 
 }
 
+// ps mace@email.com pw:7k_b3N&8@@*!
+
 export default function SignUpForm() {
 
     const countryid = 156
     const regexSearch = /^[A-Za-z]+$/
 
-    const [ save, setSave ] = useState()
-    let navigate = useNavigate()
+    const navigate = useNavigate()
+    const isSubmitting = navigate.state === 'submitting'
 
     const [genderStatusRequired, setGenderStatusRequired] = useState(true)
     const [enteredInput, setEnteredInput] = useState(getInputValues)
@@ -84,7 +86,9 @@ export default function SignUpForm() {
 
         if(identifier == 'city')
             {
+                console.log({passes_value: event.target.value})
                 const city = cityList[event.target.value]
+                console.log({city_object: city})
                 updateEnteredInputState(identifier, city.name)
                 updateEnteredInputState('city_id', city.id)
                 updateEnteredInputState('city_list_nr', event.target.value)
@@ -116,6 +120,7 @@ export default function SignUpForm() {
                 const currentYear = new Date().getFullYear();
                 const year = event.split("-")[0]
                 const age = currentYear - year
+                console.log({year:year, age:age})
 
                 setEnteredInputIsInvalid((prevValues) => ({
                     ...prevValues,
@@ -147,15 +152,15 @@ export default function SignUpForm() {
         titleTextArea: 'Message',
         descriptionToJoinTextArea: 'What caught your interest to join our training sessions',
         setItems : [
-            { name: 'FirstName', id: 'first_name', type: typeText, placeholder: 'first name', value: enteredInput.firstName, error: errors.first_name, invalid: enteredInputIsInvalid.firstName, required:true , onChange: (e) => inputHandle('firstName', e.target.value), onBlur : (e) => inputBlurHandle('firstName', e.target.value)},
-            { name: 'LastName', id: 'last_name', type: typeText, placeholder: 'last name', value: enteredInput.lastName, error: errors.last_name, invalid: enteredInputIsInvalid.lastName, required:true , onChange: (e) => inputHandle('lastName', e.target.value), onBlur : (e) => inputBlurHandle('lastName', e.target.value)},
+            { name: 'FirstName', id: 'first_name', type: typeText, placeholder: 'first name', value: enteredInput.firstName, error: errors.firstName, invalid: enteredInputIsInvalid.firstName, required:true , onChange: (e) => inputHandle('firstName', e.target.value), onBlur : (e) => inputBlurHandle('firstName', e.target.value)},
+            { name: 'LastName', id: 'last_name', type: typeText, placeholder: 'last name', value: enteredInput.lastName, error: errors.lastName, invalid: enteredInputIsInvalid.lastName, required:true , onChange: (e) => inputHandle('lastName', e.target.value), onBlur : (e) => inputBlurHandle('lastName', e.target.value)},
             { name: 'Email', id: 'email', type: typeEmail, placeholder: 'email', value: enteredInput.email, error: errors.email, invalid: enteredInputIsInvalid.email, required:true, onChange: (e) => inputHandle('email', e.target.value), onBlur : (e) => inputBlurHandle('email', e.target.value)},
             { name: 'Male', id: 'male', type: typeCheckBox, checked: (enteredInput.gender == 'male' ? true : false), value: 'male', required: genderStatusRequired, error: errors.male, onChange: (e) => inputHandle('gender', e.target.value)},
             { name: 'Female', id: 'female', type: typeCheckBox, checked: (enteredInput.gender == 'female' ? true : false), value: 'female', required: genderStatusRequired, error: errors.female, onChange: (e) => inputHandle('gender', e.target.value)},
-            { name: 'DateOfBirth', id: 'date_of_birth', type: typeDate, value: enteredInput.dateOfBirth, error: errors.date_of_birth, required:true, onChange: (e) => inputHandle('dateOfBirth', e.target.value), onBlur : (e) => inputBlurHandle('dateOfBirth', e.target.value)},            
-            { name: 'PhoneNumber', id: 'phone_number', type: typePhone, placeholder: 'phone number', value: enteredInput.phoneNumber, error: errors.phone_number, invalid: enteredInputIsInvalid.phone, required:true, onChange: (value) => inputHandle('phoneNumber', value), onBlur : (e) => inputBlurHandle('phone', e.target.value)},
+            { name: 'DateOfBirth', id: 'date_of_birth', type: typeDate, value: enteredInput.dateOfBirth, error: errors.dateOfBirth, required:true, onChange: (e) => inputHandle('dateOfBirth', e.target.value), onBlur : (e) => inputBlurHandle('dateOfBirth', e.target.value)},            
+            { name: 'PhoneNumber', id: 'phone_number', type: typePhone, placeholder: 'phone number', value: enteredInput.phoneNumber, error: errors.phoneNumber, invalid: enteredInputIsInvalid.phone, required:true, onChange: (value) => inputHandle('phoneNumber', value), onBlur : (e) => inputBlurHandle('phone', e.target.value)},
             { name: 'Password', id: 'password', type: typePassword, placeholder: 'passord', error: errors.password, required: true, onBlur : (e) => inputBlurHandle('password', e.target.value)},
-            { name: 'Location', id: 'location', type: typeLocation, value: enteredInput.city, cityList, stateList, stateId: enteredInput.state_id, error: errors.location, selectedStateIndexNr: enteredInput.state_id, selectedCityIndexNr: enteredInput.city_id, invalid: enteredInputIsInvalid.city, required:true , onChangeState: (e) => inputHandle('state', e), onChangeCity: (e) => inputHandle('city', e), onBlur : (e) => inputBlurHandle('city', e.target.value)},
+            { name: 'Location', id: 'location', type: typeLocation, value: enteredInput.city, cityList, stateList, stateId: enteredInput.state_id, error: errors.location, invalid: enteredInputIsInvalid.city, required:true , onChangeState: (e) => inputHandle('state', e), onChangeCity: (e) => inputHandle('city', e), onBlur : (e) => inputBlurHandle('city', e.target.value)},
         ]
     }
 
@@ -179,7 +184,6 @@ export default function SignUpForm() {
                 console.log({total_response:reqResults})
                 const contentParse = JSON.parse(reqResults.token.content)
                 console.log({token_only: contentParse.token})
-                setSave(reqResults)
                 localStorage.setItem('auth', JSON.stringify(reqResults))
                 navigate('/', {replace: true})
             } else { //if(response.status >= 400 && response.status <= 600)
@@ -223,8 +227,6 @@ export default function SignUpForm() {
         postRequest(requestData)
     }
 
-    console.log({success: save})
-
     return (
         <>
             <section className="flex flex-col items-center shadow-md bg-slate-100 py-5 rounded-md px-3 sm:mx-4 w-full sm:px-5 sm:w-4/5 md:px-3 md:shadow-xl">
@@ -261,8 +263,9 @@ export default function SignUpForm() {
                         className="w-full py-3 mt-10 bg-[#063970] rounded-md
                         font-medium text-white uppercase
                         focus:outline-none hover:shadow-none"
+                        disabled={isSubmitting}
                     >
-                        {InterfaceConfiguration.buttonname}
+                        {isSubmitting  ? 'Submitting...' : InterfaceConfiguration.buttonname}
                     </button>
 
                     <section className="flex justify-center pt-6 pb-4">
