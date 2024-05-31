@@ -1,6 +1,6 @@
 import PhoneInput from 'react-phone-number-input/input'
 import NativeSelect from '@mui/material/NativeSelect'
-import { camelCaseToLoWithSpace } from '../../js/util/postUtil'
+import { camelCaseToLoWithSpace } from '../../../js/util/postUtil'
 
 /* eslint-disable react/prop-types */
 // eslint-disable-next-line no-unused-vars
@@ -12,17 +12,16 @@ export default function LabelNameInput({
     invalid,
     cityList, 
     stateList,
-    // selectedStateIndexNr, 
-    // selectedCityIndexNr, 
     onChangeState,
     onChangeCity,
     ...props 
 }) {
 
     let checkBox = 0
-    let optionStateList = {}
-    let optionCitiesList = {}
+    let optionStateList = []
+    let optionCitiesList = []
     const lowerCaseName = camelCaseToLoWithSpace(name)
+
     if(type === 'checkbox'){
         checkBox = 1
     }
@@ -39,6 +38,8 @@ export default function LabelNameInput({
         }))
     }
 
+    console.log(optionCitiesList)
+    console.log(optionStateList)
 
     return (
         <>
@@ -50,7 +51,9 @@ export default function LabelNameInput({
                     {
                         (type != 'tel' && type != 'location') ? 
                             <input 
-                                className={`${checkBox === 1 ? 'h-8 w-8 lg:h-12 lg:w-12 accent-orange-300' : 'w-full appearance-none'} ${invalid || error && 'border-red-500'} block bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`} 
+                                className={`${checkBox === 1 ? 'h-8 w-8 lg:h-12 lg:w-12 accent-orange-300' : 'w-full appearance-none'} 
+                                ${invalid != undefined && invalid != '' || error != undefined && error != '' && 'border-red-500'} 
+                                block bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`} 
                                 id={id}
                                 name={name} 
                                 type={type}
@@ -59,7 +62,9 @@ export default function LabelNameInput({
                             />
                         : type === 'tel' ?
                             <PhoneInput
-                                className={`${invalid || error && 'border-red-500'} w-full appearance-none block bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`}
+                                className={`${invalid != undefined && invalid != '' || error != undefined && error != '' && 'border-red-500'} 
+                                w-full appearance-none block bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight 
+                                focus:outline-none focus:bg-white`}
                                 country="NL"
                                 {...props}
                             />
@@ -71,7 +76,11 @@ export default function LabelNameInput({
                                         onChange={onChangeState}
                                         placeholder='select state ...' 
                                     >
-                                        {optionStateList.map((value, index) => (<option key={index} value={index}>{value.label}</option>))}
+                                        {
+                                            optionStateList instanceof Array && 
+                                            optionStateList.length > 0 && 
+                                            optionStateList.map((value, index) => (<option key={index} value={index}>{value.label}</option>))
+                                        }
                                     </NativeSelect>
                                     <NativeSelect
                                         className={`w-full block text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`}
@@ -79,7 +88,11 @@ export default function LabelNameInput({
                                         placeholder='select city ...'
                                         autoFocus 
                                     >
-                                        {optionCitiesList.map((value, index) => (<option key={index} value={index}>{value.label}</option>))}
+                                        {
+                                            optionCitiesList instanceof Array && 
+                                            optionCitiesList.length > 0 && 
+                                            optionCitiesList.map((value, index) => (<option key={index} value={index}>{value.label}</option>))
+                                        }
                                     </NativeSelect>
                                 </ section> 
                         </>
@@ -90,7 +103,7 @@ export default function LabelNameInput({
                 {invalid && type == 'checkbox' &&  <p className="text-red-500 text-xs italic">Please fill gender</p>}
                 {invalid && type == 'date' &&  <p className="text-red-500 text-xs italic">Sorry, only between the age of 7 and 60 years can sign in!</p>}
                 {invalid && type == 'tel' &&  <p className="text-red-500 text-xs italic">Please fill in your {lowerCaseName}</p>}
-                {(error != '') && <p className="text-red-500 text-xs italic">{error}</p>}
+                {(error != undefined && error != '') && <section className="text-red-500 text-xs italic">{error}</section>}
             </section>
         </>
     )
