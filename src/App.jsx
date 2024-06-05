@@ -8,8 +8,10 @@ import RootLayout from './pages/Root.jsx'
 import HomePage from './pages/HomePage.jsx'
 import SignUpPage from './pages/SignUpPage.jsx'
 import LoginPage from './pages/LoginPage.jsx'
+import Dashboard from './pages/Dashboard.jsx'
 import {logoutAction} from './pages/Logout.jsx'
 import {tokenLoader} from './js/util/auth.js'
+// import UsersPage from './pages/admin/UsersPage.jsx'
 
 function App() {
   // const [count, setCount] = useState(0)
@@ -24,6 +26,8 @@ function App() {
         { path: '/sign-up', element: <SignUpPage /> },
         { path: '/login', element: <LoginPage /> },
         { path: '/logout', action: logoutAction },
+        { path: '/dashboard/*', element: <Dashboard /> },
+        // { path: '/users/*', element: <Dashboard /> },
       ]  
     }
   ])
