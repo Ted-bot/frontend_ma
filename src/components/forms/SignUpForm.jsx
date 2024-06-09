@@ -1,8 +1,21 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate,
+    useNavigation,
+    // useLocation 
+} from 'react-router-dom'
 import SignUpInterface from '../interface/SignUpInterface.jsx'
 import { PostError } from '../../js/error/PostError.js'
-import { reconstructPostInput, foundInvalidInputData, prepRequestFields, inputValidList } from '../../js/util/postUtil.js'
+import { reconstructPostInput,
+    ApiFetch,
+    ApiFetchPostOptions,
+    foundInvalidInputData,
+    prepRequestFields,
+    inputValidList,
+    setLocalStorageItem,
+    deleteLocalStorageItem,
+    getNewUserObjOrStorageData,
+    setToken,
+} from '../../js/util/postUtil.js'
 import { GetState, GetCity } from "react-country-state-city";
 
 const typeText = 'text'
@@ -13,28 +26,22 @@ const typeDate = 'date'
 const typeCheckBox = 'checkbox'
 const typeLocation = 'location'
 
-function getInputValues(){
-    const storedValues = localStorage.getItem('newuser')
-
-    if(!storedValues){
-        return prepRequestFields
-    }
-
-    return JSON.parse(storedValues) 
-}
-
 // ps mace@email.com pw:7k_b3N&8@@*!
 
 export default function SignUpForm() {
 
     const countryid = 156
     const regexSearch = /^[A-Za-z]+$/
+    const nameStorageItem = 'newuser'
 
     const navigate = useNavigate()
-    const isSubmitting = navigate.state === 'submitting'
+    const navigation = useNavigation()
+    // const locationNav = useLocation()
+    
+    let isSubmitting = navigation.state === 'submitting'
 
     const [genderStatusRequired, setGenderStatusRequired] = useState(true)
-    const [enteredInput, setEnteredInput] = useState(getInputValues)
+    const [enteredInput, setEnteredInput] = useState(getNewUserObjOrStorageData(nameStorageItem))
     const [enteredInputIsInvalid, setEnteredInputIsInvalid] = useState(inputValidList)
     
     const [singleRequest, setSingleRequest] = useState(true)
@@ -53,13 +60,9 @@ export default function SignUpForm() {
     }, [singleRequest])
     
     useEffect(() => {
-        setLocalStorage(enteredInput)
+        setLocalStorageItem(nameStorageItem,enteredInput)
     }, [enteredInput])
 
-    function setLocalStorage(enteredInput){
-        localStorage.setItem('newuser', JSON.stringify(enteredInput))
-    }
-    
     function inputHandle(identifier, event){
 
         if(identifier == 'gender' && event == 'male' || event == 'female')
@@ -149,76 +152,82 @@ export default function SignUpForm() {
         setItems : [
             { name: 'FirstName', id: 'first_name', type: typeText, placeholder: 'first name', value: enteredInput.firstName, error: errors.firstName, invalid: enteredInputIsInvalid.firstName, required:true , onChange: (e) => inputHandle('firstName', e.target.value), onBlur : (e) => inputBlurHandle('firstName', e.target.value)},
             { name: 'LastName', id: 'last_name', type: typeText, placeholder: 'last name', value: enteredInput.lastName, error: errors.lastName, invalid: enteredInputIsInvalid.lastName, required:true , onChange: (e) => inputHandle('lastName', e.target.value), onBlur : (e) => inputBlurHandle('lastName', e.target.value)},
-            { name: 'Email', id: 'email', type: typeEmail, placeholder: 'email', value: enteredInput.email, error: errors.email, invalid: enteredInputIsInvalid.email, required:true, onChange: (e) => inputHandle('email', e.target.value), onBlur : (e) => inputBlurHandle('email', e.target.value)},
+            { name: 'Email', id: 'email', type: typeEmail, placeholder: 'email', value: enteredInput.email, error: errors.email, invalid: enteredInputIsInvalid.email, autoComplete: 'email', required:true, onChange: (e) => inputHandle('email', e.target.value), onBlur : (e) => inputBlurHandle('email', e.target.value)},
             { name: 'Male', id: 'male', type: typeCheckBox, checked: (enteredInput.gender == 'male' ? true : false), value: 'male', required: genderStatusRequired, error: errors.male, onChange: (e) => inputHandle('gender', e.target.value)},
             { name: 'Female', id: 'female', type: typeCheckBox, checked: (enteredInput.gender == 'female' ? true : false), value: 'female', required: genderStatusRequired, error: errors.female, onChange: (e) => inputHandle('gender', e.target.value)},
             { name: 'DateOfBirth', id: 'date_of_birth', type: typeDate, value: enteredInput.dateOfBirth, invalid: enteredInputIsInvalid.dateOfBirth, error: errors.dateOfBirth, required:true, onChange: (e) => inputHandle('dateOfBirth', e.target.value), onBlur : (e) => inputBlurHandle('dateOfBirth', e.target.value)},            
             { name: 'PhoneNumber', id: 'phone_number', type: typePhone, placeholder: 'phone number', value: enteredInput.phoneNumber, error: errors.phoneNumber, invalid: enteredInputIsInvalid.phone, required:true, onChange: (value) => inputHandle('phoneNumber', value), onBlur : (e) => inputBlurHandle('phone', e.target.value)},
-            { name: 'Password', id: 'password', type: typePassword, placeholder: 'passord', error: errors.password, required: true, onBlur : (e) => inputBlurHandle('password', e.target.value)},
+            { name: 'Password', id: 'password', type: typePassword, placeholder: 'passord', error: errors.password, autoComplete: 'current-password', required: true, onBlur : (e) => inputBlurHandle('password', e.target.value)},
             { name: 'Location', id: 'location', type: typeLocation, value: enteredInput.city, cityList, stateList, stateId: enteredInput.state_id, error: errors.location, invalid: enteredInputIsInvalid.city, required:true , onChangeState: (e) => inputHandle('state', e), onChangeCity: (e) => inputHandle('city', e), onBlur : (e) => inputBlurHandle('city', e.target.value)},
         ]
     }
 
     const postRequest = async (data) => {
         try {
-            const response = await fetch("/api/v2/register",{ 
-                method: "POST",
-                headers: {
-                    "Content-Type":"application/json",
-                },
-                body: JSON.stringify(data)
-            })
+            const options = { url: '/api/v2/register', method: 'POST'}
+            const ApiOptions = ApiFetchPostOptions(options,data)            
+            const response = ApiFetch(ApiOptions)
         
-            if(response.ok)
-            {
-                localStorage.removeItem("newuser")
-                const reqResults = await response.json()
-                localStorage.setItem('auth', JSON.stringify(reqResults))
-                navigate('/', {replace: true})
-            } else { //if(response.status >= 400 && response.status <= 600)
+            if(!response.ok)
+            { //if(response.status >= 400 && response.status <= 600)
                 const errorJson = await response.json()
-                throw new PostError(response, errorJson)
+                throw new PostError('Api Sign up error', errorJson)
             }
+
+            deleteLocalStorageItem(nameStorageItem)
+            const reqResults = await response.json()
+            setToken(reqResults)
+            navigate('/dashboard') 
+            // redirect
+
         } catch (error) {
 
-            if(error.backendReport != undefined && 
-                Array.isArray(error.backendReport.errors) && 
-                error.backendReport.errors.sql_state == null
+            if(
+                error.response != undefined && 
+                error.response != '' &&
+                !error.response.errors.error
             )
             {
-                error.backendReport.errors.map((item) => {
-                    console.log({test: item})
+                error.response.errors instanceof Array &&
+                error.response.errors.map((error) => {
                     setErrors((prevValues) => {
                         return {
                             ...prevValues,
-                            [item.property] : item.message
+                            [error.property] : error.message
                         }
                     })
                 })
-            }
-            else if(error.backendReport != undefined && Object.keys(error.backendReport.errors).length === 4) {
-                setErrors(() => {
-                    return {
-                        [error.backendReport.errors.property[0]]: error.backendReport.errors.message
-                    }
-                })
             } else {
-                console.log(error)
+
+                if(error.response instanceof Object){
+                    const arrayProperties = error.response.errors.property[0]
+                    const messageError = error.response.errors.message
+                    
+                    setErrors((prevValues) => {
+                        return {
+                            ...prevValues,
+                            [arrayProperties] : messageError
+                        }
+                    })
+                } else {
+                    console.log(error)
+                }
             }
+
         }
     }
 
-
     function handleSubmit(event, enteredInput, enteredInputIsInvalid) {
-        event.preventDefault()
-        
+        event.preventDefault()        
+        // console.log({redirect: redirect})
         const pw = event.target.password.value
         const requestData = reconstructPostInput(enteredInput, pw)
         foundInvalidInputData(enteredInputIsInvalid)
         postRequest(requestData)
     }
 
-    console.log({dateOfbirth_valid:enteredInputIsInvalid.dateOfBirth})
+    console.log({state: navigate})
+    console.log({submitting: isSubmitting})
 
     return (
         <>

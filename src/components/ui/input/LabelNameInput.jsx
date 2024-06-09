@@ -54,7 +54,6 @@ export default function LabelNameInput({
                                 id={id}
                                 name={name} 
                                 type={type}
-                                autoComplete='off'
                                 {...props}
                             />
                         : type === 'tel' ?
