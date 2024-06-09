@@ -1,5 +1,9 @@
 // import { useState } from 'react'
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { createBrowserRouter,
+  RouterProvider,
+  // useLocation,
+  // matchPath
+ } from 'react-router-dom'
 
 // import reactLogo from './assets/react.svg'
 // import viteLogo from '/vite.svg'
@@ -8,12 +12,25 @@ import RootLayout from './pages/Root.jsx'
 import HomePage from './pages/HomePage.jsx'
 import SignUpPage from './pages/SignUpPage.jsx'
 import LoginPage from './pages/LoginPage.jsx'
-import Dashboard from './pages/Dashboard.jsx'
+import DashboardPage from './pages/DashboardPage.jsx'
 import {logoutAction} from './pages/Logout.jsx'
 import {tokenLoader} from './js/util/auth.js'
 // import UsersPage from './pages/admin/UsersPage.jsx'
 
 function App() {
+  // const {pathname} = useLocation()
+
+  // const patterns = [
+  //   "/:dashboard/:firstKey/:secondKey/:thirdKey/:fourthKey",
+  //   "/:dashboard/:firstKey/:secondKey/:thirdKey",
+  //   "/:dashboard/:firstKey/:secondKey",
+  //   "/:dashboard/:firstKey"
+  // ]
+
+  // const match = patterns.reduce(
+  //   (match, pattern) => (matchPath(pattern, match) ? match : patter),
+  //   pathname
+  // )
   // const [count, setCount] = useState(0)
   const router = createBrowserRouter([
     { 
@@ -26,8 +43,7 @@ function App() {
         { path: '/sign-up', element: <SignUpPage /> },
         { path: '/login', element: <LoginPage /> },
         { path: '/logout', action: logoutAction },
-        { path: '/dashboard/*', element: <Dashboard /> },
-        // { path: '/users/*', element: <Dashboard /> },
+        { path: '/dashboard/*', element: <DashboardPage />}
       ]  
     }
   ])

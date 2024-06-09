@@ -26,6 +26,75 @@ const inputValidList = {
     password: false,
 }
 
+export function ApiFetchPostOptions(defineRequest, data, headerOptions = null) {
+    return {
+       url: defineRequest.url, 
+       method: defineRequest.method,
+       headers: {
+           "Content-Type":"application/json",
+           ...headerOptions
+       },
+       body: JSON.stringify(data)
+   }
+}
+
+export function ApiFetchGetOptions(defineRequest,headerOptions = null) {
+    return {
+       url: defineRequest.url, 
+       method: defineRequest.method,
+       headers: {
+           "Content-Type":"application/json",
+           ...headerOptions
+       },
+   }
+}
+
+export async function ApiFetch(data){
+    
+    const url = data.url
+    delete data.url
+    const res = await fetch(url, data)
+
+    return res
+}
+
+export function setLocalStorageItem(name,data){
+    localStorage.setItem(name, JSON.stringify(data))
+}
+
+export function getLocalStorageItem(name){
+    return JSON.parse(localStorage.getItem(name))
+}
+
+export function deleteLocalStorageItem(name){
+    localStorage.removeItem(name)
+}
+
+export function setToken(data){
+    if(localStorage.getItem('auth') != null){
+        localStorage.removeItem('auth')
+    }
+    localStorage.setItem('auth', JSON.stringify(data))
+}
+
+export function getToken(){
+    return  localStorage.getItem('auth') != null ? JSON.parse(localStorage.getItem('auth')) : null
+}
+
+export function deleteToken(){
+    localStorage.removeItem("auth")
+}
+
+export function getNewUserObjOrStorageData(name){
+    const storedValues = localStorage.getItem(name)
+
+    if(!storedValues){
+        return prepRequestFields
+    }
+
+    return JSON.parse(storedValues) 
+}
+
 export function reconstructPostInput(data, pw)
 {        
         let requiredPostRequestFields = {
@@ -69,7 +138,6 @@ export function CamelCaseToSnakeCase(string)
 
 export function camelCaseToLoWithSpace(data)
 {
-    console.log(data)
     const firstName = 'FirstName'
     const lastName = 'LastName'
     const dateOfBirth = 'DateOfBirth'
