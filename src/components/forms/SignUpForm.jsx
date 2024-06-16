@@ -27,6 +27,9 @@ const typeCheckBox = 'checkbox'
 const typeLocation = 'location'
 
 // ps mace@email.com pw:7k_b3N&8@@*!
+// ps reset pw:84N@^7ad8sh
+// ps reset pw:TNrh5vrZ4N201n2
+// ps reset pw:GivjJD4guFwQhzv
 
 export default function SignUpForm() {
 

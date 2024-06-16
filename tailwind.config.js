@@ -19,6 +19,9 @@ export default {
       },
       fontFamily: {
         'fondamento': ["Fondamento"],
+      },
+      translate: {
+        '50per' : '50%'
       }     
     },
   },

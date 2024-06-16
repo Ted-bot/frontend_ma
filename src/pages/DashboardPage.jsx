@@ -4,6 +4,8 @@ import { AdminGuesser,
     ResourceGuesser,
 } from '@api-platform/admin'
 import { Layout } from 'react-admin'
+// import { createTheme } from '@mui/material/styles'
+
 import MyMenu from '../components/navigations/DashboardNavigation.jsx'
 import ProfileList from '../dataProvider/Profile/ProfileList.jsx'
 import UserCreate from '../dataProvider/User/UserCreate.jsx'
@@ -22,6 +24,25 @@ import UsersDashboardPage from './admin/UsersDashboardPage'
 
 export default function DashboardPage() {
 
+    // const theme = createTheme({
+    //     breakpoints: {
+    //         values: {
+    //           mobile: 0,
+    //           tablet: 640,
+    //           laptop: 1024,
+    //           desktop: 1200,
+    //         },
+    //         palette: {
+    //             primary: {
+    //                 main: purple[500],
+    //             },
+    //             secondary: {
+    //                 main: green[500],
+    //             },
+    //         },
+    //     }
+    // })
+
     const dataProvider = hydraDataProvider({ entrypoint: '/api' })
     const schemaAnalyzer = hydraSchemaAnalyzer()
     const itemLocalstorage = 'user'
@@ -34,17 +55,17 @@ export default function DashboardPage() {
         login: async ({ email, password }) => {
             
             const apiOptions = {url: '/api/v1/login', method: 'POST'}
-            const prepareQuery = ApiFetchPostOptions(apiOptions,{ email, password })
-            const authenticatClient = await ApiFetch(prepareQuery)
+            const prepareQueryObj = ApiFetchPostOptions(apiOptions,{ email, password })
+            const authenticateClient = await ApiFetch(prepareQueryObj)
             
-            if(!authenticatClient.ok)
+            if(!authenticateClient.ok)
             {
                 console.log({redirect: 'failed!'})
-                const response = await authenticatClient.json()
+                const response = await authenticateClient.json()
                 throw new PostError('Api Login error', response)  
             }
 
-            return Promise.resolve(authenticatClient)           
+            return Promise.resolve(authenticateClient)           
 
         },
         logout: () => {
@@ -69,7 +90,7 @@ export default function DashboardPage() {
             const userData = getLocalStorageItem(itemLocalstorage)
             return Promise.resolve({
                 id: userData.id,
-                fullName: userData.name,
+                fullName: userData.firstName + ' ' + userData.lastName,
             })},
         getPermissions: () => Promise.resolve(''),
     }    

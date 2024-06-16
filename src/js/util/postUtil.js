@@ -38,10 +38,10 @@ export function ApiFetchPostOptions(defineRequest, data, headerOptions = null) {
    }
 }
 
-export function ApiFetchGetOptions(defineRequest,headerOptions = null) {
+export function ApiFetchGetOptions(url,headerOptions = null) {
     return {
-       url: defineRequest.url, 
-       method: defineRequest.method,
+       url: url, 
+       method: 'GET',
        headers: {
            "Content-Type":"application/json",
            ...headerOptions
@@ -63,7 +63,8 @@ export function setLocalStorageItem(name,data){
 }
 
 export function getLocalStorageItem(name){
-    return JSON.parse(localStorage.getItem(name))
+
+    return localStorage.getItem(name) != null ? JSON.parse(localStorage.getItem(name)) : null
 }
 
 export function deleteLocalStorageItem(name){
