@@ -20,8 +20,6 @@ import './CalendarModal.css'
 
     return createPortal(
         <dialog ref={dialog} className="result-modal">
-        {/* <dialog ref={dialog} className="z-10 flex flex-col result-modal rounded-md p-8 bg-gray-400 border-gray-700"> */}
-         {/* <dialog ref={dialog} className="c"> */}
             <section>
                 <form method="dialog" className="flex w-4 float-right justify-end">
                     <button className='px-2 rounded-md hover:border-2 hover:border-rose-500 hover:bg-rose-300'>X</button>
