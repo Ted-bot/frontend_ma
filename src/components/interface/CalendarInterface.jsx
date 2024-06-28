@@ -24,15 +24,13 @@ const localizer = dateFnsLocalizer({
   locales,
 })
   export default function CalendarInterface({getPlannedEvents, clickHandle}){
-
-      return (
-        <Calendar
-          localizer={localizer}
-          events={getPlannedEvents}
-          startAccessor="start"
-          endAccessor="end"
-          onSelectEvent={clickHandle}
-          style={{ height: 500 }}
-        />
-      )
+    
+      return (<Calendar
+        localizer={localizer}
+        events={getPlannedEvents}
+        startAccessor="start"
+        endAccessor="end"
+        onSelectEvent={clickHandle}
+        style={{ height: 500 }}
+      />)
 }

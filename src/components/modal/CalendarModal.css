@@ -22,12 +22,6 @@
 .result-modal[open] {
     animation: slide-in-from-top 0.35s ease-out;
   }
-/* .result-modal progress {
-    width: 100%;
-    height: 1.5rem;
-    margin: 0;
-    accent-color: #46cebe;
-} */
 
 @keyframes slide-in-from-top {
     0% {
