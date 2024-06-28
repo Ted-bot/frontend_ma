@@ -8,13 +8,15 @@ import ParagraphCard from '../components/cards/ParagraphCard.jsx';
   
 export default function HomePage() {
   
+  const nameWrap = 'Focus Points'
+
   return (
     <>
         <HomeBillboard />
         <HeroButtonWrap>
           <ActionCallButton />
         </HeroButtonWrap>
-        <FeatureCardsWrap>
+        <FeatureCardsWrap name={nameWrap}>
           <FeatureCard />
           <FeatureCard />
           <FeatureCard />

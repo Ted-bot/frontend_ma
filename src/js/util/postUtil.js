@@ -26,6 +26,17 @@ const inputValidList = {
     password: false,
 }
 
+export function ApiFetchGetOptions(url,headerOptions = null) {
+    return {
+        url: url, 
+        method: 'GET',
+        headers: {
+            "Content-Type":"application/json",
+            ...headerOptions
+        },
+    }
+}
+
 export function ApiFetchPostOptions(defineRequest, data, headerOptions = null) {
     return {
        url: defineRequest.url, 
@@ -35,17 +46,6 @@ export function ApiFetchPostOptions(defineRequest, data, headerOptions = null) {
            ...headerOptions
        },
        body: JSON.stringify(data)
-   }
-}
-
-export function ApiFetchGetOptions(url,headerOptions = null) {
-    return {
-       url: url, 
-       method: 'GET',
-       headers: {
-           "Content-Type":"application/json",
-           ...headerOptions
-       },
    }
 }
 

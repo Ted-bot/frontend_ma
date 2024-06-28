@@ -15,6 +15,7 @@ import LoginPage from './pages/LoginPage.jsx'
 import DashboardPage from './pages/DashboardPage.jsx'
 import {logoutAction} from './pages/Logout.jsx'
 import CalendarPage from './pages/CalendarPage.jsx'
+import OrderPage from './pages/OrderPage.jsx'
 
 import {tokenLoader} from './js/util/auth.js'
 // import UsersPage from './pages/admin/UsersPage.jsx'
@@ -46,7 +47,8 @@ function App() {
         { path: '/login', element: <LoginPage /> },
         { path: '/logout', action: logoutAction },
         { path: '/dashboard/*', element: <DashboardPage />},
-        { path: '/Calendar', element: <CalendarPage />},
+        { path: '/calendar', element: <CalendarPage />},
+        { path: '/order', element: <OrderPage />},
       ]  
     }
   ])

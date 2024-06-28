@@ -1,15 +1,22 @@
-import {useState, useEffect} from 'react'
-import FeatureCardsWrap from '../components/wraps/client/FeatureCardsWrap'; 
-import CalendarEvents from '../components/interface/Calendar';
-import { ApiFetchGetOptions, ApiFetch, getToken } from '../js/util/postUtil';
-import { PostError } from '../js/error/PostError';
+import {useState, useEffect, useCallback, useRef} from 'react'
+import FeatureCardsWrap from '../components/wraps/client/FeatureCardsWrap' 
+import CalendarInterface from '../components/interface/CalendarInterface.jsx'
+import { ApiFetchGetOptions, ApiFetchPostOptions, ApiFetch, getToken } from '../js/util/postUtil'
+import { PostError } from '../js/error/PostError'
 
 import CalendarModal from '../components/modal/CalendarModal.jsx'
 
 export default function CalendarPage(){
 
+    const wrapName = 'Calendar'
     const [plannedEvents, setPlannedEvents] = useState([])
+    const [showInModal, setShowInModal] = useState({
+        title: '',
+        startDateTime: '',
+        endTime: '',
+    })
     const token = getToken()
+    const dialog = useRef()
 
     useEffect(() => {
         getPlannedEvents()
@@ -26,6 +33,7 @@ export default function CalendarPage(){
         }
 
         const events = response['hydra:member'].map((response) => ({
+            id: response.id,
             title: response.title,
             start: new Date(response.startDate),
             end: new Date(response.endDate),
@@ -35,14 +43,40 @@ export default function CalendarPage(){
         setPlannedEvents(events)
     }
 
-    console.log({plannedEvents: plannedEvents})
-    
+    const handleSelectEvent = useCallback(
+        async (event) =>  {
+            dialog.current.open()
+            const extractStartTimeEvent = new Date(event.start)
+            const extractEventTimeEnd = new Date(event.end)
+
+            const extractDay = extractStartTimeEvent.toDateString()
+            const extractStartTimeHours = extractStartTimeEvent.getHours()
+            const extractStartTimeMin = extractStartTimeEvent.getMinutes()
+            const startTimeEvent = extractStartTimeHours + ':' + extractStartTimeMin
+            
+            const extractEndTimeHours = extractEventTimeEnd.getHours()
+            const extractEndTimeMin = extractEventTimeEnd.getMinutes()
+            const endTimeEvent = extractEndTimeHours + ':' + extractEndTimeMin
+
+            setShowInModal((prevValues) => {
+                return {
+                    title: event.title,
+                    day: extractDay,
+                    start: startTimeEvent,
+                    end: endTimeEvent
+                }
+            })
+        },
+        []
+    )
+
     return(
         <>
-            <CalendarModal title={'test'} start='12 AM' end='2 PM' />
-            <FeatureCardsWrap>    
-                <CalendarEvents 
-                    getPlannedEvents={plannedEvents}  
+            <CalendarModal ref={dialog} {...showInModal} />
+            <FeatureCardsWrap name={wrapName}>    
+                <CalendarInterface 
+                    getPlannedEvents={plannedEvents}
+                    clickHandle={handleSelectEvent}  
                 />
             </FeatureCardsWrap>
         </>

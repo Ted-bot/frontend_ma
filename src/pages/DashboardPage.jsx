@@ -4,6 +4,7 @@ import { AdminGuesser,
     ResourceGuesser,
 } from '@api-platform/admin'
 import { Layout } from 'react-admin'
+// import { redirect } from 'react-router-dom'
 // import { createTheme } from '@mui/material/styles'
 
 import MyMenu from '../components/navigations/DashboardNavigation.jsx'
@@ -55,7 +56,7 @@ export default function DashboardPage() {
         login: async ({ email, password }) => {
             
             const apiOptions = {url: '/api/v1/login', method: 'POST'}
-            const prepareQueryObj = ApiFetchPostOptions(apiOptions,{ email, password })
+            const prepareQueryObj = ApiFetchPostOptions(apiOptions,{ username: email, password })
             const authenticateClient = await ApiFetch(prepareQueryObj)
             
             if(!authenticateClient.ok)
@@ -64,7 +65,7 @@ export default function DashboardPage() {
                 const response = await authenticateClient.json()
                 throw new PostError('Api Login error', response)  
             }
-
+            
             return Promise.resolve(authenticateClient)           
 
         },

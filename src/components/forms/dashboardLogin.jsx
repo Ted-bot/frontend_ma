@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Form, redirect } from 'react-router-dom'
 import { useLogin } from 'react-admin'
 import { setToken } from '../../js/util/postUtil'
 
@@ -16,7 +17,7 @@ const MyLoginForm = () => {
             return response.json()
         }).then((response) => {
             setToken(response.token)
-            return response
+            redirect('/api/dashboard')
         })
         .catch((error) => {
             if(error.response != undefined ){
@@ -32,7 +33,7 @@ const MyLoginForm = () => {
                 <section className='flex justify-center'>
                     {errors && <p className="text-red-500 text-xs italic py-3">{errors} </p>}
                 </section>
-                    <form onSubmit={handleSubmit} >
+                    <Form onSubmit={handleSubmit} >
                         <input
                             className={`w-full appearance-none block bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`} 
                             name="email"
@@ -57,7 +58,7 @@ const MyLoginForm = () => {
                         >
                             Login
                         </button>
-                    </form>
+                    </Form>
                 </section>
             </section>
     )

@@ -1,0 +1,53 @@
+.result-modal {
+    position: absolute;
+    border-radius: 30px;
+    padding: 3rem;
+    /* left: 50%; */
+    /* top: 25%; */
+    /* transform: translate(-50%, -50%); */
+    background-color: dimgray;
+}
+
+.result-modal::backdrop {
+    background: rgba(0, 0, 0, 0.9);
+    position: fixed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+
+
+.result-modal[open] {
+    animation: slide-in-from-top 0.35s ease-out;
+  }
+/* .result-modal progress {
+    width: 100%;
+    height: 1.5rem;
+    margin: 0;
+    accent-color: #46cebe;
+} */
+
+@keyframes slide-in-from-top {
+    0% {
+      transform: translateY(-15%);
+      opacity: 0;
+    }
+    100% {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  
+  @keyframes flash {
+    0% {
+      opacity: 0.5;
+    }
+    50% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0.5;
+    }
+  }
