@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { redirect } from 'react-router-dom'
 import { Card, CardContent, CardHeader } from "@mui/material"
 import CssBaseline from '@mui/material/CssBaseline'
 // import { useDataProvider } from 'react-admin'
@@ -8,6 +9,7 @@ import { ApiFetch,
  setLocalStorageItem,
  getLocalStorageItem
 } from '../../js/util/postUtil.js'
+import { getAuthToken } from '../../js/util/auth.js'
 // import Paper from '@mui/material/Paper'
 import Box from '@mui/material/Box'
 // import Stack from '@mui/material/Stack'
@@ -20,36 +22,41 @@ const UsersDashboardPage = () => {
   const [dashboardData,setDashBoardData] = useState({id: '', firstName: '', lastName: '', email: ''})
   const itemLocalstorage = 'user'
   const CurrentStateStorage = getLocalStorageItem(itemLocalstorage) != null ? getLocalStorageItem(itemLocalstorage) : null
+  const token = getAuthToken()
 
   useEffect(() => {
-    console.log('is loading data!!!')
-    requestUserData(getToken())
+    console.log({tokenAvailable: token})
+    requestUserData(token)
     .then((response) => {
+
+      console.log({responseDashboardData: response})
       const storeData = {
         id: response.id,
         firstName: response.firstName,
         lastName: response.lastName,
         email: response.email
-    }
+      }
 
-    console.log({data_before_insertion: response})
-    Object.entries(storeData).map(([key, value]) => {
-      console.log({key, value})
-      setDashBoardData((prevValues) => ({
-        ...prevValues,
-        [key] : value
-      }))
-    })
+      console.log({data_before_insertion: response})
+      Object.entries(storeData).map(([key, value]) => {
+        console.log({key, value})
+        setDashBoardData((prevValues) => ({
+          ...prevValues,
+          [key] : value
+        }))
+      })
 
-    setLocalStorageItem(itemLocalstorage, storeData)
+      setLocalStorageItem(itemLocalstorage, storeData)
     })
     .catch((error) => {
       console.log({userFetchError: error})
+
     })
-  })
+  },[])
 
   const requestUserData = async (token) => {
     const GetUrl = '/api/v1/dashboard/user'
+    console
     const requestOptions = ApiFetchGetOptions(GetUrl, {'X-Authorization': 'Bearer ' + token})
     const request = ApiFetch(requestOptions)
 
@@ -75,7 +82,7 @@ const UsersDashboardPage = () => {
   
   return (
     <Card>
-      <CardHeader sx={{ mx: 2 }} title={`Dashboard ${dashboardData.firstName}`} />
+      <CardHeader sx={{ mx: 2 }} title={`${dashboardData.firstName} Dashboard`} />
       <CssBaseline />
       <CardContent>
         <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)' }}>

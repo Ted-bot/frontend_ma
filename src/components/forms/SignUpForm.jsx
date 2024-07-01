@@ -16,7 +16,7 @@ import { reconstructPostInput,
     getNewUserObjOrStorageData,
     setToken,
 } from '../../js/util/postUtil.js'
-import { GetState, GetCity } from "react-country-state-city";
+import { GetState, GetCity } from "react-country-state-city"
 
 const typeText = 'text'
 const typeEmail = 'email'
@@ -35,7 +35,7 @@ export default function SignUpForm() {
 
     const countryid = 156
     const regexSearch = /^[A-Za-z]+$/
-    const nameStorageItem = 'newuser'
+    const nameStorageItem = 'new_user'
 
     const navigate = useNavigate()
     const navigation = useNavigation()

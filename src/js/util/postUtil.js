@@ -37,7 +37,7 @@ export function ApiFetchGetOptions(url,headerOptions = null) {
     }
 }
 
-export function ApiFetchPostOptions(defineRequest, data, headerOptions = null) {
+export function ApiFetchPostOptions(defineRequest = {url : '', method : 'POST'}, data, headerOptions = null) {
     return {
        url: defineRequest.url, 
        method: defineRequest.method,

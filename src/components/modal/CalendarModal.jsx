@@ -6,8 +6,9 @@ import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
 import './CalendarModal.css'
 
- const CalendarModal = forwardRef(function CalendarModal({ day, title, start, end}, ref){
+ const CalendarModal = forwardRef(function CalendarModal({ id, day, title,description, start, end, handleSubmit}, ref){
     const dialog = useRef()
+    let setTypeEvent
 
     useImperativeHandle(ref, () => {
 
@@ -18,13 +19,33 @@ import './CalendarModal.css'
         }
     })
 
+    
+    const typeEvent = (title)  => {
+        switch(title){
+            case 'training':
+                setTypeEvent = 'text-amber-400';
+                break
+            case 'special':
+                setTypeEvent = 'text-rose-300';
+                break
+            case 'expeditie':
+                setTypeEvent = 'text-teal-400';
+                break
+        }
+
+        return setTypeEvent
+    }
+
     return createPortal(
         <dialog ref={dialog} className="result-modal">
             <section>
                 <form method="dialog" className="flex w-4 float-right justify-end">
                     <button className='px-2 rounded-md hover:border-2 hover:border-rose-500 hover:bg-rose-300'>X</button>
                 </form>
-                <h1 className="text-center underline underline-offset-4 pb-4 text-2xl">{title}</h1>
+                <h1 className={`text-center underline underline-offset-4 pb-4 text-2xl ${typeEvent(title)}`}>{title}</h1>
+            </section>
+            <section className='w-full text-center text-slate-300'>
+                {description}
             </section>
 
             <section>
@@ -93,11 +114,13 @@ import './CalendarModal.css'
                 </Box>
             
                 <section className="flex flex-inline justify-center mt-8">
-                    <button 
-                        className="text-slate-100 h-16 w-42 px-8 rounded-b-full text-2xl rounded-t-full border-0 ring-2 shadow-xl ring-red-500 bg-red-500 bg-gradient-to-r from-red-500 to-yellow-500 transition-all duration-300 hover:from-orange-400 hover:text-yellow-200 hover:to-red-400 hover:ring-red-400 hover:shadow-2xl"
-                    >
-                        Sign Up
-                    </button>
+                    <form onSubmit={(e) => handleSubmit(e, id)}>
+                        <button 
+                            className="text-slate-100 h-16 w-42 px-8 rounded-b-full text-2xl rounded-t-full border-0 ring-2 shadow-xl ring-red-500 bg-red-500 bg-gradient-to-r from-red-500 to-yellow-500 transition-all duration-300 hover:from-orange-400 hover:text-yellow-200 hover:to-red-400 hover:ring-red-400 hover:shadow-2xl"
+                        >
+                            Sign Up
+                        </button>
+                    </form>
                 </section>
             </section>
         </dialog>,

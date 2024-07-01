@@ -17,12 +17,14 @@ const MyLoginForm = () => {
             return response.json()
         }).then((response) => {
             setToken(response.token)
-            redirect('/api/dashboard')
+            redirect('/dashboard')
         })
         .catch((error) => {
+
             if(error.response != undefined ){
                 error.response.errors != undefined && setErrors(error.response.errors)
-            }            
+            }      
+            redirect('/dashboard/login')      
         })
     }
 
@@ -52,7 +54,7 @@ const MyLoginForm = () => {
                             placeholder='Enter Password'
                             onChange={e => setPassword(e.target.value)}
                         />
-                        <button type="submit" className="w-full py-3 mt-10 bg-[#063970] rounded-md
+                        <button className="w-full py-3 mt-10 bg-[#063970] rounded-md
                             font-medium text-white uppercase
                             focus:outline-none hover:shadow-none hover:bg-[#4a8add]"
                         >

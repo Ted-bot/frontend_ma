@@ -1,5 +1,5 @@
 export function getAuthToken(){
-    const token = localStorage.getItem('auth')
+    const token = JSON.parse(localStorage.getItem('auth'))
     return token
 }
 

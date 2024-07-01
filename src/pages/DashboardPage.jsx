@@ -55,7 +55,7 @@ export default function DashboardPage() {
     const authProvider = {
         login: async ({ email, password }) => {
             
-            const apiOptions = {url: '/api/v1/login', method: 'POST'}
+            const apiOptions = {url: '/api/login_check', method: 'POST'}
             const prepareQueryObj = ApiFetchPostOptions(apiOptions,{ username: email, password })
             const authenticateClient = await ApiFetch(prepareQueryObj)
             
@@ -65,6 +65,8 @@ export default function DashboardPage() {
                 const response = await authenticateClient.json()
                 throw new PostError('Api Login error', response)  
             }
+
+            console.log({loggedIn: authenticateClient})
             
             return Promise.resolve(authenticateClient)           
 
@@ -89,16 +91,16 @@ export default function DashboardPage() {
         },
         getIdentity: () => {
             const userData = getLocalStorageItem(itemLocalstorage)
+
             return Promise.resolve({
-                id: userData.id,
-                fullName: userData.firstName + ' ' + userData.lastName,
+                id: userData?.id,
+                fullName: userData?.firstName + ' ' + userData?.lastName,
             })},
         getPermissions: () => Promise.resolve(''),
     }    
 
     const MyLayout = props => <Layout {...props} menu={MyMenu} />
 
-    // console.log({user: UserName})
     return (
         <>
             <AdminGuesser
