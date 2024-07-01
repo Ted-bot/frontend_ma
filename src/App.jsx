@@ -13,9 +13,10 @@ import HomePage from './pages/HomePage.jsx'
 import SignUpPage from './pages/SignUpPage.jsx'
 import LoginPage from './pages/LoginPage.jsx'
 import DashboardPage from './pages/DashboardPage.jsx'
-import {logoutAction} from './pages/Logout.jsx'
+import {logoutAction} from './pages/ActionLogout.jsx'
 import CalendarPage from './pages/CalendarPage.jsx'
 import OrderPage from './pages/OrderPage.jsx'
+import PaymentPage from './pages/admin/PaymentPage.jsx'
 
 import {tokenLoader} from './js/util/auth.js'
 // import UsersPage from './pages/admin/UsersPage.jsx'
@@ -49,6 +50,7 @@ function App() {
         { path: '/dashboard/*', element: <DashboardPage />},
         { path: '/calendar', element: <CalendarPage />},
         { path: '/order', element: <OrderPage />},
+        { path: '/payment', element: <PaymentPage />},
       ]  
     }
   ])

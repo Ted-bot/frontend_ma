@@ -1,0 +1,157 @@
+   
+    .rbc-header {
+        color: white;
+        font-size: 14px !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 36px !important;
+        background: #333031;
+    }
+
+    /* Toolbar */
+
+    .rbc-btn-group button {
+        color: rgba(239, 244, 247, 1);
+        background-color: #8e1b3e;
+    }
+
+    /* */
+
+    /* Day class */
+    .rbc-day-bg {
+        color: #ffffff;
+    }
+
+    /* */
+  
+  
+    /* Week class */
+    .rbc-time-slot {
+        background-color:rgba(255, 207, 35, 0.8);
+    }
+  
+    .rbc-time-slot:not {
+        background-color:rgb(34, 11, 3, 0.8);
+    }
+
+    .rbc-time-column {
+        background-color: rgba(255, 207, 35, 0.8);
+    }
+
+    .rbc-timeslot-group {
+        height: 10rem;
+    }
+
+    .rbc-event,
+    .rbc-background-content {
+        z-index: 2;
+        padding: 0px !important;
+        border: none !important;
+        background-color: #a2c7dd;
+        /* background-color: none; */
+    }
+
+    /* end Week Class */
+
+  /* end day Class */
+
+  /* Month class */
+
+  .rbc-month-row {
+    /* background-color:rgba(250, 157, 91, 0.8); */
+    background-color:rgba(239, 244, 247, 1);
+  }
+
+  .rbc-now {
+    background-color:rgba(250, 157, 91, 0.8);
+  }
+
+   .rbc-current button {
+    border-radius: 30px;
+    background-color: rgba(255, 207, 35, 0.8);
+    padding: 2.5px;
+  }
+  /* */
+
+
+  /* Agenda 8 */
+  .rbc-agenda-table {
+    border-color: #e85c32;
+    /* display: none; */
+  }
+  
+  .rbc-agenda-table thead {
+    /* border-color: #e85c32; */
+    display: none;
+  }
+
+  .rbc-agenda-date-cell {
+    color: rgb(247, 189, 96);
+    background-color: rgba(142, 27, 62, 0.8);
+  }
+
+  .rbc-agenda-time-cell {
+    color: rgb(171, 35, 76);
+    background-color: rgba(239, 244, 247, 1);
+    /* background-color: rgba(239, 244, 247, 1); */
+  }
+
+  .rbc-agenda-event-cell {
+    background-color: rgba(239, 244, 247, 1);
+    text-align: center;
+    line-height: 3rem;
+    /* border-radius: 0%; */
+  }
+
+  .rbc-agenda-event-cell:hover {
+    color: rgb(252, 251, 250);
+    background-color: rgb(245, 124, 18);
+    /* border-radius: 0%; */
+  }
+
+  /* end agenda */
+
+  
+  .rbc-allday-cell {
+    display: none;
+  }
+  
+  .rbc-time-header-cell .rbc-today {
+    background-color: #ff5e31 !important;
+  }
+  
+  .rbc-time-slot {
+    color: #74a4c3;
+    z-index: 1;
+  }
+  
+  .rbc-time-slot:not(.rbc-today .rbc-time-slot) {
+    color: rgb(195, 28, 53);
+    background-color: #eff4f7;
+  }
+  
+  /*Event Styles*/
+  .rbc-event,
+  .rbc-background-event {
+    z-index: 2;
+    /* background-color: #e85c32; */
+    padding: 0px !important;
+    border: none !important;
+  }
+  
+  .rbc-event-label {
+    display: none !important;
+  }
+  
+  .rbc-events-container {
+    width: 100% !important;
+  }
+  
+  /*Timeslots Customization*/
+  .rbc-day-slot .rbc-time-slot:after {
+    content: "";
+    width: 100%;
+    border-top: 2px dotted #fbb3ec;
+    display: block;
+  }
