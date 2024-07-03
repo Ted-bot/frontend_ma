@@ -1,6 +1,6 @@
 import SelectedOrderForPaymentInterface from "../../interface/SelectedOrderForPaymentInterface"
 
-export default function SelectedOrderForPaymentForm(){
+export default function SelectedOrderForPaymentForm({latestOrder}){
 
     return(
         <>
@@ -9,7 +9,7 @@ export default function SelectedOrderForPaymentForm(){
                     <h1 className={`flex justify-center pt-3 pb-6 text-2xl`}>Order</h1>
                 </section>
                 <form action="" name='address' id='address'>
-                    <SelectedOrderForPaymentInterface />
+                    <SelectedOrderForPaymentInterface latestOrder={latestOrder} />
                 </form>
             </section>
         </>
