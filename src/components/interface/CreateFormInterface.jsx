@@ -1,7 +1,7 @@
 import LabelNameInput from "../ui/input/LabelNameInput"
 
 // eslint-disable-next-line react/prop-types
-export default function CreateInterfaceForm({array}) {
+export default function CreateFormInterface({array}) {
 
         return array.map((item) => (
         <LabelNameInput 

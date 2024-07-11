@@ -169,7 +169,7 @@ const AddressForm = () => {
     
     return (
         <>
-        <section className="flex flex-col shadow-md bg-slate-100 py-5 rounded-md px-3 sm:mx-4 w-full sm:px-5 sm:w-4/5 md:px-3 md:shadow-xl">
+        <section className="flex flex-col shadow-md bg-slate-100 py-5 rounded-md px-3 sm:mx-4 sm:px-5 sm:w-full md:px-3 md:shadow-xl">
             <section>
                 <h1 className={`flex justify-center pt-3 pb-6 text-2xl`}>{addressForm.name}</h1>
             </section>

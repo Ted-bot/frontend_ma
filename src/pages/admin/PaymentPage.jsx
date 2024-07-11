@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { 
     ApiFetchGetOptions,
     ApiFetch,
+    setLocalStorageItem,
     getToken
  } from "../../js/util/postUtil"
 
@@ -15,6 +16,7 @@ const PaymentPage = () => {
     }, [])
 
     const token = getToken()
+    const [currencyType, setCurrencyType] = useState(null)
     const [userOrder, setUserOrder] = useState(null)
 
     const ApiRequest = async () => {
@@ -28,6 +30,8 @@ const PaymentPage = () => {
         }
 
         console.log({ responseShopOrder: response })       
+
+        setLocalStorageItem(response.curreny.name,response.curreny.symbol)
         
         setUserOrder(response) 
     }

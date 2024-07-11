@@ -3,7 +3,7 @@ import { useNavigate,
     useNavigation,
     // useLocation 
 } from 'react-router-dom'
-import SignUpInterface from '../interface/SignUpInterface.jsx'
+import CreateFormInterface from '../interface/CreateFormInterface.jsx'
 import { PostError } from '../../js/error/PostError.js'
 import { reconstructPostInput,
     ApiFetch,
@@ -241,7 +241,7 @@ export default function SignUpForm() {
                 <form onSubmit={(e) => handleSubmit(e, enteredInput, enteredInputIsInvalid)} name='sign-up' id='sign-up'>
 
                     <section className="flex flex-wrap -mx-3 mb-6">
-                       <SignUpInterface array={InterfaceConfiguration.setItems} />                        
+                       <CreateFormInterface array={InterfaceConfiguration.setItems} />                        
                     </section>
 
                     <label className="w-full">
