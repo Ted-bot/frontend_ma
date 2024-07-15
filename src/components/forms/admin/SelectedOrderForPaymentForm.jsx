@@ -21,6 +21,7 @@ export default function SelectedOrderForPaymentForm({latestOrder}){
                     { latestOrder?.lastOrder != undefined && <SelectedOrderForPaymentInterface latestOrder={latestOrder.lastOrder} />}
                 </section>
                 
+                {/* User Order */}
                 <section>
                     <Box sx={{ display: 'grid', gridTemplateRows: 'repeat(4, 1fr)' }}>
                         <Grid 

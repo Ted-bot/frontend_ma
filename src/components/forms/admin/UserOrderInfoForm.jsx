@@ -1,11 +1,15 @@
 import {useEffect, useState} from 'react'
 import { Form } from "react-router-dom"
-import AddressInterface from "../../interface/AddressInterface.jsx"
+import UserOrderInfoInterface from '../../interface/UserOrderInfoInterface'
 import { setLocalStorageItem } from '../../../js/util/postUtil.js'
 import { GetState, GetCity } from "react-country-state-city"
+import { alpha } from "@mui/material"
+import Divider from '@mui/material/Divider'
 
 const inputValidList = {
-    unitNumber: false,
+    firstAndLastName: false,
+    email: false,
+    phoneNumber: false,
     streetNumber: false,
     addressLine: false,
     city: false,
@@ -16,12 +20,15 @@ const inputValidList = {
     // countryId: false,
 }
 
-const AddressForm = () => {
+const UserOrderInfoForm = ({user}) => {
 
     const addressStorageName = 'user_address'
     const countryid = 156
     const typeLocation = 'location'
     const prepRequestFields = {
+        firstAndLastName:'',
+        email:'',
+        phoneNumber:'',
         unitNumber: '',
         streetNumber: '',
         addressLine: '',
@@ -36,8 +43,8 @@ const AddressForm = () => {
     
     const regexSearch = /^[A-Za-z]+$/
     const regexDigitSearch = /^[d+]+$/
-    const formAddress = getUserAddressObjOrStorageData(addressStorageName)
-    const [enteredInput, setEnteredInput] = useState(formAddress)
+    const userFormInfo = getUserInfoObjOrStorageData(addressStorageName)
+    const [enteredInput, setEnteredInput] = useState(userFormInfo)
     // const [enteredInput, setEnteredInput] = useState(getNewUserObjOrStorageData(nameStorageItem))
     const [enteredInputIsInvalid, setEnteredInputIsInvalid] = useState(inputValidList)
 
@@ -57,7 +64,7 @@ const AddressForm = () => {
     }, [singleRequest])
 
 
-    function getUserAddressObjOrStorageData(name){
+    function getUserInfoObjOrStorageData(name){
         const storedValues = localStorage.getItem(name)
     
         if(!storedValues){
@@ -77,7 +84,7 @@ const AddressForm = () => {
     }
 
     function inputHandle(identifier, event){
-        
+        console.log({onchange: event.target.value})
         console.log({identifier, event: event?.target?.value})
         if(identifier == 'state')
             {
@@ -136,24 +143,76 @@ const AddressForm = () => {
             {
                 setEnteredInputIsInvalid((prevValues) => ({
                     ...prevValues,
-                    [identifier] : regexSearch.test(event) ? false : true
+                    [identifier] : regexSearch.test(event.target.value) ? false : true
                 }))
+                return
             }
 
         if(type == 'number')
             {
+                console.log({isNumber: event.target.value})
                 setEnteredInputIsInvalid((prevValues) => ({
                     ...prevValues,
-                    [identifier] : Number.isInteger(Number(event)) ? false : true
+                    [identifier] : Number.isInteger(Number(event.target.value)) ? false : true
                 }))
+                return
             }
+
             
+
+            setEnteredInputIsInvalid((prevValues) => ({
+                ...prevValues,
+                [identifier] : (event.target.value == '') ? true : false
+            }))
+            
+    }
+
+    const UserForm = {
+        name: 'Personal Information',
+        fields : [
+            {
+                name: 'First- and LastName', 
+                id: 'firstAndLastName', 
+                type: 'text', 
+                placeholder: 'type first and last name', 
+                value: user?.firstAndLastName ? user.firstAndLastName : enteredInput.firstAndLastName, 
+                invalid: enteredInputIsInvalid.firstAndLastName, 
+                error: 'error', 
+                required : true, 
+                onChange: (e) => inputHandle('firstAndLastName', e), 
+                onBlur: (e) => inputBlurHandle('firstAndLastName', e)
+            },
+            {
+                name: 'E-mail', 
+                id: 'email', 
+                type: 'email', 
+                placeholder: 'email', 
+                autoComplete: 'email',
+                value: user?.email ? user?.email : enteredInput.email, 
+                invalid: enteredInputIsInvalid.email, 
+                error: 'error', 
+                required : true, 
+                onChange: (e) => inputHandle('email', e), 
+                onBlur: (e) => inputBlurHandle('email', e)},
+            {
+                name: 'Phone Number', 
+                id: 'phone_number', 
+                type: 'tel', 
+                placeholder: 'type phone number', 
+                value: user?.phoneNumber ? user?.phoneNumber : enteredInput.phoneNumber, 
+                invalid: enteredInputIsInvalid.phoneNumber, 
+                error: 'error', 
+                required : true, 
+                onChange: (e) => inputHandle('phoneNumber', e), 
+                onBlur: (e) => inputBlurHandle('phoneNumber', e)
+            },
+        ],
     }
     
     const addressForm = {
         name: 'Address',
         fields : [
-            {name: 'unitNumber', id: 'unit_number', type: 'text', placeholder: 'unit number', value: enteredInput.unitNumber, invalid: enteredInputIsInvalid.unitNumber, error: 'error', required : true, onChange: (e) => inputHandle('unitNumber', e), onBlur: (e) => inputBlurHandle('unitNumber', e)},
+            {name: 'unitNumber', id: 'unit_number', type: 'text', placeholder: 'unit number', value: enteredInput.unitNumber, invalid: enteredInputIsInvalid.unitNumber, error: 'error',  onChange: (e) => inputHandle('unitNumber', e), onBlur: (e) => inputBlurHandle('unitNumber', e)},
             {name: 'streetNumber', id: 'street_number', type: 'number', placeholder: 'street number', min: 0, value: enteredInput.streetNumber, invalid: enteredInputIsInvalid.streetNumber, error: 'error', required : true, onChange: (e) => inputHandle('streetNumber', e), onBlur: (e) => inputBlurHandle('streetNumber', e)},
             {name: 'addressLine', id: 'address_line', type: 'text', placeholder: 'address line', value: enteredInput.addressLine, invalid: enteredInputIsInvalid.addressLine, error: 'error', required : true, onChange: (e) => inputHandle('addressLine', e), onBlur: (e) => inputBlurHandle('addressLine', e)},
             // {name: 'region', id: 'region', type: 'text', placeholder: 'region', value: enteredInput.region, invalid: enteredInputIsInvalid.region, error: 'error', required : true, onChange: (e) => inputHandle('region', e.target.value), onBlur: (e) => inputBlurHandle('region', e.target.value)},
@@ -166,15 +225,21 @@ const AddressForm = () => {
     setLocalStorageItem(addressStorageName,enteredInput)
     
     console.log({enteredInputIsInvalid: enteredInputIsInvalid})
+    console.log({enteredInput: enteredInput})
     
     return (
         <>
         <section className="flex flex-col shadow-md bg-slate-100 py-5 rounded-md px-3 sm:mx-4 sm:px-5 sm:w-full md:px-3 md:shadow-xl">
-            <section>
-                <h1 className={`flex justify-center pt-3 pb-6 text-2xl`}>{addressForm.name}</h1>
-            </section>
             <form action="" name='address' id='address'>
-                <AddressInterface array={addressForm.fields} />
+                <section>
+                    <h1 className={`flex justify-center pt-3 pb-6 text-2xl`}>{UserForm.name}</h1>
+                    <UserOrderInfoInterface array={UserForm.fields} />
+                </section>
+                <Divider sx={{marginRight: '1.2rem', marginLeft: '1.2rem' , borderBottomWidth: 2, marginTop: 2, marginBottom: 1, backgroundColor: alpha('#90caf9', 0.8) }} />
+                <section>
+                    <h1 className={`flex justify-center pt-3 pb-6 text-2xl`}>{addressForm.name}</h1>
+                    <UserOrderInfoInterface array={addressForm.fields} />
+                </section>
             </form>
         </section>
     </>
@@ -182,4 +247,4 @@ const AddressForm = () => {
 }
 
 
-export default AddressForm
+export default UserOrderInfoForm

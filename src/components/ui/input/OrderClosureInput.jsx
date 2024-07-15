@@ -1,8 +1,10 @@
 import { 
     getLocalStorageItem
  } from "../../../js/util/postUtil"
+import Divider from '@mui/material/Divider'
+import { alpha } from "@mui/material"
 
-export default function OrderClosureInput({name, qty, price, totalPrice}){
+export default function OrderClosureInput({name, qty, price, totalPrice, subscriptionType, startSubscription, endSubscription}){
     const currencyType = 'EUR'
     // console.log({price})
     return (
@@ -18,9 +20,21 @@ export default function OrderClosureInput({name, qty, price, totalPrice}){
                         <input 
                             className="w-8 bg-opacity-100 font-bold rounded-md text-center"
                             type="text"
-                            value={qty}
+                            defaultValue={qty}
                         />
                     </section>
+                    {subscriptionType !== 'no_duration' && <section>
+                        <Divider sx={{ borderBottomWidth: 1, marginTop: 1, marginBottom: 1, backgroundColor: alpha('#90caf9', 0.5) }} />
+                            <section className="text-neutral-700 font-medium">
+                             {subscriptionType == 'month' &&  qty}   {subscriptionType} 
+                            </section>
+                            <section className="inline-flex text-sm">
+                                <span className="text-rose-500 font-semibold">{startSubscription}</span>
+                                <span className="text-neutral-500 font-semibold">&nbsp; t/m &nbsp;</span>                            
+                                <span className="text-rose-500 font-semibold">{endSubscription}</span>
+                            </section>
+                        <Divider sx={{ borderBottomWidth: 1, marginTop: 1, marginBottom: 1, backgroundColor: alpha('#90caf9', 0.5) }} />
+                    </section>}
                     <section className="font-bold text-neutral-500/80 sm:text-base md:text-xl">
                     {getLocalStorageItem(currencyType)} {totalPrice}
                     </section>

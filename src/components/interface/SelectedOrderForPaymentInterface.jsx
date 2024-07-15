@@ -17,6 +17,9 @@ export default function SelectedOrderForPaymentInterface({latestOrder}){
                     totalPrice={orderLine.totalProductPrice}
                     price={orderLine.productPrice}
                     qty={orderLine.quantity}
+                    subscriptionType={orderLine.productSubscription}
+                    startSubscription={orderLine?.productSubscriptionStart}                    
+                    endSubscription={orderLine?.productSubscriptionEnd}                    
                     // {...orderline}
                     // clickHandler={}
                 />

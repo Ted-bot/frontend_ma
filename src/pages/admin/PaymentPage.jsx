@@ -6,8 +6,8 @@ import {
     getToken
  } from "../../js/util/postUtil"
 
-import AddressForm from "../../components/forms/admin/AddressForm"
-import OrderForm from "../../components/forms/admin/SelectedOrderForPaymentForm"
+import UserOrderInfoForm from "../../components/forms/admin/UserOrderInfoForm"
+import SelectedOrderForPaymentForm from "../../components/forms/admin/SelectedOrderForPaymentForm"
 
 const PaymentPage = () => {
 
@@ -18,6 +18,7 @@ const PaymentPage = () => {
     const token = getToken()
     const [currencyType, setCurrencyType] = useState(null)
     const [userOrder, setUserOrder] = useState(null)
+    const [userInfo, setUserInfo] = useState(null)
 
     const ApiRequest = async () => {
         const ApiOptions = ApiFetchGetOptions('/api/v1/order',{'X-Authorization': 'Bearer ' + token})
@@ -32,14 +33,23 @@ const PaymentPage = () => {
         console.log({ responseShopOrder: response })       
 
         setLocalStorageItem(response.curreny.name,response.curreny.symbol)
+
+        setUserInfo(response.user)
         
-        setUserOrder(response) 
+        setUserOrder({
+            orderId: response?.orderId,
+            currency: response?.currency,
+            lastOrder: response?.lastOrder,
+            orderTaxPrice: response?.orderTaxPrice,
+            orderTotalAmount: response?.orderTotalAmount,
+            orderTotalProductPrice: response?.orderTotalProductPrice,
+        }) 
     }
 
     return (
         <>
-            <AddressForm />
-            <OrderForm latestOrder={userOrder} />
+            <UserOrderInfoForm user={userInfo} />
+            <SelectedOrderForPaymentForm latestOrder={userOrder} />
         </>
     )
 }

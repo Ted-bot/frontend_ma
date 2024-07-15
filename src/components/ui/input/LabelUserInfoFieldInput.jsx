@@ -1,6 +1,8 @@
 import NativeSelect from '@mui/material/NativeSelect'
+import PhoneInput from 'react-phone-number-input/input'
+import { useRef, useState } from 'react'
 
-export default function LabelAddressFieldInput({
+export default function LabelUserInfoFieldInput({
     id,
     name,
     type,
@@ -16,11 +18,8 @@ export default function LabelAddressFieldInput({
 
         let optionStateList = []
         let optionCitiesList = []
-        // const lowerCaseName = camelCaseToLoWithSpace(name)
-    
-        // if(type === 'checkbox'){
-        //     checkBox = 1
-        // }
+        const [userData, setUserData] = useState(null)
+        const ref = useRef()
     
         if(type === 'location'){
             optionStateList = stateList.map((state) => ({
@@ -34,6 +33,12 @@ export default function LabelAddressFieldInput({
             }))
         }
 
+        if(type == 'tel'){
+            console.log({phoneNumber:value})
+        }
+
+
+    // console.log({invalid: invalid, name: name, currentValue: ref.current?.value, phone: `+${value}`})
     return (
         <>
         <section className={`w-full lg:justify-center px-3 mb-6 md:mb-0`}>
@@ -43,18 +48,31 @@ export default function LabelAddressFieldInput({
                 </section>
 
             {
-                (type != 'location') ?
+                (type != 'location' && type != 'tel') ?
                 <input 
                 // ${invalid != undefined && invalid != '' || error != undefined && error != '' && 'border-red-500'} 
-                    className={`${(invalid != false && value == '') && 'border-red-500'}
+                    className={`${(invalid != false && ref?.current?.value == '') && name != 'unitNumber' && 'border-red-500'}
                         w-full appearance-none block bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`
                     } 
+                    ref={ref}
                     id={id}
                     name={name} 
                     type={type}
-                    value={value}
+                    defaultValue={value}
                     {...props}
                 />
+                : type == 'tel' ?
+                    <PhoneInput
+                        className={`${invalid && ref?.current?.value == ''
+                            // || error != undefined && error != '' 
+                            && 'border-red-500'} 
+                        w-full appearance-none block bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight 
+                        focus:outline-none focus:bg-white`}
+                        country="NL"
+                        ref={ref}
+                        value={`+31${value}`}
+                        {...props}
+                    />
                 :
                 <>
                     <section className='flex w-full justify-evenly'>
@@ -85,7 +103,8 @@ export default function LabelAddressFieldInput({
                 </>
                 }
             </label>
-            {invalid != false && value == '' && <p className="text-red-500 text-xs italic">Please fill in a {name} </p>}
+            {console.log({invalid: invalid, name: name, value, value})}
+            {invalid && name != 'unitNumber' && ref?.current?.value == '' && <p className="text-red-500 text-xs italic">Please fill in a {name} </p>}
         </section>
         </>
     )
