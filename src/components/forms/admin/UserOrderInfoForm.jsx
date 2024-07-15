@@ -20,7 +20,7 @@ const inputValidList = {
     // countryId: false,
 }
 
-const UserOrderInfoForm = ({user}) => {
+const UserOrderInfoForm = ({user, address}) => {
 
     const addressStorageName = 'user_address'
     const countryid = 156
@@ -37,6 +37,7 @@ const UserOrderInfoForm = ({user}) => {
         postalCode: '',
         state:'',
         city_id:'',
+        state_id:'',
         city_list_nr:'',
         countryId: countryid
     }
@@ -52,7 +53,6 @@ const UserOrderInfoForm = ({user}) => {
     const [cityList, setCityList] = useState([])
     const [singleRequest, setSingleRequest] = useState(true)
  
- 
     useEffect(() => {
         if(singleRequest){
             setSingleRequest(false)
@@ -60,9 +60,25 @@ const UserOrderInfoForm = ({user}) => {
                 setStateList(result)
             })
 
-        }
-    }, [singleRequest])
+            
 
+            GetCity(countryid, Number(address.reactStateNr)).then((result) => {
+                console.log({cityResults: result})
+                setCityList(result)
+            })
+
+            setEnteredInput((prevValue) => ({
+                ...prevValue,
+                ['city_id']: Number(address.reactCityNr)
+            }))
+            
+            setEnteredInput((prevValue) => ({
+                ...prevValue,
+                ['state_id']: Number(address.reactStateNr)
+            }))
+        }        
+
+    }, [])
 
     function getUserInfoObjOrStorageData(name){
         const storedValues = localStorage.getItem(name)
@@ -84,15 +100,16 @@ const UserOrderInfoForm = ({user}) => {
     }
 
     function inputHandle(identifier, event){
-        console.log({onchange: event.target.value})
-        console.log({identifier, event: event?.target?.value})
+        
         if(identifier == 'state')
             {
-                const state = stateList[event?.target?.value]; //here you will get full state object.
+                console.log({Lijst: stateList})
+                console.log({LijstWaarde: event.target})
+                const state = stateList.find((element) => element.id == Number(event.target.value)); //here you will get full state object.
                 updateEnteredInputState('state_list_nr', event?.target?.value)
                 updateEnteredInputState('state_id', state.id)       
-                updateEnteredInputState(identifier, state.name)
-                GetCity(countryid,state.id).then((result) => {
+                updateEnteredInputState(identifier, state?.name)
+                GetCity(countryid, state.id).then((result) => {
                     console.log({cityResults: result})
                     setCityList(result)
                 })
@@ -103,9 +120,10 @@ const UserOrderInfoForm = ({user}) => {
             {
                 console.log({cityList})
                 const city = cityList[event?.target?.value]
+                console.log({testCityList:city})
                 console.log({cityIndentifier: city})
                 updateEnteredInputState('city_list_nr', event?.target?.value)
-                updateEnteredInputState('city_id', city.id)
+                updateEnteredInputState('city_id', city?.id)
                 updateEnteredInputState(identifier, city?.name)
                 return
             }
@@ -156,9 +174,7 @@ const UserOrderInfoForm = ({user}) => {
                     [identifier] : Number.isInteger(Number(event.target.value)) ? false : true
                 }))
                 return
-            }
-
-            
+            }            
 
             setEnteredInputIsInvalid((prevValues) => ({
                 ...prevValues,
@@ -218,7 +234,7 @@ const UserOrderInfoForm = ({user}) => {
             // {name: 'region', id: 'region', type: 'text', placeholder: 'region', value: enteredInput.region, invalid: enteredInputIsInvalid.region, error: 'error', required : true, onChange: (e) => inputHandle('region', e.target.value), onBlur: (e) => inputBlurHandle('region', e.target.value)},
             {name: 'postalCode', id: 'postal_code', type: 'text', placeholder: 'postal code', value: enteredInput.postalCode, invalid: enteredInputIsInvalid.postalCode, error: 'error', required : true, onChange: (e) => inputHandle('postalCode', e), onBlur: (e) => inputBlurHandle('postalCode', e)},
             // {name: 'countryId', id: 'country_id', type: 'text', placeholder: 'country', value: enteredInput.countryId, invalid: enteredInputIsInvalid.countryId, error: 'error', required : true, onChange: (e) => inputHandle('countryId', e.target.value), onBlur: (e) => inputBlurHandle('countryId', e.target.value)},
-            { name: 'Location', id: 'location', type: typeLocation, value: enteredInput.city, cityList, stateList, stateId: enteredInput.state_id, invalid: enteredInputIsInvalid.city, required:true , onChangeState: (e) => inputHandle('state', e), onChangeCity: (e) => inputHandle('city', e), onBlur : (e) => inputBlurHandle('city', e)},
+            { name: 'Location', id: 'location', type: typeLocation, value: enteredInput.city, defaultValueCity: enteredInput.city_id, defaultValueState: enteredInput.state_id, cityList, stateList, invalid: enteredInputIsInvalid.city, required:true , onChangeState: (e) => inputHandle('state', e), onChangeCity: (e) => inputHandle('city', e), onBlur : (e) => inputBlurHandle('city', e)},
         ],
     }
 
@@ -226,6 +242,7 @@ const UserOrderInfoForm = ({user}) => {
     
     console.log({enteredInputIsInvalid: enteredInputIsInvalid})
     console.log({enteredInput: enteredInput})
+    console.log({LijstState: stateList})
     
     return (
         <>

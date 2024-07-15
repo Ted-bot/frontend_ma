@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { 
     ApiFetchGetOptions,
     ApiFetch,
@@ -19,6 +19,7 @@ const PaymentPage = () => {
     const [currencyType, setCurrencyType] = useState(null)
     const [userOrder, setUserOrder] = useState(null)
     const [userInfo, setUserInfo] = useState(null)
+    const [userAddress, setUserAddress] = useState(null)
 
     const ApiRequest = async () => {
         const ApiOptions = ApiFetchGetOptions('/api/v1/order',{'X-Authorization': 'Bearer ' + token})
@@ -35,7 +36,7 @@ const PaymentPage = () => {
         setLocalStorageItem(response.curreny.name,response.curreny.symbol)
 
         setUserInfo(response.user)
-        
+        setUserAddress(response.address)
         setUserOrder({
             orderId: response?.orderId,
             currency: response?.currency,
@@ -48,7 +49,7 @@ const PaymentPage = () => {
 
     return (
         <>
-            <UserOrderInfoForm user={userInfo} />
+            {userAddress?.reactStateNr != undefined && <UserOrderInfoForm user={userInfo} address={userAddress} />}
             <SelectedOrderForPaymentForm latestOrder={userOrder} />
         </>
     )

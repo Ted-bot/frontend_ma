@@ -7,6 +7,8 @@ export default function LabelUserInfoFieldInput({
     name,
     type,
     value,
+    defaultValueCity,
+    defaultValueState,
     invalid,
     city,
     state,
@@ -37,8 +39,14 @@ export default function LabelUserInfoFieldInput({
             console.log({phoneNumber:value})
         }
 
+        if(type == 'location'){
+            console.log({stateListOPtions:stateList})
+            console.log({cityListOPtions:cityList})
+            console.log({DefaultValueCity:defaultValueCity})
+            console.log({DefaultValueState:defaultValueState})
+        }
 
-    // console.log({invalid: invalid, name: name, currentValue: ref.current?.value, phone: `+${value}`})
+
     return (
         <>
         <section className={`w-full lg:justify-center px-3 mb-6 md:mb-0`}>
@@ -77,26 +85,27 @@ export default function LabelUserInfoFieldInput({
                 <>
                     <section className='flex w-full justify-evenly'>
                             <NativeSelect
+                                value={defaultValueState}
                                 className={`w-full block text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`}
                                 onChange={onChangeState}
-                                placeholder='select state ...' 
+                                placeholder='select state ...'
                             >
                                 {
                                     optionStateList instanceof Array && 
-                                    optionStateList.length > 0 && 
-                                    optionStateList.map((value, index) => (<option key={index} value={index}>{value.label}</option>))
+                                    optionStateList?.length > 0 && 
+                                    optionStateList?.map((value, index) => (<option key={index} value={value.value}>{value.label}</option>))
                                 }
                             </NativeSelect>
                             <NativeSelect
+                                value={defaultValueCity}
                                 className={`w-full block text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`}
                                 onChange={onChangeCity}
                                 placeholder='select city ...'
-                                autoFocus 
                             >
                                 {
                                     optionCitiesList instanceof Array && 
-                                    optionCitiesList.length > 0 && 
-                                    optionCitiesList.map((value, index) => (<option key={index} value={index}>{value.label}</option>))
+                                    optionCitiesList?.length > 0 && 
+                                    optionCitiesList.map((value, index) => (<option key={index} value={value.value}>{value.label}</option>))
                                 }
                             </NativeSelect>
                         </ section> 

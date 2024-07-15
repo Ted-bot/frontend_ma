@@ -11,6 +11,7 @@ import Box from '@mui/material/Box'
 export default function SelectedOrderForPaymentForm({latestOrder}){
 
     const currencyType = 'EUR'
+    const paymentCurrency = getLocalStorageItem(currencyType)
 
     return(
         <>
@@ -21,7 +22,6 @@ export default function SelectedOrderForPaymentForm({latestOrder}){
                     { latestOrder?.lastOrder != undefined && <SelectedOrderForPaymentInterface latestOrder={latestOrder.lastOrder} />}
                 </section>
                 
-                {/* User Order */}
                 <section>
                     <Box sx={{ display: 'grid', gridTemplateRows: 'repeat(4, 1fr)' }}>
                         <Grid 
@@ -33,7 +33,7 @@ export default function SelectedOrderForPaymentForm({latestOrder}){
                                 <section className="font-medium text-neutral-500/80 sm:text-base md:text-lg">price : </section>
                             </Box>
                             <Box sx={{ marginRight: '0px', marginLeft: 'auto', paddingRight: '1.2rem' }}>
-                                <section className="font-medium text-neutral-500/80 sm:text-base md:text-lg">{getLocalStorageItem(currencyType)} {latestOrder?.orderTotalProductPrice}</section>
+                                <section className="font-medium text-neutral-500/80 sm:text-base md:text-lg">{paymentCurrency} {latestOrder?.orderTotalProductPrice}</section>
                             </Box>
                         </Grid>
                         <Grid
@@ -44,8 +44,8 @@ export default function SelectedOrderForPaymentForm({latestOrder}){
                             <Box sx={{ paddingLeft: '1.2rem' }}>
                                 <section className="font-medium text-neutral-500/80 sm:text-base md:text-lg">tax (9%): </section>
                             </Box>
-                            <Box item sx={{ marginRight: '0px', marginLeft: 'auto', paddingRight: '1.2rem' }}>
-                                <section className="font-medium text-neutral-500/80 sm:text-base md:text-lg">{getLocalStorageItem(currencyType)} {latestOrder?.orderTaxPrice}</section>
+                            <Box sx={{ marginRight: '0px', marginLeft: 'auto', paddingRight: '1.2rem' }}>
+                                <section className="font-medium text-neutral-500/80 sm:text-base md:text-lg">{paymentCurrency} {latestOrder?.orderTaxPrice}</section>
                             </Box>
                         </Grid>
 
@@ -56,11 +56,11 @@ export default function SelectedOrderForPaymentForm({latestOrder}){
                             direction="row"
                             sx={{ flexGrow: 1}}
                         >
-                            <Box item sx={{ paddingLeft: '1.2rem' }}>
+                            <Box sx={{ paddingLeft: '1.2rem' }}>
                                 <section className="font-bold text-blue-600/80 sm:text-lg md:text-xl">Total Amount : </section>
                             </Box>
-                            <Box item sx={{ marginRight: '0px', marginLeft: 'auto', paddingRight: '1.2rem' }}>
-                                <section className="font-bold text-blue-600/80 sm:text-lg md:text-xl">{getLocalStorageItem(currencyType)} {latestOrder?.orderTotalAmount}</section>
+                            <Box sx={{ marginRight: '0px', marginLeft: 'auto', paddingRight: '1.2rem' }}>
+                                <section className="font-bold text-blue-600/80 sm:text-lg md:text-xl">{paymentCurrency} {latestOrder?.orderTotalAmount}</section>
                             </Box>
                         </Grid>
                     </Box>
