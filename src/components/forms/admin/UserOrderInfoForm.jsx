@@ -58,9 +58,7 @@ const UserOrderInfoForm = ({user, address}) => {
             setSingleRequest(false)
             GetState(countryid).then((result) => {
                 setStateList(result)
-            })
-
-            
+            })           
 
             GetCity(countryid, Number(address.reactStateNr)).then((result) => {
                 console.log({cityResults: result})
@@ -100,11 +98,9 @@ const UserOrderInfoForm = ({user, address}) => {
     }
 
     function inputHandle(identifier, event){
-        
+
         if(identifier == 'state')
             {
-                console.log({Lijst: stateList})
-                console.log({LijstWaarde: event.target})
                 const state = stateList.find((element) => element.id == Number(event.target.value)); //here you will get full state object.
                 updateEnteredInputState('state_list_nr', event?.target?.value)
                 updateEnteredInputState('state_id', state.id)       
@@ -145,18 +141,16 @@ const UserOrderInfoForm = ({user, address}) => {
 
                 }                
             }
-        // updateEnteredInputState(identifier, event)
-        if(identifier != undefined && event != ''){
-            console.log({check: 'enterIfCheck',identifier, event: event?.target?.value})
-            updateEnteredInputState(identifier, event?.target?.value)
-        }              
+
+        if(identifier != undefined && event != '')
+            {
+                console.log({check: 'enterIfCheck',identifier, event: event?.target?.value})
+                updateEnteredInputState(identifier, event?.target?.value)
+            }              
     }
             
     function inputBlurHandle(identifier, event, type='text') {
-        
-        console.log({identifier, event})
-        console.log({textInputStreetNumber:Number.isInteger(Number(event))})
-        
+       
         if(type == 'text')
             {
                 setEnteredInputIsInvalid((prevValues) => ({
@@ -176,10 +170,10 @@ const UserOrderInfoForm = ({user, address}) => {
                 return
             }            
 
-            setEnteredInputIsInvalid((prevValues) => ({
-                ...prevValues,
-                [identifier] : (event.target.value == '') ? true : false
-            }))
+        setEnteredInputIsInvalid((prevValues) => ({
+            ...prevValues,
+            [identifier] : (event.target.value == '') ? true : false
+        }))
             
     }
 
@@ -228,21 +222,68 @@ const UserOrderInfoForm = ({user, address}) => {
     const addressForm = {
         name: 'Address',
         fields : [
-            {name: 'unitNumber', id: 'unit_number', type: 'text', placeholder: 'unit number', value: enteredInput.unitNumber, invalid: enteredInputIsInvalid.unitNumber, error: 'error',  onChange: (e) => inputHandle('unitNumber', e), onBlur: (e) => inputBlurHandle('unitNumber', e)},
-            {name: 'streetNumber', id: 'street_number', type: 'number', placeholder: 'street number', min: 0, value: enteredInput.streetNumber, invalid: enteredInputIsInvalid.streetNumber, error: 'error', required : true, onChange: (e) => inputHandle('streetNumber', e), onBlur: (e) => inputBlurHandle('streetNumber', e)},
-            {name: 'addressLine', id: 'address_line', type: 'text', placeholder: 'address line', value: enteredInput.addressLine, invalid: enteredInputIsInvalid.addressLine, error: 'error', required : true, onChange: (e) => inputHandle('addressLine', e), onBlur: (e) => inputBlurHandle('addressLine', e)},
-            // {name: 'region', id: 'region', type: 'text', placeholder: 'region', value: enteredInput.region, invalid: enteredInputIsInvalid.region, error: 'error', required : true, onChange: (e) => inputHandle('region', e.target.value), onBlur: (e) => inputBlurHandle('region', e.target.value)},
-            {name: 'postalCode', id: 'postal_code', type: 'text', placeholder: 'postal code', value: enteredInput.postalCode, invalid: enteredInputIsInvalid.postalCode, error: 'error', required : true, onChange: (e) => inputHandle('postalCode', e), onBlur: (e) => inputBlurHandle('postalCode', e)},
-            // {name: 'countryId', id: 'country_id', type: 'text', placeholder: 'country', value: enteredInput.countryId, invalid: enteredInputIsInvalid.countryId, error: 'error', required : true, onChange: (e) => inputHandle('countryId', e.target.value), onBlur: (e) => inputBlurHandle('countryId', e.target.value)},
-            { name: 'Location', id: 'location', type: typeLocation, value: enteredInput.city, defaultValueCity: enteredInput.city_id, defaultValueState: enteredInput.state_id, cityList, stateList, invalid: enteredInputIsInvalid.city, required:true , onChangeState: (e) => inputHandle('state', e), onChangeCity: (e) => inputHandle('city', e), onBlur : (e) => inputBlurHandle('city', e)},
+            {
+                name: 'unitNumber',
+                id: 'unit_number',
+                type: 'text',
+                placeholder: 'unit number',
+                value: address.unitNumber ? address.unitNumber : enteredInput.unitNumber,
+                invalid: enteredInputIsInvalid.unitNumber,
+                error: 'error',
+                onChange: (e) => inputHandle('unitNumber', e),
+                onBlur: (e) => inputBlurHandle('unitNumber', e)},
+            {
+                name: 'streetNumber',
+                id: 'street_number',
+                type: 'number',
+                placeholder: 'street number',
+                min: 0, 
+                value: address.streetNumber ? address.streetNumber : enteredInput.streetNumber,
+                invalid: enteredInputIsInvalid.streetNumber,
+                error: 'error',
+                required : true,
+                onChange: (e) => inputHandle('streetNumber', e), onBlur: (e) => inputBlurHandle('streetNumber', e)},
+            {
+                name: 'addressLine',
+                id: 'address_line',
+                type: 'text',
+                placeholder: 'address line',
+                value: address.streetName ? address.streetName : enteredInput.addressLine,
+                invalid: enteredInputIsInvalid.addressLine,
+                error: 'error',
+                equired : true,
+                onChange: (e) => inputHandle('addressLine', e),
+                onBlur: (e) => inputBlurHandle('addressLine', e)},
+            {
+                name: 'postalCode',
+                id: 'postal_code',
+                type: 'text',
+                placeholder: 'postal code',
+                value: address.postalCode ? address.postalCode : enteredInput.postalCode,
+                invalid: enteredInputIsInvalid.postalCode,
+                error: 'error',
+                equired : true, onChange: (e) => inputHandle('postalCode', e),
+                onBlur: (e) => inputBlurHandle('postalCode', e)
+            },
+            {
+                name: 'Location',
+                id: 'location',
+                type: typeLocation, 
+                value: enteredInput.city, 
+                defaultValueCity: address.reactCityNr ? address.reactCityNr : enteredInput.city_id,
+                defaultValueState: address.reactStateNr ? address.reactStateNr : enteredInput.state_id,
+                cityList, 
+                stateList,
+                invalid: enteredInputIsInvalid.city,
+                required:true,
+                onChangeState: (e) => inputHandle('state', e),
+                onChangeCity: (e) => inputHandle('city', e),
+                onBlur : (e) => inputBlurHandle('city', e)
+            },
         ],
     }
 
     setLocalStorageItem(addressStorageName,enteredInput)
-    
-    console.log({enteredInputIsInvalid: enteredInputIsInvalid})
-    console.log({enteredInput: enteredInput})
-    console.log({LijstState: stateList})
     
     return (
         <>
