@@ -13,13 +13,13 @@ export default function SelectedOrderForPaymentInterface({latestOrder}){
         // console.log({line: orderLine.productName})
                 <OrderClosureInput
                     key={key}
-                    name={orderLine.productName}
-                    totalPrice={orderLine.totalProductPrice}
-                    price={orderLine.productPrice}
+                    name={orderLine.name}
+                    totalPrice={orderLine.totalAmount.value}
+                    price={orderLine.unitPrice.value}
                     qty={orderLine.quantity}
-                    subscriptionType={orderLine.productSubscription}
-                    startSubscription={orderLine?.productSubscriptionStart}                    
-                    endSubscription={orderLine?.productSubscriptionEnd}                    
+                    subscriptionType={orderLine.productDetails.subscriptionDetails.productSubscription}
+                    startSubscription={orderLine.productDetails.subscriptionDetails.productSubscriptionStart}                    
+                    endSubscription={orderLine.productDetails.subscriptionDetails.productSubscriptionEnd}                    
                     // {...orderline}
                     // clickHandler={}
                 />

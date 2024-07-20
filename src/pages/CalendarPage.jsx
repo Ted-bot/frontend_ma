@@ -77,7 +77,7 @@ export default function CalendarPage(){
     }
 
     const handleSelectEvent = useCallback(
-        async (event) =>  {
+        (event) =>  { //unnessecary async removed
             // console.log({eventSelected: event})
 
             const selectedDate = new Date(event.start).toLocaleDateString('en-us', options)

@@ -26,13 +26,13 @@ export default function OrderClosureInput({name, qty, price, totalPrice, subscri
                     {subscriptionType !== 'no_duration' && <section>
                         <Divider sx={{ borderBottomWidth: 1, marginTop: 1, marginBottom: 1, backgroundColor: alpha('#90caf9', 0.5) }} />
                             <section className="text-neutral-700 font-medium">
-                             {subscriptionType == 'month' &&  qty}   {subscriptionType} 
+                             valid for {subscriptionType == 'month' &&  qty}   {subscriptionType} 
                             </section>
-                            <section className="inline-flex text-sm">
-                                <span className="text-rose-500 font-semibold">{startSubscription}</span>
-                                <span className="text-neutral-500 font-semibold">&nbsp; t/m &nbsp;</span>                            
-                                <span className="text-rose-500 font-semibold">{endSubscription}</span>
-                            </section>
+                                <section className="inline-flex text-sm">
+                                    <span className="text-rose-500 font-semibold">{startSubscription}</span>
+                                    <span className="text-neutral-500 font-semibold">&nbsp; t/m &nbsp;</span>                            
+                                    <span className="text-rose-500 font-semibold">{endSubscription}</span>
+                                </section>
                         <Divider sx={{ borderBottomWidth: 1, marginTop: 1, marginBottom: 1, backgroundColor: alpha('#90caf9', 0.5) }} />
                     </section>}
                     <section className="font-bold text-neutral-500/80 sm:text-base md:text-xl">

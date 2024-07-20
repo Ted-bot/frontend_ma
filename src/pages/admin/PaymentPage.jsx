@@ -1,10 +1,11 @@
-import { useState, useEffect, Suspense } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { 
     ApiFetchGetOptions,
     ApiFetch,
     setLocalStorageItem,
     getToken
  } from "../../js/util/postUtil"
+ import UserOrderModal from '../../components/modal/UserOrderModal'
 
 import UserOrderInfoForm from "../../components/forms/admin/UserOrderInfoForm"
 import SelectedOrderForPaymentForm from "../../components/forms/admin/SelectedOrderForPaymentForm"
@@ -15,6 +16,7 @@ const PaymentPage = () => {
         ApiRequest()
     }, [])
 
+    const dialog = useRef()
     const token = getToken()
     const [currencyType, setCurrencyType] = useState(null)
     const [userOrder, setUserOrder] = useState(null)
@@ -26,7 +28,7 @@ const PaymentPage = () => {
         const getResults = await ApiFetch(ApiOptions)
         const response = await getResults.json()
 
-        if(!response.lastOrder){
+        if(!response.lines){
             console.log({ response : response})
             throw new {error: 'Not Found!'}
         }
@@ -38,19 +40,28 @@ const PaymentPage = () => {
         setUserInfo(response.user)
         setUserAddress(response.address)
         setUserOrder({
-            orderId: response?.orderId,
-            currency: response?.currency,
-            lastOrder: response?.lastOrder,
-            orderTaxPrice: response?.orderTaxPrice,
-            orderTotalAmount: response?.orderTotalAmount,
-            orderTotalProductPrice: response?.orderTotalProductPrice,
+            orderId: response.orderId,
+            currency: response.currency,
+            lastOrder: response.lines,
+            orderTaxPrice: response.orderTaxPrice,
+            orderTotalAmount: response.amount.value,
+            orderTotalProductPrice: response.orderTotalProductPrice,
         }) 
     }
 
+    const handleSelectEvent = useCallback(
+        (event) =>  { //unnessecary async removed
+            // console.log({eventSelected: event})
+
+            
+            dialog.current.open()
+        })
+
     return (
         <>
-            {userAddress?.reactStateNr != undefined && <UserOrderInfoForm user={userInfo} address={userAddress} />}
-            <SelectedOrderForPaymentForm latestOrder={userOrder} />
+            {userAddress?.reactStateNr != undefined && <UserOrderModal ref={dialog} user={userInfo} address={userAddress}/>}
+            {/* {userAddress?.reactStateNr != undefined && <UserOrderInfoForm handleClick={handleSelectEvent} user={userInfo} address={userAddress} />} */}
+            {userAddress?.reactStateNr != undefined && <SelectedOrderForPaymentForm latestOrder={userOrder} handleClick={handleSelectEvent} user={userInfo} address={userAddress} />}
         </>
     )
 }

@@ -8,19 +8,26 @@ import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
 import Box from '@mui/material/Box'
 
-export default function SelectedOrderForPaymentForm({latestOrder}){
+import UserOrderInfoForm from "./UserOrderInfoForm"
+
+import IconRight from "../../../assets/IconRight"
+
+export default function SelectedOrderForPaymentForm({latestOrder, handleClick, user, address}){
 
     const currencyType = 'EUR'
     const paymentCurrency = getLocalStorageItem(currencyType)
 
     return(
         <>
-            <section className="flex flex-col justify-center shadow-md bg-slate-100 py-5 rounded-md px-3 sm:mx-4 sm:px-5 sm:w-full md:px-3 md:shadow-xl">
+            <section className="flex-col shadow-md w-full bg-slate-100 py-5 rounded-md px-3 sm:mx-2 sm:px-5 md:grid md:mx-2 md:shadow-xl">
+
+                <h1 className={`pt-3 pb-6 text-2xl text-center`}>Address & Peronsal Information</h1>
+
+                <UserOrderInfoForm handleClick={handleClick} user={user} address={address} />
 
                 <h1 className={`pt-3 pb-6 text-2xl text-center`}>Order</h1>
-                <section className="flex-col col-span-full justify-items-stretch sm:grid-cols-none md:grid">
-                    { latestOrder?.lastOrder != undefined && <SelectedOrderForPaymentInterface latestOrder={latestOrder.lastOrder} />}
-                </section>
+
+                { latestOrder?.lastOrder != undefined && <SelectedOrderForPaymentInterface latestOrder={latestOrder.lastOrder} />}
                 
                 <section>
                     <Box sx={{ display: 'grid', gridTemplateRows: 'repeat(4, 1fr)' }}>

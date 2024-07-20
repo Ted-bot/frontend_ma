@@ -54,12 +54,11 @@ export default function LabelUserInfoFieldInput({
                 <section>
                     {name}
                 </section>
-
             {
                 (type != 'location' && type != 'tel') ?
                 <input 
-                // ${invalid != undefined && invalid != '' || error != undefined && error != '' && 'border-red-500'} 
-                    className={`${(invalid != false && ref?.current?.value == '') && name != 'unitNumber' && 'border-red-500'}
+                // ${ error != undefined && error != '' && 'border-red-500'} 
+                    className={`${(invalid != false && id != 'unit_number' && ref?.current?.value == '') && name != 'unitNumber' && 'border-red-500'}
                         w-full appearance-none block bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`
                     } 
                     ref={ref}
@@ -84,36 +83,36 @@ export default function LabelUserInfoFieldInput({
                 :
                 <>
                     <section className='flex w-full justify-evenly'>
-                            <NativeSelect
-                                value={defaultValueState}
-                                className={`w-full block text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`}
-                                onChange={onChangeState}
-                                placeholder='select state ...'
-                            >
-                                {
-                                    optionStateList instanceof Array && 
-                                    optionStateList?.length > 0 && 
-                                    optionStateList?.map((value, index) => (<option key={index} value={value.value}>{value.label}</option>))
-                                }
-                            </NativeSelect>
-                            <NativeSelect
-                                value={defaultValueCity}
-                                className={`w-full block text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`}
-                                onChange={onChangeCity}
-                                placeholder='select city ...'
-                            >
-                                {
-                                    optionCitiesList instanceof Array && 
-                                    optionCitiesList?.length > 0 && 
-                                    optionCitiesList.map((value, index) => (<option key={index} value={value.value}>{value.label}</option>))
-                                }
-                            </NativeSelect>
-                        </ section> 
+                        <NativeSelect
+                            value={defaultValueState}
+                            className={`w-full block text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`}
+                            onChange={onChangeState}
+                            placeholder='select state ...'
+                        >
+                            {
+                                optionStateList instanceof Array && 
+                                optionStateList?.length > 0 && 
+                                optionStateList?.map((value, index) => (<option key={index} value={value.value}>{value.label}</option>))
+                            }
+                        </NativeSelect>
+                        <NativeSelect
+                            value={defaultValueCity}
+                            className={`w-full block text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`}
+                            onChange={onChangeCity}
+                            placeholder='select city ...'
+                        >
+                            {
+                                optionCitiesList instanceof Array && 
+                                optionCitiesList?.length > 0 && 
+                                optionCitiesList.map((value, index) => (<option key={index} value={value.value}>{value.label}</option>))
+                            }
+                        </NativeSelect>
+                    </ section> 
                 </>
                 }
             </label>
             {console.log({invalid: invalid, name: name, value, value})}
-            {invalid && name != 'unitNumber' && ref?.current?.value == '' && <p className="text-red-500 text-xs italic">Please fill in a {name} </p>}
+            {invalid && id != 'unit_number' && ref?.current?.value == '' && <p className="text-red-500 text-xs italic">Please fill in a {name} </p>}
         </section>
         </>
     )
