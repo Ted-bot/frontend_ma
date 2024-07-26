@@ -1,10 +1,12 @@
-import { useEffect, useState, forwardRef, useImperativeHandle, useRef } from 'react'
+import { useEffect, useState, forwardRef, useImperativeHandle, useRef, useContext } from 'react'
 import { createPortal } from 'react-dom'
 import Divider from '@mui/material/Divider'
 
 import UserOrderInfoInterface from '../interface/UserOrderInfoInterface'
 import { GetState, GetCity } from "react-country-state-city"
 import { setLocalStorageItem } from '../../js/util/postUtil'
+
+import {OrderContext} from '../../store/shop-order-context'
 
 import './CalendarModal.css'
 import { alpha } from "@mui/material"
@@ -14,16 +16,20 @@ const inputValidList = {
     email: false,
     phoneNumber: false,
     streetNumber: false,
+    unitNumber: false,
     addressLine: false,
     city: false,
     region: false,
     postalCode: false,
-    state:false,
-    city:false,
+    state: false,
+    city: false,
     // countryId: false,
 }
 
- const UserOrderModal = forwardRef(function UserOrderModal({ handleSubmit, user, address}, ref){
+const UserDataModal = forwardRef(function UserDataModal({ formSubmit, user, address}, ref){
+
+    useContext(OrderContext)
+
     const dialog = useRef()
     const addressStorageName = 'user_address'
     const countryid = 156
@@ -152,7 +158,10 @@ const inputValidList = {
     }
             
     function inputBlurHandle(identifier, event, type='text') {
-       
+        if(identifier == 'unitNumber'){
+            return
+        }
+
         if(type == 'text')
             {
                 setEnteredInputIsInvalid((prevValues) => ({
@@ -184,7 +193,7 @@ const inputValidList = {
         fields : [
             {
                 name: 'First- and LastName', 
-                id: 'firstAndLastName', 
+                id: 'FirstAndLastName', 
                 type: 'text', 
                 placeholder: 'type first and last name', 
                 value: user?.firstAndLastName ? user.firstAndLastName : enteredInput.firstAndLastName, 
@@ -196,7 +205,7 @@ const inputValidList = {
             },
             {
                 name: 'E-mail', 
-                id: 'email', 
+                id: 'Email', 
                 type: 'email', 
                 placeholder: 'email', 
                 autoComplete: 'email',
@@ -208,7 +217,7 @@ const inputValidList = {
                 onBlur: (e) => inputBlurHandle('email', e)},
             {
                 name: 'Phone Number', 
-                id: 'phone_number', 
+                id: 'PhoneNumber', 
                 type: 'tel', 
                 placeholder: 'type phone number', 
                 value: user?.phoneNumber ? user?.phoneNumber : enteredInput.phoneNumber, 
@@ -226,7 +235,7 @@ const inputValidList = {
         fields : [
             {
                 name: 'Unit Number',
-                id: 'unit_number',
+                id: 'UnitNumber',
                 type: 'text',
                 placeholder: 'unit number',
                 value: address.unitNumber ? address.unitNumber : enteredInput.unitNumber,
@@ -236,7 +245,7 @@ const inputValidList = {
                 onBlur: (e) => inputBlurHandle('unitNumber', e)},
             {
                 name: 'Street Number',
-                id: 'street_number',
+                id: 'StreetNumber',
                 type: 'number',
                 placeholder: 'street number',
                 min: 0, 
@@ -247,7 +256,7 @@ const inputValidList = {
                 onChange: (e) => inputHandle('streetNumber', e), onBlur: (e) => inputBlurHandle('streetNumber', e)},
             {
                 name: 'Street Name',
-                id: 'address_line',
+                id: 'AddressLine',
                 type: 'text',
                 placeholder: 'address line',
                 value: address.streetName ? address.streetName : enteredInput.addressLine,
@@ -258,7 +267,7 @@ const inputValidList = {
                 onBlur: (e) => inputBlurHandle('addressLine', e)},
             {
                 name: 'Postal Code',
-                id: 'postal_code',
+                id: 'PostalCode',
                 type: 'text',
                 placeholder: 'postal code',
                 value: address.postalCode ? address.postalCode : enteredInput.postalCode,
@@ -269,7 +278,7 @@ const inputValidList = {
             },
             {
                 name: 'Location',
-                id: 'location',
+                id: 'Location',
                 type: typeLocation, 
                 value: enteredInput.city, 
                 defaultValueCity: address.reactCityNr ? address.reactCityNr : enteredInput.city_id,
@@ -300,10 +309,18 @@ const inputValidList = {
     return createPortal(
         <dialog ref={dialog} className="result-modal">
             <section>
-                <form method="dialog" className="flex w-4 float-right justify-end">
+                <form
+                    method="dialog" 
+                    className="flex w-4 float-right justify-end"
+                >
                     <button className='px-2 rounded-md hover:border-2 hover:border-rose-500 hover:bg-rose-300'>X</button>
                 </form>
-                <form action="" name='address' id='address'>
+                <form 
+                    // onSubmit={(e) => formAction(e)}
+                    onSubmit={(e) => formSubmit(e)}
+                    name='address'
+                    id='address'
+                >
                     <section>
                         <h1 className={`flex justify-center pt-3 pb-6 text-2xl`}>{userForm?.name}</h1>
                         {userForm && <UserOrderInfoInterface array={userForm.fields} />}
@@ -325,4 +342,4 @@ const inputValidList = {
     )
 })
 
-export default UserOrderModal
+export default UserDataModal

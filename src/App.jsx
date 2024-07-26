@@ -16,7 +16,7 @@ import DashboardPage from './pages/DashboardPage.jsx'
 import {logoutAction} from './pages/ActionLogout.jsx'
 import CalendarPage from './pages/CalendarPage.jsx'
 import OrderPage from './pages/OrderPage.jsx'
-import PaymentPage from './pages/admin/PaymentPage.jsx'
+import PaymentPage from './pages/client/PaymentPage.jsx'
 
 import {tokenLoader} from './js/util/auth.js'
 // import UsersPage from './pages/admin/UsersPage.jsx'

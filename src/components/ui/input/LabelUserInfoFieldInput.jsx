@@ -78,6 +78,7 @@ export default function LabelUserInfoFieldInput({
                         country="NL"
                         ref={ref}
                         value={`+31${value}`}
+                        id={id}
                         {...props}
                     />
                 :
@@ -100,6 +101,7 @@ export default function LabelUserInfoFieldInput({
                             className={`w-full block text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`}
                             onChange={onChangeCity}
                             placeholder='select city ...'
+                            id={id}
                         >
                             {
                                 optionCitiesList instanceof Array && 

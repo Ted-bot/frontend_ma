@@ -21,7 +21,7 @@ import { ApiFetch,
 } from '../js/util/postUtil.js'
 import { PostError } from '../js/error/PostError.js'
 
-import UsersDashboardPage from './admin/UsersDashboardPage'
+import UsersDashboardPage from './client/UsersDashboardPage'
 
 export default function DashboardPage() {
 
