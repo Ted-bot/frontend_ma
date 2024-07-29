@@ -1,37 +1,35 @@
+import { useRef, useState, useContext } from 'react'
+import {OrderContext} from '../../../store/shop-order-context'
 import NativeSelect from '@mui/material/NativeSelect'
 import PhoneInput from 'react-phone-number-input/input'
-import { useRef, useState } from 'react'
+// import { OrderContext } from '../../../store/shop-order-context';
+
 
 export default function LabelUserInfoFieldInput({
     id,
+    state_id,
     name,
     type,
     value,
-    defaultValueCity,
-    defaultValueState,
     invalid,
-    city,
-    state,
-    cityList, 
-    stateList,
-    onChangeState,
-    onChangeCity,
     ...props}){
 
+
+        const {availableCities, availableStates, currentUserState, currentUserCity, userSelectedLocation} = useContext(OrderContext)
         let optionStateList = []
         let optionCitiesList = []
-        const [userData, setUserData] = useState(null)
+        // const [userData, setUserData] = useState(null)
         const ref = useRef()
     
         if(type === 'location'){
-            optionStateList = stateList.map((state) => ({
+            optionStateList = availableStates.map((state) => ({
                 label: state.name,
                 value: state.id
             }))
             
-            optionCitiesList = cityList.map((state) => ({
-                label: state.name,
-                value: state.id
+            optionCitiesList = availableCities.map((city) => ({
+                label: city.name,
+                value: city.id
             }))
         }
 
@@ -39,13 +37,7 @@ export default function LabelUserInfoFieldInput({
             console.log({phoneNumber:value})
         }
 
-        if(type == 'location'){
-            console.log({stateListOPtions:stateList})
-            console.log({cityListOPtions:cityList})
-            console.log({DefaultValueCity:defaultValueCity})
-            console.log({DefaultValueState:defaultValueState})
-        }
-
+        console.log({availableCities: optionCitiesList})
 
     return (
         <>
@@ -63,7 +55,7 @@ export default function LabelUserInfoFieldInput({
                     } 
                     ref={ref}
                     id={id}
-                    name={name} 
+                    // name={name} 
                     type={type}
                     defaultValue={value}
                     {...props}
@@ -78,17 +70,18 @@ export default function LabelUserInfoFieldInput({
                         country="NL"
                         ref={ref}
                         value={`+31${value}`}
+                        // value={`0031${value}`}
                         id={id}
+                        // name={id}
                         {...props}
                     />
                 :
-                <>
                     <section className='flex w-full justify-evenly'>
                         <NativeSelect
-                            value={defaultValueState}
                             className={`w-full block text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`}
-                            onChange={onChangeState}
-                            placeholder='select state ...'
+                            onChange={(e) => userSelectedLocation('state', e)}
+                            value={currentUserState}
+                            id={state_id}
                         >
                             {
                                 optionStateList instanceof Array && 
@@ -97,11 +90,10 @@ export default function LabelUserInfoFieldInput({
                             }
                         </NativeSelect>
                         <NativeSelect
-                            value={defaultValueCity}
                             className={`w-full block text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`}
-                            onChange={onChangeCity}
-                            placeholder='select city ...'
                             id={id}
+                            onChange={(e) => userSelectedLocation('city', e)}
+                            value={currentUserCity}
                         >
                             {
                                 optionCitiesList instanceof Array && 
@@ -109,11 +101,10 @@ export default function LabelUserInfoFieldInput({
                                 optionCitiesList.map((value, index) => (<option key={index} value={value.value}>{value.label}</option>))
                             }
                         </NativeSelect>
-                    </ section> 
-                </>
+                    </ section>
                 }
             </label>
-            {console.log({invalid: invalid, name: name, value, value})}
+            {/* {console.log({invalid: invalid, name: name, value, value})} */}
             {invalid && id != 'unit_number' && ref?.current?.value == '' && <p className="text-red-500 text-xs italic">Please fill in a {name} </p>}
         </section>
         </>

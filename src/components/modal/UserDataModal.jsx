@@ -1,15 +1,14 @@
-import { useEffect, useState, forwardRef, useImperativeHandle, useRef, useContext } from 'react'
+
+import { useState, forwardRef, useImperativeHandle, useRef, useContext } from 'react'
 import { createPortal } from 'react-dom'
+
 import Divider from '@mui/material/Divider'
-
-import UserOrderInfoInterface from '../interface/UserOrderInfoInterface'
-import { GetState, GetCity } from "react-country-state-city"
-import { setLocalStorageItem } from '../../js/util/postUtil'
-
-import {OrderContext} from '../../store/shop-order-context'
-
 import './CalendarModal.css'
 import { alpha } from "@mui/material"
+
+import {OrderContext} from '../../store/shop-order-context'
+import UserOrderInfoInterface from '../interface/UserOrderInfoInterface'
+import { setLocalStorageItem } from '../../js/util/postUtil'
 
 const inputValidList = {
     firstAndLastName: false,
@@ -26,136 +25,16 @@ const inputValidList = {
     // countryId: false,
 }
 
-const UserDataModal = forwardRef(function UserDataModal({ formSubmit, user, address}, ref){
+const UserDataModal = forwardRef(function UserDataModal({ enteredInput, formSubmit, user, address, addressStorageName}, ref){
 
-    useContext(OrderContext)
-
+    const {userSelectedLocation} = useContext(OrderContext)
     const dialog = useRef()
-    const addressStorageName = 'user_address'
     const countryid = 156
     const typeLocation = 'location'
-    const prepRequestFields = {
-        firstAndLastName:'',
-        email:'',
-        phoneNumber:'',
-        unitNumber: '',
-        streetNumber: '',
-        addressLine: '',
-        city: '',
-        region: '',
-        postalCode: '',
-        state:'',
-        city_id:'',
-        state_id:'',
-        city_list_nr:'',
-        countryId: countryid
-    }
     
     const regexSearch = /^[A-Za-z]+$/
     const regexDigitSearch = /^[d+]+$/
-    const userFormInfo = getUserInfoObjOrStorageData(addressStorageName)
-    const [enteredInput, setEnteredInput] = useState(userFormInfo)
     const [enteredInputIsInvalid, setEnteredInputIsInvalid] = useState(inputValidList)
-
-    const [stateList, setStateList] = useState([])
-    const [cityList, setCityList] = useState([])
-    const [singleRequest, setSingleRequest] = useState(true)
- 
-    useEffect(() => {
-        if(singleRequest){
-            setSingleRequest(false)
-            GetState(countryid).then((result) => {
-                setStateList(result)
-            })           
-
-            GetCity(countryid, Number(address.reactStateNr)).then((result) => {
-                console.log({cityResults: result})
-                setCityList(result)
-            })
-
-            setEnteredInput((prevValue) => ({
-                ...prevValue,
-                ['city_id']: Number(address.reactCityNr)
-            }))
-            
-            setEnteredInput((prevValue) => ({
-                ...prevValue,
-                ['state_id']: Number(address.reactStateNr)
-            }))
-        }        
-
-    }, [])
-
-    function getUserInfoObjOrStorageData(name){
-        const storedValues = localStorage.getItem(name)
-    
-        if(!storedValues){
-            return prepRequestFields
-        }
-    
-        return JSON.parse(storedValues) 
-    }
-
-    function updateEnteredInputState(identifier, value){
-        setEnteredInput((prevValues) => {
-            return {
-                ...prevValues,
-                [identifier]: value
-            }
-        })
-    }
-
-    function inputHandle(identifier, event){
-
-        if(identifier == 'state')
-            {
-                const state = stateList.find((element) => element.id == Number(event.target.value)); //here you will get full state object.
-                updateEnteredInputState('state_list_nr', event?.target?.value)
-                updateEnteredInputState('state_id', state.id)       
-                updateEnteredInputState(identifier, state?.name)
-                GetCity(countryid, state.id).then((result) => {
-                    console.log({cityResults: result})
-                    setCityList(result)
-                })
-                return
-            }
-            
-        if(identifier == 'city')
-            {
-                console.log({cityList})
-                const city = cityList[event?.target?.value]
-                console.log({testCityList:city})
-                console.log({cityIndentifier: city})
-                updateEnteredInputState('city_list_nr', event?.target?.value)
-                updateEnteredInputState('city_id', city?.id)
-                updateEnteredInputState(identifier, city?.name)
-                return
-            }
-
-        if(identifier == 'streetNumber')
-            {
-                const convertStrToInt = Number(event?.target?.value)
-                const checkIfNumber = typeof convertStrToInt == 'number'
-                
-                if(!checkIfNumber){
-                    setEnteredInputIsInvalid((prevValues) => ({
-                        ...prevValues,
-                        [identifier] : false
-                    }))
-                    return
-                } else {
-                    updateEnteredInputState(identifier, event?.target?.value)
-                    return
-
-                }                
-            }
-
-        if(identifier != undefined && event != '')
-            {
-                console.log({check: 'enterIfCheck',identifier, event: event?.target?.value})
-                updateEnteredInputState(identifier, event?.target?.value)
-            }              
-    }
             
     function inputBlurHandle(identifier, event, type='text') {
         if(identifier == 'unitNumber'){
@@ -193,38 +72,41 @@ const UserDataModal = forwardRef(function UserDataModal({ formSubmit, user, addr
         fields : [
             {
                 name: 'First- and LastName', 
-                id: 'FirstAndLastName', 
+                id: 'firstAndLastName', 
                 type: 'text', 
                 placeholder: 'type first and last name', 
-                value: user?.firstAndLastName ? user.firstAndLastName : enteredInput.firstAndLastName, 
+                value: enteredInput.firstAndLastName, 
+                // value: user?.firstAndLastName ? user.firstAndLastName : enteredInput.firstAndLastName, 
                 invalid: enteredInputIsInvalid.firstAndLastName, 
                 error: 'error', 
                 required : true, 
-                onChange: (e) => inputHandle('firstAndLastName', e), 
+                onChange: (e) => userSelectedLocation('firstAndLastName', e), 
                 onBlur: (e) => inputBlurHandle('firstAndLastName', e)
             },
             {
                 name: 'E-mail', 
-                id: 'Email', 
+                id: 'email', 
                 type: 'email', 
                 placeholder: 'email', 
                 autoComplete: 'email',
-                value: user?.email ? user?.email : enteredInput.email, 
+                value: enteredInput.email, 
+                // value: user?.email ? user?.email : enteredInput.email, 
                 invalid: enteredInputIsInvalid.email, 
                 error: 'error', 
                 required : true, 
-                onChange: (e) => inputHandle('email', e), 
+                onChange: (e) => userSelectedLocation('email', e), 
                 onBlur: (e) => inputBlurHandle('email', e)},
             {
                 name: 'Phone Number', 
-                id: 'PhoneNumber', 
+                id: 'phoneNumber', 
                 type: 'tel', 
                 placeholder: 'type phone number', 
-                value: user?.phoneNumber ? user?.phoneNumber : enteredInput.phoneNumber, 
+                value: enteredInput.phoneNumber, 
+                // value: user?.phoneNumber ? user?.phoneNumber : enteredInput.phoneNumber, 
                 invalid: enteredInputIsInvalid.phoneNumber, 
                 error: 'error', 
                 required : true, 
-                onChange: (e) => inputHandle('phoneNumber', e), 
+                onChange: (e) => userSelectedLocation('phoneNumber', e), 
                 onBlur: (e) => inputBlurHandle('phoneNumber', e)
             },
         ],
@@ -235,67 +117,64 @@ const UserDataModal = forwardRef(function UserDataModal({ formSubmit, user, addr
         fields : [
             {
                 name: 'Unit Number',
-                id: 'UnitNumber',
+                id: 'unitNumber',
                 type: 'text',
                 placeholder: 'unit number',
-                value: address.unitNumber ? address.unitNumber : enteredInput.unitNumber,
+                value: enteredInput.unitNumber,
+                // value: address.unitNumber ? address.unitNumber : enteredInput.unitNumber,
                 invalid: enteredInputIsInvalid.unitNumber,
                 error: 'error',
-                onChange: (e) => inputHandle('unitNumber', e),
+                onChange: (e) => userSelectedLocation('unitNumber', e),
                 onBlur: (e) => inputBlurHandle('unitNumber', e)},
             {
                 name: 'Street Number',
-                id: 'StreetNumber',
+                id: 'streetNumber',
                 type: 'number',
                 placeholder: 'street number',
                 min: 0, 
-                value: address.streetNumber ? address.streetNumber : enteredInput.streetNumber,
+                value: enteredInput.streetNumber,
+                // value: address.streetNumber ? address.streetNumber : enteredInput.streetNumber,
                 invalid: enteredInputIsInvalid.streetNumber,
                 error: 'error',
                 required : true,
-                onChange: (e) => inputHandle('streetNumber', e), onBlur: (e) => inputBlurHandle('streetNumber', e)},
+                onChange: (e) => userSelectedLocation('streetNumber', e),
+                onBlur: (e) => inputBlurHandle('streetNumber', e)},
             {
                 name: 'Street Name',
-                id: 'AddressLine',
+                id: 'addressLine',
                 type: 'text',
                 placeholder: 'address line',
-                value: address.streetName ? address.streetName : enteredInput.addressLine,
+                value: enteredInput.addressLine,
+                // value: address.streetName ? address.streetName : enteredInput.addressLine,
                 invalid: enteredInputIsInvalid.addressLine,
                 error: 'error',
-                equired : true,
-                onChange: (e) => inputHandle('addressLine', e),
+                required : true,
+                onChange: (e) => userSelectedLocation('addressLine', e),
                 onBlur: (e) => inputBlurHandle('addressLine', e)},
             {
                 name: 'Postal Code',
-                id: 'PostalCode',
+                id: 'postalCode',
                 type: 'text',
                 placeholder: 'postal code',
-                value: address.postalCode ? address.postalCode : enteredInput.postalCode,
+                value: enteredInput.postalCode,
+                // value: address.postalCode ? address.postalCode : enteredInput.postalCode,
                 invalid: enteredInputIsInvalid.postalCode,
                 error: 'error',
-                equired : true, onChange: (e) => inputHandle('postalCode', e),
+                required : true,
+                onChange: (e) => userSelectedLocation('postalCode', e),
                 onBlur: (e) => inputBlurHandle('postalCode', e)
             },
             {
                 name: 'Location',
-                id: 'Location',
+                id: 'location',
+                state_id: 'stateLocation',
                 type: typeLocation, 
-                value: enteredInput.city, 
-                defaultValueCity: address.reactCityNr ? address.reactCityNr : enteredInput.city_id,
-                defaultValueState: address.reactStateNr ? address.reactStateNr : enteredInput.state_id,
-                cityList, 
-                stateList,
                 invalid: enteredInputIsInvalid.city,
-                required:true,
-                onChangeState: (e) => inputHandle('state', e),
-                onChangeCity: (e) => inputHandle('city', e),
+                required: true,
                 onBlur : (e) => inputBlurHandle('city', e)
             },
         ],
     }
-
-    setLocalStorageItem(addressStorageName,enteredInput)
-    // let setTypeEvent
 
     useImperativeHandle(ref, () => {
 
@@ -305,6 +184,8 @@ const UserDataModal = forwardRef(function UserDataModal({ formSubmit, user, addr
             }
         }
     })
+
+    setLocalStorageItem(addressStorageName,enteredInput)
     
     return createPortal(
         <dialog ref={dialog} className="result-modal">
@@ -315,8 +196,7 @@ const UserDataModal = forwardRef(function UserDataModal({ formSubmit, user, addr
                 >
                     <button className='px-2 rounded-md hover:border-2 hover:border-rose-500 hover:bg-rose-300'>X</button>
                 </form>
-                <form 
-                    // onSubmit={(e) => formAction(e)}
+                <form
                     onSubmit={(e) => formSubmit(e)}
                     name='address'
                     id='address'
@@ -331,10 +211,10 @@ const UserDataModal = forwardRef(function UserDataModal({ formSubmit, user, addr
                         {userForm && <UserOrderInfoInterface array={addressForm.fields} />}
                     </section>
                     <button 
-                            className="text-slate-100 h-16 w-42 mt-8 px-8 align-content-center w-full rounded-b-full text-2xl rounded-t-full border-0 ring-2 shadow-xl ring-red-500 bg-red-500 bg-gradient-to-r from-red-500 to-yellow-500 transition-all duration-300 hover:from-orange-400 hover:text-yellow-200 hover:to-red-400 hover:ring-red-400 hover:shadow-2xl"
-                        >
-                            Done
-                        </button>
+                        className="text-slate-100 h-16 w-42 mt-8 px-8 align-content-center w-full rounded-b-full text-2xl rounded-t-full border-0 ring-2 shadow-xl ring-red-500 bg-red-500 bg-gradient-to-r from-red-500 to-yellow-500 transition-all duration-300 hover:from-orange-400 hover:text-yellow-200 hover:to-red-400 hover:ring-red-400 hover:shadow-2xl"
+                    >
+                        Done
+                    </button>
                 </form>
             </section>
         </dialog>,

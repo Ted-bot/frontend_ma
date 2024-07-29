@@ -1,6 +1,9 @@
-import { CreateContext } from "react-admin"
+import { createContext } from "react"
 
-const OrderContext = createContext({
+export const OrderContext = createContext({
     availableStates: [],
-    availableCities: []
+    availableCities: [],
+    currentUserState: '', 
+    currentUserCity: '', 
+    userSelectedLocation: () => {}
 })

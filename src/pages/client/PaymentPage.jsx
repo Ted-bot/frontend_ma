@@ -6,6 +6,8 @@ import {
     setLocalStorageItem,
     getToken
  } from "../../js/util/postUtil"
+import { useLoaderData } from 'react-router-dom'
+
  import UserDataModal from '../../components/modal/UserDataModal'
  import UserChoosePaymentModal from '../../components/modal/UserChoosePaymentModal'
 
@@ -18,32 +20,127 @@ import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
 import Box from '@mui/material/Box'
 
+import { GetState, GetCity } from "react-country-state-city"
 import UserSelectPaymentMethodForm from '../../components/forms/client/UserSelectPaymentMethodForm'
 
 import { OrderContext } from '../../store/shop-order-context'
 
-// import IconIdeal from "../../assets/ideal.svg"
-// import IconCredit from "../../assets/creditcard.svg"
-// import IconPaypal from "../../assets/paypal.svg"
-
 const PaymentPage = () => {
+
+    const data = useLoaderData()
+    const regexSearch = /^[A-Za-z]+$/
+    const [paymentType, setPaymentType] = useState({
+        ideal : false,
+        credit_card : false,
+        pay_pal : false,
+    })
+    
+    const countryid = 156
+    const [stateList, setStateList] = useState([])
+    const prepRequestFields = {
+        firstAndLastName:'',
+        email:'',
+        phoneNumber:'',
+        unitNumber: '',
+        streetNumber: '',
+        addressLine: '',
+        city: '',
+        region: '',
+        postalCode: '',
+        state:'',
+        city_id:'',
+        state_id:'',
+        countryId: countryid
+    }
+
+    const [cityList, setCityList] = useState([])
+    
+    const getFirstTruthyItem = (obj) => Object.keys(obj).find((i) => obj[i] === 'true')
+    
+    const addressStorageName = 'user_address'
+    const userFormInfo = getUserInfoObjOrStorageData(addressStorageName)
+    const [enteredInput, setEnteredInput] = useState(userFormInfo)
+    const [symbol, setSymbol] = useState(null)
+    
+    const dialogUserAddress = useRef()
+    const dialogUserPaymentMethod = useRef()
+    const token = getToken()
+    const [currencyType, setCurrencyType] = useState('EUR')
+    const [userData, setUserData] = useState({
+        userInfo: {},
+        userAddress: {},
+        userOrder: {},
+    })
+    
+    const paymentCurrency = getLocalStorageItem(currencyType)
+
+    function updateUserData(identifier, data){
+        if(identifier == 'userData')
+        {return}
+
+        setUserData((prevState) => ({
+            ...prevState,
+            [identifier]: data
+            }
+        )
+    )}
 
     useEffect(() => {
         ApiRequest()
-    }, [])
 
-    const regexSearch = /^[A-Za-z]+$/
-    const [paymentType, setPaymentType] = useState({
-            ideal : false,
-            credit_card : false,
-            pay_pal : false,
+        GetState(countryid).then((result) => {
+            setStateList(result)
+        })           
+
+        GetCity(countryid, Number(userData.userAddress.reactStateNr)).then((result) => {
+            setCityList(result)
         })
-    
-    const getFirstTruthyItem = (obj) => Object.keys(obj).find((i) => obj[i] === 'true')
 
+        setEnteredInput((prevValue) => ({
+            ...prevValue,
+            ['city_id']: Number(userData.userAddress.reactCityNr)
+        }))
+        
+        setEnteredInput((prevValue) => ({
+            ...prevValue,
+            ['state_id']: Number(userData.userAddress.reactStateNr)
+        }))
+
+        //set user data in local storage to keep most recent data
+
+        Object.keys(userData.userInfo).forEach(key => {
+            const value = userData.userInfo[key];
+            // console.log(`Key: ${key}, Value: ${value}`)
+            setEnteredInput((prevValue) => ({
+                ...prevValue,
+                [key]: value
+            }))
+        })
+
+        Object.keys(userData.userAddress).forEach(key => {
+            const value = userData.userAddress[key];
+            // console.log(`Key: ${key}, Value: ${value}`)
+            setEnteredInput((prevValue) => ({
+                ...prevValue,
+                [key]: value
+            }))
+        })
+
+    }, [userData.userAddress.reactStateNr])
+    
+    
+    function getUserInfoObjOrStorageData(name){
+        const storedValues = localStorage.getItem(name)
+        
+        if(!storedValues){
+            return prepRequestFields
+        }
+        
+        return JSON.parse(storedValues) 
+    }    
+    
     const inputHandle = (identifier,event) => {
         event.preventDefault()
-        console.log({paymentTypSelected: paymentType})
         setPaymentType((prevValues) => ({
             [identifier]: true
         }))
@@ -75,43 +172,16 @@ const PaymentPage = () => {
             },
         ],
     }
-
-    const dialogUserAddress = useRef()
-    const dialogUserPaymentMethod = useRef()
-    const token = getToken()
-    const [currencyType, setCurrencyType] = useState('EUR')
-    const [userData, setUserData] = useState({
-        userInfo: {},
-        userAddress: {},
-        userOrder: {},
-    })
-
-    const [symbol, setSymbol] = useState(null)
-
-    function updateUserData(identifier, data){
-        setUserData((prevState) => ({
-            ...prevState,
-            [identifier]: data
-            }
-        )
-    )}
     
     const ApiRequest = async () => {
-        const ApiOptions = ApiFetchGetOptions('/api/v1/order',{'X-Authorization': 'Bearer ' + token})
-        const getResults = await ApiFetch(ApiOptions)
-        const response = await getResults.json()        
+        const response = data        
         
         if(!response.lines){
-            console.log({ response : response})
+            console.log({ apiResponseError : response})
             throw new {error: 'Not Found!'}
         }
-        
-        console.log({ responseShopOrder: response })       
-        
-        setLocalStorageItem(response.curreny.name,response.curreny.symbol)
 
-        console.log({userData: response.user})
-        console.log({userAddress: response.address})
+        setLocalStorageItem(response.curreny.name,response.curreny.symbol)
         
         updateUserData('userInfo', {...response.user})
         updateUserData('userAddress', {...response.address})
@@ -125,12 +195,9 @@ const PaymentPage = () => {
             orderTotalProductPrice: response.orderTotalProductPrice,
         })
     }
-    // const currencyType = 'EUR'
-    const paymentCurrency = getLocalStorageItem(currencyType)
     
     const userAddressModalHandler = useCallback(
         (event) =>  { //unnessecary async removed
-            // console.log({eventSelected: event})
             dialogUserAddress.current.open()
         }
     )
@@ -149,11 +216,9 @@ const PaymentPage = () => {
                 [event.target[2].id]: event.target[2].value
             }
 
-            console.log({formSubmitionEvent: options})
             event.preventDefault()
             const selectedMethod = getFirstTruthyItem(options)
             setSymbol(selectedMethod)
-            // console.log({formSubmition: event.target[0]})
         }
     )
 
@@ -161,10 +226,29 @@ const PaymentPage = () => {
         event.preventDefault()
 
         let userAddressInfo = {}
+        let cityName = ''
+        let stateName = ''
 
-        for (let i = 0; i < 7; i++){
+        for (let i = 0; i < 9; i++){
+            if(event.target[i].id == 'location'){
+                const city = ctxValue.availableCities.find((city) => city.id == Number(event.target[i].value) )
+                cityName = city.name
+            }
+
+            if(event.target[i].id == 'stateLocation')
+            {
+                const state = ctxValue.availableStates.find((state) => state.id == Number(event.target[i].value) )
+                stateName = state.name
+                continue
+            }
+
             userAddressInfo = { ...userAddressInfo, [event.target[i].id]: event.target[i].value}
         }
+
+        userAddressInfo = { ...userAddressInfo, ['location']: cityName}
+        userAddressInfo = { ...userAddressInfo, ['region']: stateName}
+        userAddressInfo = { ...userAddressInfo, ['reactStateNr']: ctxValue.currentUserState.toString()}
+        userAddressInfo = { ...userAddressInfo, ['reactCityNr']: ctxValue.currentUserCity.toString()}
 
         console.log({formAddress: userAddressInfo})
 
@@ -180,26 +264,100 @@ const PaymentPage = () => {
                 // const errorJson = await response.json()
                 throw new PostError('Api error send order address error!', getResults)
             }
-
-
-
         //     deleteLocalStorageItem(nameStorageItem)
         //     const reqResults = await response.json()
         //     setToken(reqResults)
         //     navigate('/dashboard') 
         //     // redirect
+        // localStorage.removeItem(addressStorageName);
 
         } catch (error) {
-        
+            
+            console.log({API_updateUserOrder:error})
+
         }
     }
 
-    console.log({userData})
+    function updateEnteredInputState(identifier, value){
+        setEnteredInput((prevValues) => {
+            return {
+                ...prevValues,
+                [identifier]: value
+            }
+        })
+    }
+
+    const handleUserSelectLocation = (identifier, event) => {
+        if(identifier == 'state')
+            {
+                const state = stateList.find((state) => state.id == Number(event.target.value)); //here you will get full state object.
+                updateEnteredInputState('state_id', state.id)       
+                updateEnteredInputState(identifier, state.name)
+                GetCity(countryid, state.id).then((result) => {
+                    setCityList(result)
+                })
+                return
+            }
+            
+        if(identifier == 'city')
+            {
+                const city = cityList.find((city) => city.id == Number(event.target.value))
+                updateEnteredInputState('city_id', city.id)
+                updateEnteredInputState(identifier, city.name)
+                return
+            }
+    
+        if(identifier == 'streetNumber')
+            {
+                const convertStrToInt = Number(event.target.value)
+                const checkIfNumber = typeof convertStrToInt == 'number'
+                
+                if(!checkIfNumber){
+                    setEnteredInputIsInvalid((prevValues) => ({
+                        ...prevValues,
+                        [identifier] : false
+                    }))
+                    return
+                } else {
+                    updateEnteredInputState(identifier, event.target.value)
+                    return
+
+                }                
+            }
+        
+        if(identifier == 'phoneNumber')
+            {
+                updateEnteredInputState(identifier, event)
+                return
+            }    
+        
+        if(identifier != undefined && event != '')
+            {
+                updateEnteredInputState(identifier, event.target.value)
+            }
+    }
+
+    const ctxValue = {
+        availableStates: stateList,
+        availableCities: cityList,
+        currentUserState: enteredInput.state_id,
+        currentUserCity: enteredInput.city_id,
+        userSelectedLocation: handleUserSelectLocation
+    }
 
     return (
         <>
-            <OrderContext.Provider>
-                {userData?.userAddress?.reactStateNr != undefined && <UserDataModal ref={dialogUserAddress} formSubmit={userAddressHandler} user={userData.userInfo} address={userData.userAddress}/>}
+            <OrderContext.Provider value={ctxValue}>
+                {userData?.userAddress?.reactStateNr != undefined && 
+                <UserDataModal 
+                    ref={dialogUserAddress} 
+                    enteredInput={enteredInput} 
+                    formSubmit={userAddressHandler} 
+                    user={userData.userInfo} 
+                    address={userData.userAddress}
+                    addressStorageName={addressStorageName}
+                />
+                }
                 <UserChoosePaymentModal ref={dialogUserPaymentMethod} formAction={choosePaymentFormSub} paymentMethodOptions={paymentMethodOptions} />
 
                 <section className="flex-col shadow-md w-full bg-slate-100 py-5 rounded-md px-3 sm:mx-2 sm:px-5 md:grid md:mx-2 md:shadow-xl">
