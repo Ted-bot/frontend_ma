@@ -10,63 +10,27 @@ import {OrderContext} from '../../store/shop-order-context'
 import UserOrderInfoInterface from '../interface/UserOrderInfoInterface'
 import { setLocalStorageItem } from '../../js/util/postUtil'
 
-const inputValidList = {
-    firstAndLastName: false,
-    email: false,
-    phoneNumber: false,
-    streetNumber: false,
-    unitNumber: false,
-    addressLine: false,
-    city: false,
-    region: false,
-    postalCode: false,
-    state: false,
-    city: false,
-    // countryId: false,
-}
+// const inputValidList = {
+//     firstAndLastName: false,
+//     email: false,
+//     phoneNumber: false,
+//     streetNumber: false,
+//     unitNumber: false,
+//     addressLine: false,
+//     city: false,
+//     region: false,
+//     postalCode: false,
+//     state: false,
+//     city: false,
+//     // countryId: false,
+// }
 
-const UserDataModal = forwardRef(function UserDataModal({ enteredInput, formSubmit, user, address, addressStorageName}, ref){
+const UserDataModal = forwardRef(function UserDataModal({ enteredInput, enteredInputIsInvalid, formSubmit, user, address, addressStorageName}, ref){
 
-    const {userSelectedLocation} = useContext(OrderContext)
+    const {userSelectedLocation, onBlur} = useContext(OrderContext)
     const dialog = useRef()
-    const countryid = 156
     const typeLocation = 'location'
     
-    const regexSearch = /^[A-Za-z]+$/
-    const regexDigitSearch = /^[d+]+$/
-    const [enteredInputIsInvalid, setEnteredInputIsInvalid] = useState(inputValidList)
-            
-    function inputBlurHandle(identifier, event, type='text') {
-        if(identifier == 'unitNumber'){
-            return
-        }
-
-        if(type == 'text')
-            {
-                setEnteredInputIsInvalid((prevValues) => ({
-                    ...prevValues,
-                    [identifier] : regexSearch.test(event.target.value) ? false : true
-                }))
-                return
-            }
-
-        if(type == 'number')
-            {
-                console.log({isNumber: event.target.value})
-                setEnteredInputIsInvalid((prevValues) => ({
-                    ...prevValues,
-                    [identifier] : Number.isInteger(Number(event.target.value)) ? false : true
-                }))
-                return
-            }            
-
-        setEnteredInputIsInvalid((prevValues) => ({
-            ...prevValues,
-            [identifier] : (event.target.value == '') ? true : false
-        }))
-            
-    }
-
     const userForm = {
         name: 'Personal Information',
         fields : [
@@ -75,13 +39,12 @@ const UserDataModal = forwardRef(function UserDataModal({ enteredInput, formSubm
                 id: 'firstAndLastName', 
                 type: 'text', 
                 placeholder: 'type first and last name', 
-                value: enteredInput.firstAndLastName, 
-                // value: user?.firstAndLastName ? user.firstAndLastName : enteredInput.firstAndLastName, 
+                value: enteredInput.firstAndLastName,
                 invalid: enteredInputIsInvalid.firstAndLastName, 
                 error: 'error', 
                 required : true, 
                 onChange: (e) => userSelectedLocation('firstAndLastName', e), 
-                onBlur: (e) => inputBlurHandle('firstAndLastName', e)
+                onBlur: (e) => onBlur('firstAndLastName', e)
             },
             {
                 name: 'E-mail', 
@@ -89,25 +52,24 @@ const UserDataModal = forwardRef(function UserDataModal({ enteredInput, formSubm
                 type: 'email', 
                 placeholder: 'email', 
                 autoComplete: 'email',
-                value: enteredInput.email, 
-                // value: user?.email ? user?.email : enteredInput.email, 
+                value: enteredInput.email,
                 invalid: enteredInputIsInvalid.email, 
                 error: 'error', 
                 required : true, 
                 onChange: (e) => userSelectedLocation('email', e), 
-                onBlur: (e) => inputBlurHandle('email', e)},
+                onBlur: (e) => onBlur('email', e)
+            },
             {
                 name: 'Phone Number', 
                 id: 'phoneNumber', 
                 type: 'tel', 
-                placeholder: 'type phone number', 
-                value: enteredInput.phoneNumber, 
-                // value: user?.phoneNumber ? user?.phoneNumber : enteredInput.phoneNumber, 
+                placeholder: 'type in phone number', 
+                value: '+31' + enteredInput.phoneNumber,
                 invalid: enteredInputIsInvalid.phoneNumber, 
                 error: 'error', 
                 required : true, 
-                onChange: (e) => userSelectedLocation('phoneNumber', e), 
-                onBlur: (e) => inputBlurHandle('phoneNumber', e)
+                onChange: (e) => userSelectedLocation('phoneNumber', e, 'tel'), 
+                onBlur: (e) => onBlur('phoneNumber', e)
             },
         ],
     }
@@ -121,11 +83,10 @@ const UserDataModal = forwardRef(function UserDataModal({ enteredInput, formSubm
                 type: 'text',
                 placeholder: 'unit number',
                 value: enteredInput.unitNumber,
-                // value: address.unitNumber ? address.unitNumber : enteredInput.unitNumber,
                 invalid: enteredInputIsInvalid.unitNumber,
                 error: 'error',
                 onChange: (e) => userSelectedLocation('unitNumber', e),
-                onBlur: (e) => inputBlurHandle('unitNumber', e)},
+                onBlur: (e) => onBlur('unitNumber', e)},
             {
                 name: 'Street Number',
                 id: 'streetNumber',
@@ -133,45 +94,42 @@ const UserDataModal = forwardRef(function UserDataModal({ enteredInput, formSubm
                 placeholder: 'street number',
                 min: 0, 
                 value: enteredInput.streetNumber,
-                // value: address.streetNumber ? address.streetNumber : enteredInput.streetNumber,
                 invalid: enteredInputIsInvalid.streetNumber,
                 error: 'error',
                 required : true,
                 onChange: (e) => userSelectedLocation('streetNumber', e),
-                onBlur: (e) => inputBlurHandle('streetNumber', e)},
+                onBlur: (e) => onBlur('streetNumber', e, 'number')},
             {
                 name: 'Street Name',
                 id: 'addressLine',
                 type: 'text',
                 placeholder: 'address line',
                 value: enteredInput.addressLine,
-                // value: address.streetName ? address.streetName : enteredInput.addressLine,
                 invalid: enteredInputIsInvalid.addressLine,
                 error: 'error',
                 required : true,
                 onChange: (e) => userSelectedLocation('addressLine', e),
-                onBlur: (e) => inputBlurHandle('addressLine', e)},
+                onBlur: (e) => onBlur('addressLine', e)},
             {
                 name: 'Postal Code',
                 id: 'postalCode',
                 type: 'text',
                 placeholder: 'postal code',
                 value: enteredInput.postalCode,
-                // value: address.postalCode ? address.postalCode : enteredInput.postalCode,
                 invalid: enteredInputIsInvalid.postalCode,
                 error: 'error',
                 required : true,
                 onChange: (e) => userSelectedLocation('postalCode', e),
-                onBlur: (e) => inputBlurHandle('postalCode', e)
+                onBlur: (e) => onBlur('postalCode', e)
             },
             {
                 name: 'Location',
-                id: 'location',
+                id: typeLocation,
                 state_id: 'stateLocation',
                 type: typeLocation, 
                 invalid: enteredInputIsInvalid.city,
                 required: true,
-                onBlur : (e) => inputBlurHandle('city', e)
+                onBlur : (e) => onBlur('city', e, typeLocation)
             },
         ],
     }
@@ -181,11 +139,14 @@ const UserDataModal = forwardRef(function UserDataModal({ enteredInput, formSubm
         return {
             open(){
                 dialog.current.showModal()
+            },
+            close(){
+                dialog.current.close()
             }
         }
     })
 
-    setLocalStorageItem(addressStorageName,enteredInput)
+    // setLocalStorageItem(addressStorageName,enteredInput)
     
     return createPortal(
         <dialog ref={dialog} className="result-modal">

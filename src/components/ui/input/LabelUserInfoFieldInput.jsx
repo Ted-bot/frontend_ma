@@ -2,8 +2,6 @@ import { useRef, useState, useContext } from 'react'
 import {OrderContext} from '../../../store/shop-order-context'
 import NativeSelect from '@mui/material/NativeSelect'
 import PhoneInput from 'react-phone-number-input/input'
-// import { OrderContext } from '../../../store/shop-order-context';
-
 
 export default function LabelUserInfoFieldInput({
     id,
@@ -14,12 +12,10 @@ export default function LabelUserInfoFieldInput({
     invalid,
     ...props}){
 
-
-        const {availableCities, availableStates, currentUserState, currentUserCity, userSelectedLocation} = useContext(OrderContext)
         let optionStateList = []
         let optionCitiesList = []
-        // const [userData, setUserData] = useState(null)
         const ref = useRef()
+        const {availableCities, availableStates, currentUserState, currentUserCity, userSelectedLocation} = useContext(OrderContext)
     
         if(type === 'location'){
             optionStateList = availableStates.map((state) => ({
@@ -33,12 +29,6 @@ export default function LabelUserInfoFieldInput({
             }))
         }
 
-        if(type == 'tel'){
-            console.log({phoneNumber:value})
-        }
-
-        console.log({availableCities: optionCitiesList})
-
     return (
         <>
         <section className={`w-full lg:justify-center px-3 mb-6 md:mb-0`}>
@@ -50,7 +40,7 @@ export default function LabelUserInfoFieldInput({
                 (type != 'location' && type != 'tel') ?
                 <input 
                 // ${ error != undefined && error != '' && 'border-red-500'} 
-                    className={`${(invalid != false && id != 'unit_number' && ref?.current?.value == '') && name != 'unitNumber' && 'border-red-500'}
+                    className={`${invalid && id != 'unitNumber' && 'border-4 border-rose-500'}
                         w-full appearance-none block bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`
                     } 
                     ref={ref}
@@ -62,17 +52,13 @@ export default function LabelUserInfoFieldInput({
                 />
                 : type == 'tel' ?
                     <PhoneInput
-                        className={`${invalid && ref?.current?.value == ''
-                            // || error != undefined && error != '' 
-                            && 'border-red-500'} 
+                        className={`${invalid && 'border-4 border-rose-500'} 
                         w-full appearance-none block bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight 
                         focus:outline-none focus:bg-white`}
                         country="NL"
                         ref={ref}
-                        value={`+31${value}`}
-                        // value={`0031${value}`}
+                        value={`${value}`}
                         id={id}
-                        // name={id}
                         {...props}
                     />
                 :
@@ -104,8 +90,7 @@ export default function LabelUserInfoFieldInput({
                     </ section>
                 }
             </label>
-            {/* {console.log({invalid: invalid, name: name, value, value})} */}
-            {invalid && id != 'unit_number' && ref?.current?.value == '' && <p className="text-red-500 text-xs italic">Please fill in a {name} </p>}
+            {invalid && id != 'unit_number' && ref?.current?.value == '' && <p className="text-rose-300 text-lg italic">Please fill in a {name} </p>}
         </section>
         </>
     )

@@ -25,39 +25,57 @@ import UserSelectPaymentMethodForm from '../../components/forms/client/UserSelec
 
 import { OrderContext } from '../../store/shop-order-context'
 
+const countryid = 156
+const inputValidList = {
+    firstAndLastName: false,
+    email: false,
+    phoneNumber: false,
+    streetNumber: false,
+    unitNumber: false,
+    addressLine: false,
+    city: false,
+    region: false,
+    postalCode: false,
+    state: false,
+    city: false,
+    // countryId: false,
+}
+
+const prepRequestFields = {
+    firstAndLastName:'',
+    email:'',
+    phoneNumber:'',
+    unitNumber: '',
+    streetNumber: '',
+    addressLine: '',
+    city: '',
+    region: '',
+    postalCode: '',
+    state:'',
+    city_id:'',
+    state_id:'',
+    countryId: countryid
+}
+
 const PaymentPage = () => {
 
-    const data = useLoaderData()
+    const addressStorageName = 'user_address'
     const regexSearch = /^[A-Za-z]+$/
+
+    const data = useLoaderData()
     const [paymentType, setPaymentType] = useState({
         ideal : false,
         credit_card : false,
         pay_pal : false,
-    })
-    
-    const countryid = 156
-    const [stateList, setStateList] = useState([])
-    const prepRequestFields = {
-        firstAndLastName:'',
-        email:'',
-        phoneNumber:'',
-        unitNumber: '',
-        streetNumber: '',
-        addressLine: '',
-        city: '',
-        region: '',
-        postalCode: '',
-        state:'',
-        city_id:'',
-        state_id:'',
-        countryId: countryid
-    }
+    })    
 
+    const [enteredInputIsInvalid, setEnteredInputIsInvalid] = useState(inputValidList)
+    
+    const [stateList, setStateList] = useState([]) 
     const [cityList, setCityList] = useState([])
     
-    const getFirstTruthyItem = (obj) => Object.keys(obj).find((i) => obj[i] === 'true')
+    const getSelectedPaymentMethodIcon = (obj) => Object.keys(obj).find((i) => obj[i] === 'true')
     
-    const addressStorageName = 'user_address'
     const userFormInfo = getUserInfoObjOrStorageData(addressStorageName)
     const [enteredInput, setEnteredInput] = useState(userFormInfo)
     const [symbol, setSymbol] = useState(null)
@@ -127,6 +145,11 @@ const PaymentPage = () => {
         })
 
     }, [userData.userAddress.reactStateNr])
+
+    useEffect(() => {
+        setLocalStorageItem(addressStorageName,enteredInput)
+    }
+    ,[enteredInput])
     
     
     function getUserInfoObjOrStorageData(name){
@@ -202,6 +225,12 @@ const PaymentPage = () => {
         }
     )
 
+    const closeUserAddressModalHandler = useCallback(
+        (event) =>  { //unnessecary async removed
+            dialogUserAddress.current.close()
+        }
+    )
+
     const paymentMethodModalHandler = useCallback(
         (event) => {
             dialogUserPaymentMethod.current.open()
@@ -217,7 +246,7 @@ const PaymentPage = () => {
             }
 
             event.preventDefault()
-            const selectedMethod = getFirstTruthyItem(options)
+            const selectedMethod = getSelectedPaymentMethodIcon(options)
             setSymbol(selectedMethod)
         }
     )
@@ -232,6 +261,7 @@ const PaymentPage = () => {
         for (let i = 0; i < 9; i++){
             if(event.target[i].id == 'location'){
                 const city = ctxValue.availableCities.find((city) => city.id == Number(event.target[i].value) )
+                //if city not found ?? set invalid input field
                 cityName = city.name
             }
 
@@ -264,6 +294,8 @@ const PaymentPage = () => {
                 // const errorJson = await response.json()
                 throw new PostError('Api error send order address error!', getResults)
             }
+
+            closeUserAddressModalHandler()
         //     deleteLocalStorageItem(nameStorageItem)
         //     const reqResults = await response.json()
         //     setToken(reqResults)
@@ -327,6 +359,7 @@ const PaymentPage = () => {
         
         if(identifier == 'phoneNumber')
             {
+                console.log({phoneNumber:event})
                 updateEnteredInputState(identifier, event)
                 return
             }    
@@ -337,12 +370,34 @@ const PaymentPage = () => {
             }
     }
 
+    function inputBlurHandle(identifier, event, type='text') {
+        if(identifier == 'unitNumber'){
+            return
+        }
+
+        if(type == 'text' || type == 'number')
+            {
+                setEnteredInputIsInvalid((prevValues) => ({
+                    ...prevValues,
+                    [identifier] : event.target.value != '' ? false : true
+                }))
+                return
+            }  
+
+        setEnteredInputIsInvalid((prevValues) => ({
+            ...prevValues,
+            [identifier] : (event.target.value == '') ? true : false
+        }))
+            
+    }
+
     const ctxValue = {
         availableStates: stateList,
         availableCities: cityList,
         currentUserState: enteredInput.state_id,
         currentUserCity: enteredInput.city_id,
-        userSelectedLocation: handleUserSelectLocation
+        userSelectedLocation: handleUserSelectLocation,
+        onBlur: inputBlurHandle,
     }
 
     return (
@@ -356,6 +411,7 @@ const PaymentPage = () => {
                     user={userData.userInfo} 
                     address={userData.userAddress}
                     addressStorageName={addressStorageName}
+                    enteredInputIsInvalid={enteredInputIsInvalid}
                 />
                 }
                 <UserChoosePaymentModal ref={dialogUserPaymentMethod} formAction={choosePaymentFormSub} paymentMethodOptions={paymentMethodOptions} />
