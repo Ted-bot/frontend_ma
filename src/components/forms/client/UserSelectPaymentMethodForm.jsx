@@ -5,12 +5,7 @@ import IconIdeal from "../../../assets/ideal.svg"
 import IconCredit from "../../../assets/creditcard.svg"
 import IconPaypal from "../../../assets/paypal.svg"
 
-const UserSelectPaymentMethodForm = ({selectedType, paymentMethodOptions, symbol, paymentMethodModalHandler}) => {
-
-    
-    console.log({getKeyPaymentMethod: Object.keys(selectedType)[0]})
-    console.log({paymentMethodOptions})
-    
+const UserSelectPaymentMethodForm = ({selectedType, symbol, paymentMethodModalHandler}) => {  
 
     return (
         <>

@@ -2,6 +2,7 @@
 import { useState, forwardRef, useImperativeHandle, useRef, useContext } from 'react'
 import { createPortal } from 'react-dom'
 import { Dialog } from "@mui/material";
+import { Form } from 'react-router-dom'
 
 import Divider from '@mui/material/Divider'
 import './CalendarModal.css'
@@ -158,7 +159,7 @@ const UserDataModal = forwardRef(function UserDataModal({ onClose, enteredInput,
                 >
                     <button className='px-2 rounded-md hover:border-2 hover:border-rose-500 hover:bg-rose-300'>X</button>
                 </form>
-                <form
+                <Form
                     onSubmit={(e) => formSubmit(e)}
                     name='address'
                     id='address'
@@ -177,7 +178,7 @@ const UserDataModal = forwardRef(function UserDataModal({ onClose, enteredInput,
                     >
                         Done
                     </button>
-                </form>
+                </Form>
             </section>
         </dialog>,
         document.getElementById("modal")
