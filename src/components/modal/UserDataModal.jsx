@@ -1,6 +1,7 @@
 
 import { useState, forwardRef, useImperativeHandle, useRef, useContext } from 'react'
 import { createPortal } from 'react-dom'
+import { Dialog } from "@mui/material";
 
 import Divider from '@mui/material/Divider'
 import './CalendarModal.css'
@@ -9,6 +10,8 @@ import { alpha } from "@mui/material"
 import {OrderContext} from '../../store/shop-order-context'
 import UserOrderInfoInterface from '../interface/UserOrderInfoInterface'
 import { setLocalStorageItem } from '../../js/util/postUtil'
+
+import Modal from '@mui/material/Modal'
 
 // const inputValidList = {
 //     firstAndLastName: false,
@@ -25,7 +28,7 @@ import { setLocalStorageItem } from '../../js/util/postUtil'
 //     // countryId: false,
 // }
 
-const UserDataModal = forwardRef(function UserDataModal({ enteredInput, enteredInputIsInvalid, formSubmit, user, address, addressStorageName}, ref){
+const UserDataModal = forwardRef(function UserDataModal({ onClose, enteredInput, enteredInputIsInvalid, formSubmit}, ref){
 
     const {userSelectedLocation, onBlur} = useContext(OrderContext)
     const dialog = useRef()
@@ -127,7 +130,7 @@ const UserDataModal = forwardRef(function UserDataModal({ enteredInput, enteredI
                 id: typeLocation,
                 state_id: 'stateLocation',
                 type: typeLocation, 
-                invalid: enteredInputIsInvalid.city,
+                invalid: enteredInputIsInvalid.location,
                 required: true,
                 onBlur : (e) => onBlur('city', e, typeLocation)
             },
@@ -146,10 +149,8 @@ const UserDataModal = forwardRef(function UserDataModal({ enteredInput, enteredI
         }
     })
 
-    // setLocalStorageItem(addressStorageName,enteredInput)
-    
     return createPortal(
-        <dialog ref={dialog} className="result-modal">
+        <dialog ref={dialog} className="result-modal w-full md:w-3/4 lg:w-[32rem]">
             <section>
                 <form
                     method="dialog" 

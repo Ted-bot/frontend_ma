@@ -1,10 +1,16 @@
+import { useState } from "react"
 import IconRight from "../../../assets/IconRight"
 import IconUserLocation from "../../../assets/IconUserLocation"
 import IconIdeal from "../../../assets/ideal.svg"
 import IconCredit from "../../../assets/creditcard.svg"
 import IconPaypal from "../../../assets/paypal.svg"
 
-const UserSelectPaymentMethodForm = ({symbol, paymentMethodModalHandler}) => {
+const UserSelectPaymentMethodForm = ({selectedType, paymentMethodOptions, symbol, paymentMethodModalHandler}) => {
+
+    
+    console.log({getKeyPaymentMethod: Object.keys(selectedType)[0]})
+    console.log({paymentMethodOptions})
+    
 
     return (
         <>
@@ -20,9 +26,13 @@ const UserSelectPaymentMethodForm = ({symbol, paymentMethodModalHandler}) => {
                     </section>
                     <section className="grow flex-col">
                         <section className="text-lg font-semibold">Complete payment with</section>
-                        <section>test</section>
+                        <section>
+                            {selectedType}
+                        </section>
                     </section>
-                    <section className="grow-0 px-6 content-center"><IconRight /></section>
+                    <section className="grow-0 px-6 content-center">
+                        <IconRight />
+                    </section>
                 </section>
             </section>
         </>

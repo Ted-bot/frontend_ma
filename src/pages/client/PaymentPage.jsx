@@ -60,7 +60,6 @@ const prepRequestFields = {
 const PaymentPage = () => {
 
     const addressStorageName = 'user_address'
-    const regexSearch = /^[A-Za-z]+$/
 
     const data = useLoaderData()
     const [paymentType, setPaymentType] = useState({
@@ -127,8 +126,7 @@ const PaymentPage = () => {
         //set user data in local storage to keep most recent data
 
         Object.keys(userData.userInfo).forEach(key => {
-            const value = userData.userInfo[key];
-            // console.log(`Key: ${key}, Value: ${value}`)
+            const value = userData.userInfo[key]
             setEnteredInput((prevValue) => ({
                 ...prevValue,
                 [key]: value
@@ -136,8 +134,7 @@ const PaymentPage = () => {
         })
 
         Object.keys(userData.userAddress).forEach(key => {
-            const value = userData.userAddress[key];
-            // console.log(`Key: ${key}, Value: ${value}`)
+            const value = userData.userAddress[key]
             setEnteredInput((prevValue) => ({
                 ...prevValue,
                 [key]: value
@@ -151,6 +148,12 @@ const PaymentPage = () => {
     }
     ,[enteredInput])
     
+    function checkLocationStatus(id){
+        setEnteredInputIsInvalid((prevValues) => ({
+            ...prevValues,
+            [id] : false})
+        )
+    }
     
     function getUserInfoObjOrStorageData(name){
         const storedValues = localStorage.getItem(name)
@@ -162,8 +165,18 @@ const PaymentPage = () => {
         return JSON.parse(storedValues) 
     }    
     
-    const inputHandle = (identifier,event) => {
+    const [nameType, setNameType] = useState('no payment method selected')
+    
+    const inputHandle = (identifier, event) => {
         event.preventDefault()
+        
+        Object.keys(paymentMethodOptions.fields).forEach(key => {
+            const value = paymentMethodOptions.fields[key]
+            if(value.id == identifier){
+                setNameType(value.name)
+            }
+        })
+
         setPaymentType((prevValues) => ({
             [identifier]: true
         }))
@@ -192,8 +205,8 @@ const PaymentPage = () => {
                 type: 'text', 
                 value: paymentType.pay_pal, 
                 onClick: (e) => inputHandle('pay_pal', e), 
-            },
-        ],
+            }
+        ]
     }
     
     const ApiRequest = async () => {
@@ -220,16 +233,15 @@ const PaymentPage = () => {
     }
     
     const userAddressModalHandler = useCallback(
-        (event) =>  { //unnessecary async removed
+        (event) =>  { 
             dialogUserAddress.current.open()
         }
     )
 
-    const closeUserAddressModalHandler = useCallback(
-        (event) =>  { //unnessecary async removed
-            dialogUserAddress.current.close()
-        }
-    )
+    // const closeUserAddressModalHandler = (event) =>  {
+    //         console.log({event, ref: dialogUserAddress.current})
+    //         dialogUserAddress.current.close()
+    //     }
 
     const paymentMethodModalHandler = useCallback(
         (event) => {
@@ -240,7 +252,7 @@ const PaymentPage = () => {
     const choosePaymentFormSub = useCallback(
         (event) => {
             const options = {
-                [event.target[0].id] : event.target[0].value,
+                [event.target[0].id]: event.target[0].value,
                 [event.target[1].id]: event.target[1].value,
                 [event.target[2].id]: event.target[2].value
             }
@@ -250,6 +262,7 @@ const PaymentPage = () => {
             setSymbol(selectedMethod)
         }
     )
+
 
     const userAddressHandler = async (event) => {
         event.preventDefault()
@@ -262,6 +275,17 @@ const PaymentPage = () => {
             if(event.target[i].id == 'location'){
                 const city = ctxValue.availableCities.find((city) => city.id == Number(event.target[i].value) )
                 //if city not found ?? set invalid input field
+                console.log({API_CITY: event.target[i].value == ''})
+                if(event.target[i].value == '' || event.target[i].value == undefined){
+                    setEnteredInputIsInvalid((prevValues) => ({
+                        ...prevValues,
+                        [event.target[i].id] : true})
+                    )
+                    return
+                }
+
+                checkLocationStatus(event.target[i].id)
+
                 cityName = city.name
             }
 
@@ -295,7 +319,8 @@ const PaymentPage = () => {
                 throw new PostError('Api error send order address error!', getResults)
             }
 
-            closeUserAddressModalHandler()
+            // setOnClose(true)
+            // closeUserAddressModalHandler()
         //     deleteLocalStorageItem(nameStorageItem)
         //     const reqResults = await response.json()
         //     setToken(reqResults)
@@ -336,6 +361,7 @@ const PaymentPage = () => {
                 const city = cityList.find((city) => city.id == Number(event.target.value))
                 updateEnteredInputState('city_id', city.id)
                 updateEnteredInputState(identifier, city.name)
+                checkLocationStatus('location')
                 return
             }
     
@@ -347,10 +373,11 @@ const PaymentPage = () => {
                 if(!checkIfNumber){
                     setEnteredInputIsInvalid((prevValues) => ({
                         ...prevValues,
-                        [identifier] : false
+                        [identifier] : true
                     }))
                     return
                 } else {
+
                     updateEnteredInputState(identifier, event.target.value)
                     return
 
@@ -400,6 +427,7 @@ const PaymentPage = () => {
         onBlur: inputBlurHandle,
     }
 
+    console.log({enteredInputIsInvalid})
     return (
         <>
             <OrderContext.Provider value={ctxValue}>
@@ -422,7 +450,7 @@ const PaymentPage = () => {
                     {userData?.userInfo && userData?.userAddress && <UserOrderInfoForm userAddressModalHandler={userAddressModalHandler} user={userData.userInfo} address={userData.userAddress} />}
 
                     <h1 className={`pt-3 pb-6 mt-8 text-2xl text-center`}>Choose Payment Method</h1>
-                    <UserSelectPaymentMethodForm symbol={symbol} paymentMethodModalHandler={paymentMethodModalHandler} />
+                    <UserSelectPaymentMethodForm symbol={symbol} paymentMethodModalHandler={paymentMethodModalHandler} paymentMethodOptions={paymentMethodOptions.fields} selectedType={nameType} />
 
                     <h1 className={`pt-3 pb-6 mt-8 text-2xl text-center`}>Order</h1>
                     { userData.userOrder?.lastOrder != undefined && <SelectedOrderForPaymentInterface latestOrder={userData.userOrder.lastOrder} />}

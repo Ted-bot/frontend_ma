@@ -28,7 +28,7 @@ export default function LabelUserInfoFieldInput({
                 value: city.id
             }))
         }
-
+        
     return (
         <>
         <section className={`w-full lg:justify-center px-3 mb-6 md:mb-0`}>
@@ -64,10 +64,10 @@ export default function LabelUserInfoFieldInput({
                 :
                     <section className='flex w-full justify-evenly'>
                         <NativeSelect
-                            className={`w-full block text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`}
+                            className={`${invalid && 'border-4 border-rose-500 '}w-full block text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`}
+                            id={state_id}
                             onChange={(e) => userSelectedLocation('state', e)}
                             value={currentUserState}
-                            id={state_id}
                         >
                             {
                                 optionStateList instanceof Array && 
@@ -76,9 +76,10 @@ export default function LabelUserInfoFieldInput({
                             }
                         </NativeSelect>
                         <NativeSelect
-                            className={`w-full block text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`}
+                            className={`${invalid && 'border-4 border-rose-500 '}w-full block text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`}
                             id={id}
                             onChange={(e) => userSelectedLocation('city', e)}
+                            // value={etst}
                             value={currentUserCity}
                         >
                             {
@@ -91,6 +92,7 @@ export default function LabelUserInfoFieldInput({
                 }
             </label>
             {invalid && id != 'unit_number' && ref?.current?.value == '' && <p className="text-rose-300 text-lg italic">Please fill in a {name} </p>}
+            {invalid && id == 'location' && <p className="text-rose-300 text-lg italic">Please set a {name} </p>}
         </section>
         </>
     )
