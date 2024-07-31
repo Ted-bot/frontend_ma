@@ -104,12 +104,26 @@ export function reconstructPostInput(data, pw)
 
         for (const [key, value] of Object.entries(data)) {
             let newKey
-            if( key === 'city_id' || key === 'city_list_nr' || key === 'state_id' || key === 'state_list_nr' || key === 'state'){
+            // key === 'state_id' || 
+            // key === 'city_id' ||
+            if( key === 'city_list_nr' || key === 'state_list_nr' || key === 'state'){
                 continue
             }
 
             if( key === 'city' ){
                 newKey = 'location'
+                requiredPostRequestFields[newKey] = value
+                continue
+            }
+
+            if( key === 'cityId' ){
+                newKey = 'location'
+                requiredPostRequestFields[newKey] = value
+                continue
+            }
+
+            if( key === 'state_id' ){
+                newKey = 'stateId'
                 requiredPostRequestFields[newKey] = value
                 continue
             }

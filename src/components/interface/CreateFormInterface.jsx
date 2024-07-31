@@ -1,12 +1,10 @@
-import LabelAddressFieldInput from "../ui/input/LabelAddressFieldInput"
+import LabelNameInput from "../ui/input/LabelNameInput"
 
 // eslint-disable-next-line react/prop-types
-export default function AddressInterface({array}) {
-
-    console.log({paymentArray: array})
+export default function CreateFormInterface({array}) {
 
         return array.map((item) => (
-        <LabelAddressFieldInput 
+        <LabelNameInput 
             name={item.name}
             type={item.type}
             key={item.id}
