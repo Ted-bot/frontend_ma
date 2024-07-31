@@ -304,7 +304,7 @@ const PaymentPage = () => {
         }
 
         const confirmUserOrder = {
-            ammount: amount,
+            amount: amount,
             billingAddress: billingAddress,
             shippingAddress: billingAddress,
             metadata: { some : 'find out'},
