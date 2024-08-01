@@ -222,50 +222,26 @@ const PaymentPage = () => {
             throw new {error: 'Not Found!'}
         }
 
-        setLocalStorageItem('amount',response.amount)
-        //     "billingAddress" => [
-        //     "streetAndNumber" => "Keizersgracht 313",
-        //     "postalCode" => "1016 EE",
-        //     "city" => "Amsterdam",
-        //     "country" => "nl",
-        //     "givenName" => "Luke",
-        //     "familyName" => "Skywalker",
-        //     "email" => "luke@skywalker.com",
-        // ],
-        // "shippingAddress" => [
-        //     "streetAndNumber" => "Keizersgracht 313",
-        //     "postalCode" => "1016 EE",
-        //     "city" => "Amsterdam",
-        //     "country" => "nl",
-        //     "givenName" => "Luke",
-        //     "familyName" => "Skywalker",
-        //     "email" => "luke@skywalker.com",
-        // ],
-        // "metadata" => [
-        //     "some" => "data",
-        // ],
-        // "consumerDateOfBirth" => "1958-01-31",
-        setLocalStorageItem('locale',response.locale)
-        setLocalStorageItem('orderNumber',response.orderId)
-        setLocalStorageItem('consumerDateOfBirth',response.user.consumerDateOfBirth)
-        // "redirectUrl" => "https://your_domain.com/return?some_other_info=foo",
-        // "webhookUrl" => "https://your_domain.com/webhook",
-        // "method" => "ideal",
-        setLocalStorageItem('lines',response.lines)
-
-        setLocalStorageItem(response.curreny.name,response.curreny.symbol)
-        
         updateUserData('userInfo', {...response.user})
         updateUserData('userAddress', {...response.address})
         updateUserData('userOrder', 
-        {
-            orderId: response.orderId,
-            currency: response.currency,
-            lastOrder: response.lines,
-            orderTaxPrice: response.orderTaxPrice,
-            orderTotalAmount: response.amount.value,
-            orderTotalProductPrice: response.orderTotalProductPrice,
-        })
+            {
+                orderId: response.orderId,
+                currency: response.currency,
+                lastOrder: response.lines,
+                orderTaxPrice: response.orderTaxPrice,
+                orderTotalAmount: response.amount.value,
+                orderTotalProductPrice: response.orderTotalProductPrice,
+            })
+
+        setLocalStorageItem('amount',response.amount)
+        setLocalStorageItem('locale',response.locale)
+        setLocalStorageItem('orderNumber',response.orderId)
+        setLocalStorageItem('consumerDateOfBirth',response.user.consumerDateOfBirth)
+        setLocalStorageItem(response.curreny.name,response.curreny.symbol)  
+            
+        setLocalStorageItem('lines', response.lines)       
+            
     }
     
     const userAddressModalHandler = useCallback(
@@ -284,6 +260,7 @@ const PaymentPage = () => {
 
         const mollieOrder = JSON.parse(localStorage.getItem(addressStorageName))
         const lines = JSON.parse(localStorage.getItem('lines'))
+
         const consumerDateOfBirth = JSON.parse(localStorage.getItem('consumerDateOfBirth'))
         const amount = JSON.parse(localStorage.getItem('amount'))
         const orderNumber = JSON.parse(localStorage.getItem('orderNumber'))
@@ -310,11 +287,14 @@ const PaymentPage = () => {
             metadata: { some : 'find out'},
             consumerDateOfBirth: consumerDateOfBirth,
             locale: locale,
-            orderNumber: orderNumber,
-            redirectUrl: 'http://localhost:5173/',
-            webhookUrl: 'http://localhost:5173/payment/webhook',
-            method: 'find out',
-            lines: lines,
+            orderNumber: orderNumber.toString(),
+            redirectUrl: 'http://www.localhost:5173/',
+            webhookUrl: 'http://www.localhost:5173/payment',
+            method: mollieOrder.paymentMethodId,
+            lines: lines.map((line) => {
+                delete line.productDetails
+                return  line
+            }) ,
         }
             
         console.log({createOrderMollie: confirmUserOrder})
