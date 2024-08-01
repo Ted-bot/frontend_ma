@@ -310,7 +310,7 @@ const PaymentPage = () => {
             metadata: { some : 'find out'},
             consumerDateOfBirth: consumerDateOfBirth,
             locale: locale,
-            orderNumber: mollieOrder.paymentMethodId,
+            orderNumber: orderNumber,
             redirectUrl: 'http://localhost:5173/',
             webhookUrl: 'http://localhost:5173/payment/webhook',
             method: 'find out',
