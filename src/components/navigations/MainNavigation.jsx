@@ -73,7 +73,7 @@ function MainNavigation() {
                             Registration
                         </NavLink>
                         <NavLink
-                        to="/login"
+                        to="/dashboard/login"
                         className={({ isActive, isPending }) =>
                             isPending ? "pending" : isActive ? "text-cyan-200 underline decoration-solid underline-offset-8 decoration-2 decoration-cyan-200" : ""
                         }

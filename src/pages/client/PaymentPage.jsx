@@ -226,7 +226,7 @@ const PaymentPage = () => {
         updateUserData('userAddress', {...response.address})
         updateUserData('userOrder', 
             {
-                orderId: response.orderId,
+                // orderId: response.orderId,
                 currency: response.currency,
                 lastOrder: response.lines,
                 orderTaxPrice: response.orderTaxPrice,
@@ -236,8 +236,9 @@ const PaymentPage = () => {
 
         setLocalStorageItem('amount',response.amount)
         setLocalStorageItem('locale',response.locale)
-        setLocalStorageItem('orderNumber',response.orderId)
-        setLocalStorageItem('consumerDateOfBirth',response.user.consumerDateOfBirth)
+        setLocalStorageItem('description',response.description)
+        // setLocalStorageItem('orderNumber',response.orderId)
+        // setLocalStorageItem('consumerDateOfBirth',response.user.consumerDateOfBirth)
         setLocalStorageItem(response.curreny.name,response.curreny.symbol)  
             
         setLocalStorageItem('lines', response.lines)       
@@ -261,35 +262,48 @@ const PaymentPage = () => {
         const mollieOrder = JSON.parse(localStorage.getItem(addressStorageName))
         const lines = JSON.parse(localStorage.getItem('lines'))
 
-        const consumerDateOfBirth = JSON.parse(localStorage.getItem('consumerDateOfBirth'))
+        const stateId = mollieOrder.state_id
+        const state = ctxValue.availableStates.find((state) => state.id == stateId )
+
+        // console.log({state:state, stateName: state.name})
+        // stateName = state.name
+
+        // const consumerDateOfBirth = JSON.parse(localStorage.getItem('consumerDateOfBirth'))
         const amount = JSON.parse(localStorage.getItem('amount'))
-        const orderNumber = JSON.parse(localStorage.getItem('orderNumber'))
+        // const orderNumber = JSON.parse(localStorage.getItem('orderNumber'))
         const locale = JSON.parse(localStorage.getItem('locale'))
+        const description = JSON.parse(localStorage.getItem('description'))
         let splitFullName = mollieOrder.firstAndLastName
         const userNameArray = splitFullName.split(" ")
-        const streetAndNumber = mollieOrder.addressLine + ' ' + mollieOrder.streetNumber + ' ' +  mollieOrder.unitNumber
-        const country = mollieOrder.county
+        const streetAndNumber = mollieOrder.addressLine + ' ' + mollieOrder.streetNumber
+        const addintionalNumber = mollieOrder.unitNumber
 
         const billingAddress = {
-            streetAndNumber : streetAndNumber.trim(),
-            postalCode : mollieOrder.postalCode,
-            city : mollieOrder.city,
-            country : country.toLowerCase(),
+            title: 'Mr.', // set gender check
             givenName : userNameArray[0],
             familyName : userNameArray[1],
+            organisationName: '', // set gender check
+            streetAndNumber : streetAndNumber.trim(),
+            streetAdditional : addintionalNumber,
+            postalCode : mollieOrder.postalCode,
             email : mollieOrder.email,
+            phone : mollieOrder.phoneNumber,
+            city : mollieOrder.city,
+            region : state.name,
+            country : mollieOrder.country,
         }
 
         const confirmUserOrder = {
+            description: description,
             amount: amount,
+            // redirectUrl: 'http://localhost:5173/',
+            redirectUrl: 'http://localhost:5173/payment',
+            webhookUrl: 'https://hkdk.events/8xzfpv28njjwx6/webhook/mollie_direct_payment',
+            // webhookUrl: 'https://smee.io/Xbaygp2A7TmD1ppz',
             billingAddress: billingAddress,
             shippingAddress: billingAddress,
-            metadata: { some : 'find out'},
-            consumerDateOfBirth: consumerDateOfBirth,
+            metadata: { order_id : 'find out'},
             locale: locale,
-            orderNumber: orderNumber.toString(),
-            redirectUrl: 'http://www.localhost:5173/',
-            webhookUrl: 'http://www.localhost:5173/payment',
             method: mollieOrder.paymentMethodId,
             lines: lines.map((line) => {
                 delete line.productDetails
@@ -329,6 +343,9 @@ const PaymentPage = () => {
         //     navigate('/dashboard') 
         //     // redirect
         // localStorage.removeItem(addressStorageName);
+
+        const redirectIDeal = getPayResults.redirect
+        window.location.replace(redirectIDeal)
 
         } catch (error) {
             

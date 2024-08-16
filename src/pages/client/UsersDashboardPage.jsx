@@ -56,7 +56,6 @@ const UsersDashboardPage = () => {
 
   const requestUserData = async (token) => {
     const GetUrl = '/api/v1/dashboard/user'
-    console
     const requestOptions = ApiFetchGetOptions(GetUrl, {'X-Authorization': 'Bearer ' + token})
     const request = ApiFetch(requestOptions)
 
