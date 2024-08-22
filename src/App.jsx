@@ -21,6 +21,7 @@ import PaymentPage from './pages/client/PaymentPage.jsx'
 import { PaymentLoader } from './components/loader/PaymentLoader.jsx'
 
 import {tokenLoader} from './js/util/auth.js'
+import ContactPage from './pages/ContactPage.jsx'
 // import UsersPage from './pages/admin/UsersPage.jsx'
 
 function App() {
@@ -45,6 +46,7 @@ function App() {
         { path: '/order', element: <OrderPage />},
         { path: '/payment', element: <PaymentPage />, loader:  PaymentLoader},
         { path: '/dashboard/*', element: <DashboardPage />},
+        { path: '/contact', element: <ContactPage />},
       ]  
     }
   ])

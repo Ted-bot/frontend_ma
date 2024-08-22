@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 import TextWithLineBreaks from "../ui/text/TextWithLineBreaks"
 import Box from '@mui/material/Box'
 import IconRight from "../../assets/IconRight"
@@ -34,7 +35,6 @@ export default function OrderCard({name, description, duration, durationLength, 
                             </section>
                             {directOrPeriodic != 0  &&
                             <>
-                                {/* <TextWithLineBreaks text={`per ${duration}`} /> */}
                                 <div className="text-sm mt-0.5"><span>per </span><span className="font-extrabold">{duration}</span><br />
                                     <span className="font-extrabold">{price}</span>
                                     <span className="font-semibold"> for </span>
@@ -56,17 +56,12 @@ export default function OrderCard({name, description, duration, durationLength, 
                             </>}
                         </Box>                        
                     </section>
-{/* hover:bg-green-600 hover:text-white bg-green-700*/}
-                    <button className="sp-ref-all-btns rounded-md mb-5 py-4 text-gray-300 px-6 first-button" id="first-button">
-                        <span className="">Free Trail</span>    
-                        {/*  text-green-800 hover:text-text-green-300*/}
+                    <button className="sp-ref-all-btns rounded-md mb-5 py-4 px-6 first-button">
+                        <span className="">Free Trail</span> 
                         <FontAwesomeIcon icon={faArrowRightLong} className="sp-hidden-fa-icon pl-2" />
                     </button>
-                    {/* hover:bg-green-700 hover:text-white */}
-                    <button className="sp-ref-all-btns rounded-md mb-5 py-4 px-6 second-button" id="second-button">   
-                        {/* underline underline-offset-8 decoration-2 text-green-700 */}
+                    <button className="sp-ref-all-btns rounded-md mb-5 py-4 px-6 second-button">
                         <span className="">Order Now </span>
-                        {/*  hover:text-text-orange-300  text-green-800*/}
                         <FontAwesomeIcon icon={faArrowRightLong} className="sp-fa-icon pl-2" />                        
                     </button>
                     <section className="sp-last text-center">
