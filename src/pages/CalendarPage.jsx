@@ -24,30 +24,33 @@ export default function CalendarPage(){
         getPlannedEvents()
     }, [])
 
-    const getPlannedEvents = async () => {
-        const getOptions = ApiFetchGetOptions('/api/trainingsessions',{'X-Authorization': 'Bearer ' + token})
-        const getResults = await ApiFetch(getOptions)
-        const response = await getResults.json()
-        
-        if(!getResults.ok)
-        {
-            throw new PostError('Api Login error', response)  
-        }
+    const getPlannedEvents = useCallBack( 
+        async () => {
+            const getOptions = ApiFetchGetOptions('/api/trainingsessions',{'X-Authorization': 'Bearer ' + token})
+            const getResults = await ApiFetch(getOptions)
+            const response = await getResults.json()
+            
+            if(!getResults.ok)
+            {
+                throw new PostError('Api Login error', response)  
+            }
 
-        const events = response['hydra:member'].map((response) => ({
-            id: response.id,
-            title: response.title,
-            start: new Date(response.startDate),
-            end: new Date(response.endDate),
-            resource: response.description,
-        }))
+            const events = response['hydra:member'].map((response) => ({
+                id: response.id,
+                title: response.title,
+                start: new Date(response.startDate),
+                end: new Date(response.endDate),
+                resource: response.description,
+            }))
 
-        console.log({loadingEvents : events})
+            console.log({loadingEvents : events})
 
-        setPlannedEvents(events)
-    }
+            setPlannedEvents(events)
+        },[]
+    )
 
-    const handleSubmit = async (event, id) => { 
+    const handleSubmit = useCallback(
+        async (event, id) => { 
         event.preventDefault()
         const ApiOptions = ApiFetchPostOptions({url: '/api/subscribe/events', method:'POST'}, {event_id: id},{'X-Authorization': 'Bearer ' + token})
         
@@ -73,10 +76,10 @@ export default function CalendarPage(){
         } catch (error){
             console.log({SubscribeEventError: error})
         }
+    }, []
+)
 
-    }
-
-    const handleSelectEvent = useCallback(
+    const handleSelectEvent = 
         (event) =>  { //unnessecary async removed
             // console.log({eventSelected: event})
 
@@ -111,9 +114,7 @@ export default function CalendarPage(){
                     end: endTimeEvent
                 }
             })
-        },
-        []
-    )
+        }
 
     return(
         <>

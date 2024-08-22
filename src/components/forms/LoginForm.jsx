@@ -121,6 +121,7 @@ export default function LoginForm() {
                         setErrors(error.response.errors)
                     }
                 } else {
+                    // "code":401,"message":"JWT Token not found"
                     console.log(error)
                 }
             notify('Invalid email or password')

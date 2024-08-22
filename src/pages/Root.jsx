@@ -8,14 +8,16 @@ import MainNavigation from '../components/navigations/MainNavigation.jsx'
 const patterns = [
   "/:dashboard/:firstKey/:secondKey/:thirdKey",
   "/:dashboard/:firstKey/:secondKey",
-  "/:dashboard/:firstKey",
-  "/:dashboard"
+  "/dashboard/:firstKey",
+  "/dashboard/"
 ]
 
 function Root(){
   let navbarComponent = <MainNavigation />
   const { pathname } = useLocation()
-  const match = patterns.find(path => (matchPath(path, pathname))) ? true : false
+  const proxyDashboardLogin = pathname === '/dashboard/login' ? '/login' : pathname
+  // console.log({patname: pathname, proxy: proxyDashboardLogin})
+  const match = patterns.find(path => (matchPath(path, proxyDashboardLogin))) ? true : false
 
   return (
   <>

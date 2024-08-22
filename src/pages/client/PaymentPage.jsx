@@ -298,7 +298,7 @@ const PaymentPage = () => {
             amount: amount,
             // redirectUrl: 'http://localhost:5173/',
             redirectUrl: 'http://localhost:5173/payment',
-            webhookUrl: 'https://hkdk.events/8xzfpv28njjwx6/webhook/mollie_direct_payment',
+            webhookUrl: 'https://hkdk.events/8xzfpv28njjwx6',
             // webhookUrl: 'https://smee.io/Xbaygp2A7TmD1ppz',
             billingAddress: billingAddress,
             shippingAddress: billingAddress,

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { redirect } from 'react-router-dom'
 import { Card, CardContent, CardHeader } from "@mui/material"
 import CssBaseline from '@mui/material/CssBaseline'
@@ -23,6 +23,38 @@ const UsersDashboardPage = () => {
   const itemLocalstorage = 'user'
   const CurrentStateStorage = getLocalStorageItem(itemLocalstorage) != null ? getLocalStorageItem(itemLocalstorage) : null
   const token = getAuthToken()
+  const [errors, setErrors] = useState('')
+
+  const requestUserData = useCallback(
+    async (token) => {
+    const GetUrl = '/api/v1/dashboard/user'
+    const requestOptions = ApiFetchGetOptions(GetUrl, {'X-Authorization': 'Bearer ' + token})
+    const request = ApiFetch(requestOptions)
+
+    try {
+      
+      const response = await request
+      const getResults = await response.json()
+
+      // console.log({reponse_api_dashboard: response})
+      console.log({reponse_api_dashboard: getResults})
+
+      if(!response.ok && response.status === 401){ // 401
+        throw {response: { message: getResults.message, code: response.status }}
+      }
+
+      return { id: getResults.id, firstName: getResults.first_name, lastName: getResults.last_name, email: getResults.email }
+    
+    } catch (error) {
+
+      if(error.response != undefined ){
+        error.response.code != undefined && setErrors(error.response.message)
+      }
+      console.log({ error_request_userdata: error })
+      // return 
+      }        
+    }, [token]
+  )
 
   useEffect(() => {
     console.log({tokenAvailable: token})
@@ -54,34 +86,26 @@ const UsersDashboardPage = () => {
     })
   },[])
 
-  const requestUserData = async (token) => {
-    const GetUrl = '/api/v1/dashboard/user'
-    const requestOptions = ApiFetchGetOptions(GetUrl, {'X-Authorization': 'Bearer ' + token})
-    const request = ApiFetch(requestOptions)
-
-    try {
-      const response = await request
-      const response_1 = await response.json()
-      return { id: response_1.id, firstName: response_1.first_name, lastName: response_1.last_name, email: response_1.email }
-    } catch (error) {
-      return (console.log({ error_request_userdata: error }))
-    }        
-  }
-
   if(CurrentStateStorage != null)
   if(CurrentStateStorage.firstName != '' && dashboardData.firstName == ''){
-    Object.entries(CurrentStateStorage).map(([key, value]) => {
-      console.log({key, value})
-      setDashBoardData((prevValues) => ({
-        ...prevValues,
-        [key] : value
-      }))
-    })
+    // useMemo(()=> {
+        Object.entries(CurrentStateStorage).map(([key, value]) => {
+        console.log({key, value})
+        setDashBoardData((prevValues) => ({
+          ...prevValues,
+          [key] : value
+        }))
+      })
+    // }, [CurrentStateStorage])
   }
   
   return (
     <Card>
       <CardHeader sx={{ mx: 2 }} title={`${dashboardData.firstName} Dashboard`} />
+      
+      <CardContent>
+        {errors && <p className="text-red-500 text-5xl italic py-3 "> {errors} </p>}
+        </CardContent>
       <CssBaseline />
       <CardContent>
         <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)' }}>
@@ -89,7 +113,7 @@ const UsersDashboardPage = () => {
               container 
               direction="column"
               sx={{ flexGrow: 1}}
-            >
+              >
               <Box 
                   display='block'
                   my={2}

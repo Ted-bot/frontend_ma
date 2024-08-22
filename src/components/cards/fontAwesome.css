@@ -1,0 +1,130 @@
+/* |
+  FIRST BUTTON IN CARD
+| */
+
+/* icon class */
+section button .sp-hidden-fa-icon {
+  visibility: hidden;
+  /* -webkit-transition: visibility 0.1s eas-in-out .5s; */
+  /* -moz-transition: visibility 0.1s eas-in-out .5s;
+  -o-transition: visibility 0.1s eas-in-out .5s; */
+  transition: visibility 0.2s ease-in-out .5s;
+}
+
+section button:hover .sp-hidden-fa-icon {
+  visibility: visible;
+  width: 2rem;
+}
+
+/* search element */
+section button:nth-child(3) {
+  text-decoration: none;
+  background-color: rgb(16, 93, 48);
+  font-weight: 300;
+  font-size: 1rem;
+  transition: background-color 0.4s ease-in-out .15s;
+  transition: font-weight 0.4s ease-in-out .15s;
+  transition: font-size 0.4s ease-in-out .15s;
+}
+
+section button:hover:nth-child(3) {
+  text-decoration: underline;
+  text-decoration-thickness: 3px;
+  text-underline-offset: 8px;
+  background-color: transparent;
+  color: rgb(22, 101, 52);
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+
+/* |
+SECOND BUTTON IN CARD
+| */
+
+/* icon class */
+section button .sp-fa-icon {
+  visibility: visible;
+  display: inline-flex;
+  /* -webkit-transition: visibility 0.1s eas-in-out .5s;
+  -moz-transition: visibility 0.1s eas-in-out .5s;
+  -o-transition: visibility 0.1s eas-in-out .5s; */
+  transition: visibility 0.4s ease-in-out .5s;
+  transition: display 0.4s ease-in-out .4s;
+}
+
+section button:hover .sp-fa-icon {
+  color: rgb(16, 93, 48);
+  visibility: hidden;
+  display: none;
+  width: 2rem;
+}
+
+/* search element */
+section button:nth-child(4) {
+  background-color: transparent;
+  font-weight: 300;
+  text-decoration: underline;
+  text-decoration-thickness: 3px;
+  text-underline-offset: 8px;
+  color: rgb(16, 93, 48);
+  font-size: 1rem;
+  /* visibility: hidden; */
+  transition: all 0.4s ease-in-out .15s;
+  /* transition: font-weight 0.4s ease-in-out .15s;
+  transition: font-size 0.4s ease-in-out .15s; */
+  /* transition: text-decoration 0.4s ease-in-out .15s;
+  transition: text-decoration-thickness 0.4s ease-in-out .15s; */
+}
+
+section button:hover:nth-child(4) {
+  font-weight: 700;
+  text-decoration: none;
+  background-color: rgb(16, 93, 48);
+  color: rgb(245, 255, 249);
+  font-size: 1.1rem;
+}
+
+/* has method get prev el */
+button:has(+ button:is(:hover, :focus-visible)) {
+  font-size: 0.7rem;
+  opacity: 0.3;
+}
+
+.sp-section {
+  transition: all 0.4s ease-in-out .15s;
+  /* border-color: blue; */
+}
+
+.second-button:has(~ .first-button) {
+  border-width: thick;
+  border-color: red;
+}
+
+button:hover:nth-child(3) + button:nth-child(4) {
+  opacity: 0.3;
+  font-size: 0.7rem;
+}
+
+/* CARD PRICE CARD */
+.card-subscription
+{
+  /* background-color: aqua; */
+  border-width: thick;
+  border-color: red;
+  transition: all 0.4s ease-in-out .15s;
+}
+
+.card-subscription:hover .sp-section
+{
+  background-color: rgb(145, 255, 0);
+  border-width: thick;
+  border-color: red;
+}
+
+.card-subscription:hover
+{
+  background-color: aqua;
+  transform: scale(1.05);
+
+}

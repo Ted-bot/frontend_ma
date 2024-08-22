@@ -9,6 +9,7 @@ import { createBrowserRouter,
 // import viteLogo from '/vite.svg'
 import './App.css'
 import RootLayout from './pages/Root.jsx'
+import { useEffect, useState } from 'react'
 import HomePage from './pages/HomePage.jsx'
 import SignUpPage from './pages/SignUpPage.jsx'
 import LoginPage from './pages/LoginPage.jsx'
@@ -23,20 +24,12 @@ import {tokenLoader} from './js/util/auth.js'
 // import UsersPage from './pages/admin/UsersPage.jsx'
 
 function App() {
-  // const {pathname} = useLocation()
 
-  // const patterns = [
-  //   "/:dashboard/:firstKey/:secondKey/:thirdKey/:fourthKey",
-  //   "/:dashboard/:firstKey/:secondKey/:thirdKey",
-  //   "/:dashboard/:firstKey/:secondKey",
-  //   "/:dashboard/:firstKey"
-  // ]
+  const [activeIndex, setActiveIndex] = useState(0);
+    useEffect(() => {
 
-  // const match = patterns.reduce(
-  //   (match, pattern) => (matchPath(pattern, match) ? match : patter),
-  //   pathname
-  // )
-  // const [count, setCount] = useState(0)
+    }, [activeIndex])
+
   const router = createBrowserRouter([
     { 
       path: '/', 
@@ -48,10 +41,10 @@ function App() {
         { path: '/sign-up', element: <SignUpPage /> },
         { path: '/login', element: <LoginPage /> },
         { path: '/logout', action: logoutAction },
-        { path: '/dashboard/*', element: <DashboardPage />},
         { path: '/calendar', element: <CalendarPage />},
         { path: '/order', element: <OrderPage />},
         { path: '/payment', element: <PaymentPage />, loader:  PaymentLoader},
+        { path: '/dashboard/*', element: <DashboardPage />},
       ]  
     }
   ])
