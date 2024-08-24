@@ -10,7 +10,7 @@ import { Layout } from 'react-admin'
 import MyMenu from '../components/navigations/DashboardNavigation.jsx'
 import ProfileList from '../dataProvider/Profile/ProfileList.jsx'
 import UserCreate from '../dataProvider/User/UserCreate.jsx'
-import MyLoginForm from '../components/forms/dashboardLogin.jsx'
+import LoginDashboardLoader from '../components/loader/LoginDashboardLoader.jsx'
 import { ApiFetch,
      ApiFetchPostOptions,
     //  ApiFetchGetOptions,
@@ -49,7 +49,7 @@ export default function DashboardPage() {
     const itemLocalstorage = 'user'
 
     const MyLogin = () => (
-            <MyLoginForm />
+            <LoginDashboardLoader />
     )
 
     const authProvider = {

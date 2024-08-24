@@ -26,7 +26,8 @@ export function logoutAction(){
                 throw new PostError(response, errorJson)
             }
         } catch (error) {
-                console.log(error)
+            localStorage.removeItem('auth')
+            console.log({error, token: localStorage.getItem('auth')})
         }
     }
 

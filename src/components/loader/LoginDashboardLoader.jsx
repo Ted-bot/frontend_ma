@@ -3,7 +3,7 @@ import { Form, redirect } from 'react-router-dom'
 import { useLogin } from 'react-admin'
 import { setToken } from '../../js/util/postUtil'
 
-const MyLoginForm = () => {
+const LoginDashboardLoader = () => {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [errors, setErrors] = useState('')
@@ -73,4 +73,4 @@ const MyLoginForm = () => {
     )
 }
 
-export default MyLoginForm
+export default LoginDashboardLoader

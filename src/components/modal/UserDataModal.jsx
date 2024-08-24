@@ -1,7 +1,6 @@
 
-import { useState, forwardRef, useImperativeHandle, useRef, useContext } from 'react'
+import { forwardRef, useImperativeHandle, useRef, useContext } from 'react'
 import { createPortal } from 'react-dom'
-import { Dialog } from "@mui/material";
 import { Form } from 'react-router-dom'
 
 import Divider from '@mui/material/Divider'
@@ -29,11 +28,23 @@ import Modal from '@mui/material/Modal'
 //     // countryId: false,
 // }
 
-const UserDataModal = forwardRef(function UserDataModal({ onClose, enteredInput, enteredInputIsInvalid, formSubmit}, ref){
-
+const UserDataModal = forwardRef(function UserDataModal({ enteredInput, enteredInputIsInvalid, formSubmit}, ref){
+    
     const {userSelectedLocation, onBlur} = useContext(OrderContext)
     const dialog = useRef()
     const typeLocation = 'location'
+    
+    useImperativeHandle(ref, () => {
+    
+        return {
+            open(){
+                dialog.current.showModal()
+            }
+            // close(){
+            //     dialog.current.close()
+            // }
+        }
+    })
     
     const userForm = {
         name: 'Personal Information',
@@ -43,7 +54,7 @@ const UserDataModal = forwardRef(function UserDataModal({ onClose, enteredInput,
                 id: 'firstAndLastName', 
                 type: 'text', 
                 placeholder: 'type first and last name', 
-                value: enteredInput.firstAndLastName,
+                value: enteredInput?.firstAndLastName,
                 invalid: enteredInputIsInvalid.firstAndLastName, 
                 error: 'error', 
                 required : true, 
@@ -56,7 +67,7 @@ const UserDataModal = forwardRef(function UserDataModal({ onClose, enteredInput,
                 type: 'email', 
                 placeholder: 'email', 
                 autoComplete: 'email',
-                value: enteredInput.email,
+                value: enteredInput?.email,
                 invalid: enteredInputIsInvalid.email, 
                 error: 'error', 
                 required : true, 
@@ -68,7 +79,7 @@ const UserDataModal = forwardRef(function UserDataModal({ onClose, enteredInput,
                 id: 'phoneNumber', 
                 type: 'tel', 
                 placeholder: 'type in phone number', 
-                value: '+31' + enteredInput.phoneNumber,
+                value: enteredInput?.phoneNumber,
                 invalid: enteredInputIsInvalid.phoneNumber, 
                 error: 'error', 
                 required : true, 
@@ -86,7 +97,7 @@ const UserDataModal = forwardRef(function UserDataModal({ onClose, enteredInput,
                 id: 'unitNumber',
                 type: 'text',
                 placeholder: 'unit number',
-                value: enteredInput.unitNumber,
+                value: enteredInput?.unitNumber,
                 invalid: enteredInputIsInvalid.unitNumber,
                 error: 'error',
                 onChange: (e) => userSelectedLocation('unitNumber', e),
@@ -97,7 +108,7 @@ const UserDataModal = forwardRef(function UserDataModal({ onClose, enteredInput,
                 type: 'number',
                 placeholder: 'street number',
                 min: 0, 
-                value: enteredInput.streetNumber,
+                value: enteredInput?.streetNumber,
                 invalid: enteredInputIsInvalid.streetNumber,
                 error: 'error',
                 required : true,
@@ -108,7 +119,7 @@ const UserDataModal = forwardRef(function UserDataModal({ onClose, enteredInput,
                 id: 'addressLine',
                 type: 'text',
                 placeholder: 'address line',
-                value: enteredInput.addressLine,
+                value: enteredInput?.addressLine,
                 invalid: enteredInputIsInvalid.addressLine,
                 error: 'error',
                 required : true,
@@ -119,7 +130,7 @@ const UserDataModal = forwardRef(function UserDataModal({ onClose, enteredInput,
                 id: 'postalCode',
                 type: 'text',
                 placeholder: 'postal code',
-                value: enteredInput.postalCode,
+                value: enteredInput?.postalCode,
                 invalid: enteredInputIsInvalid.postalCode,
                 error: 'error',
                 required : true,
@@ -131,24 +142,13 @@ const UserDataModal = forwardRef(function UserDataModal({ onClose, enteredInput,
                 id: typeLocation,
                 state_id: 'stateLocation',
                 type: typeLocation, 
-                invalid: enteredInputIsInvalid.location,
+                invalid: enteredInputIsInvalid.city,
                 required: true,
                 onBlur : (e) => onBlur('city', e, typeLocation)
             },
         ],
     }
 
-    useImperativeHandle(ref, () => {
-
-        return {
-            open(){
-                dialog.current.showModal()
-            },
-            close(){
-                dialog.current.close()
-            }
-        }
-    })
 
     return createPortal(
         <dialog ref={dialog} className="result-modal w-full md:w-3/4 lg:w-[32rem]">

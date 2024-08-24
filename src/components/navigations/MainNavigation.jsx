@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { NavLink, Form, useRouteLoaderData } from 'react-router-dom'
+import {useLogout } from 'react-admin'
+import { MenuItem } from '@mui/material'
 // import classes from './MainNavigation.module.css'
 
 function MainNavigation() {
@@ -9,10 +11,13 @@ function MainNavigation() {
     // const [openAvatarDropdown, setOpenAvatarDropdown] = useState(false);
 
     const toggleNav = () => {
-        setOpenNav(!openNav);
-        // setOpenAvatarDropdown(false);
-    };
+        setOpenNav(!openNav)
+        // setOpenAvatarDropdown(false)
+    }
 
+    // const logout = useLogout()
+    // const handleClick = () => logout()
+    
     // const toggleAvatarDropdown = () => {
     //     setOpenAvatarDropdown(!openAvatarDropdown);
     // };
@@ -40,22 +45,41 @@ function MainNavigation() {
                     Home
                 </NavLink>
                 <NavLink
-                    to="/event"
+                    to="/calendar"
                     className={({ isActive, isPending }) =>
                         isPending ? "pending" : isActive ? "text-cyan-200 underline decoration-solid underline-offset-8 decoration-2 decoration-cyan-200" : ""
                     }
                 >
                     Event
                 </NavLink>
-                {/* <NavLink
-                    to="/services"
+                <NavLink
+                    to="/subscribe"
                     className={({ isActive, isPending }) =>
-                        isPending ? "pending" : isActive ? "text-blue-900" : ""
+                        isPending ? "pending" : isActive ? "text-cyan-200 underline decoration-solid underline-offset-8 decoration-2 decoration-cyan-200" : ""
                     }
                 >
-                    Services
-                </NavLink> */}
+                    Subscribe
+                </NavLink>
+                <NavLink
+                    to="/contact"
+                    className={({ isActive, isPending }) =>
+                        isPending ? "pending" : isActive ? "text-cyan-200 underline decoration-solid underline-offset-8 decoration-2 decoration-cyan-200" : ""
+                    }
+                >
+                    contact
+                </NavLink>
                 {token &&
+                    // <MenuItem
+                    //     className={({ isActive, isPending }) =>
+                    //         isPending ? "pending" : isActive ? "text-cyan-200 underline decoration-solid underline-offset-8 decoration-2 decoration-cyan-200" : ""
+                    //     }
+                    //     onClick={handleClick}
+                    //     // ref={ref}
+                    //     // It's important to pass the props to allow Material UI to manage the keyboard navigation
+                    //     // {...props}
+                    // >
+                    //     logout
+                    // </MenuItem>
                     <Form action="/logout" method="post">
                         <button>
                             logout

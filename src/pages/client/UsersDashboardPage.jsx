@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { redirect } from 'react-router-dom'
 import { Card, CardContent, CardHeader } from "@mui/material"
 import CssBaseline from '@mui/material/CssBaseline'
@@ -49,6 +49,7 @@ const UsersDashboardPage = () => {
 
       if(error.response != undefined ){
         error.response.code != undefined && setErrors(error.response.message)
+        throw {message: error.response.message}
       }
       console.log({ error_request_userdata: error })
       // return 

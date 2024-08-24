@@ -1,5 +1,5 @@
-import {useState, useEffect, useCallback, useRef} from 'react'
-import FeatureCardsWrap from '../components/wraps/client/FeatureCardsWrap' 
+import {useState, useEffect, useCallback, useMemo, useRef} from 'react'
+import MainContentWrap from '../components/wraps/client/MainContentWrap' 
 import CalendarInterface from '../components/interface/CalendarInterface.jsx'
 import { ApiFetchGetOptions, ApiFetchPostOptions, ApiFetch, getToken } from '../js/util/postUtil'
 import { PostError } from '../js/error/PostError'
@@ -18,13 +18,13 @@ export default function CalendarPage(){
     })
     const token = getToken()
     const dialog = useRef()
-    const options = { month: 'short', day: 'numeric' }
+    
 
     useEffect(() => {
         getPlannedEvents()
     }, [])
 
-    const getPlannedEvents = useCallBack( 
+    const getPlannedEvents = useCallback( 
         async () => {
             const getOptions = ApiFetchGetOptions('/api/trainingsessions',{'X-Authorization': 'Bearer ' + token})
             const getResults = await ApiFetch(getOptions)
@@ -76,25 +76,25 @@ export default function CalendarPage(){
         } catch (error){
             console.log({SubscribeEventError: error})
         }
-    }, []
+    }, [token]
 )
 
-    const handleSelectEvent = 
+    const handleSelectEvent = useMemo(() => 
         (event) =>  { //unnessecary async removed
             // console.log({eventSelected: event})
-
+            const options = { month: 'short', day: 'numeric' }
             const selectedDate = new Date(event.start).toLocaleDateString('en-us', options)
-
+            
             if(event.start < new Date()){
                 let text = `This ${event.title} on ${selectedDate} has already passed!\nPlease selected one of the upcoming available dates`
                 window.alert(text)
                 return
             }
-
+            
             dialog.current.open()
             const extractStartTimeEvent = new Date(event.start)
             const extractEventTimeEnd = new Date(event.end)
-
+            
             const extractDay = extractStartTimeEvent.toDateString()
             const extractStartTimeHours = extractStartTimeEvent.getHours()
             const extractStartTimeMin = extractStartTimeEvent.getMinutes()
@@ -103,7 +103,7 @@ export default function CalendarPage(){
             const extractEndTimeHours = extractEventTimeEnd.getHours()
             const extractEndTimeMin = extractEventTimeEnd.getMinutes()
             const endTimeEvent = extractEndTimeHours + ':' + extractEndTimeMin
-
+            
             setShowInModal((prevValues) => {
                 return {
                     id: event.id,
@@ -115,23 +115,24 @@ export default function CalendarPage(){
                 }
             })
         }
-
+    )
+        
     return(
         <>
-            <CalendarModal ref={dialog} handleSubmit={(e) => handleSubmit(e)} {...showInModal} />
-            <FeatureCardsWrap name={wrapName}>
-                <>
-                    {responseRequest != null && 
-                        <section className={Object.keys(responseRequest)[0] =! 'error' ? 'red-100 border border-red-400 text-red-700' : 'green-100 border border-green-400 text-green-700'}>
-                            {responseRequest}
-                        </section>
-                    }
-                    <CalendarInterface 
-                        getPlannedEvents={plannedEvents}
-                        clickHandle={handleSelectEvent} 
-                    />
-                </>    
-            </FeatureCardsWrap>
-        </>
+        <CalendarModal ref={dialog} handleSubmit={(e) => handleSubmit(e)} {...showInModal} />
+        <MainContentWrap name={wrapName}>
+            <>
+                {responseRequest != null && 
+                    <section className={Object.keys(responseRequest)[0] =! 'error' ? 'red-100 border border-red-400 text-red-700' : 'green-100 border border-green-400 text-green-700'}>
+                        {responseRequest}
+                    </section>
+                }
+                <CalendarInterface 
+                    getPlannedEvents={plannedEvents}
+                    clickHandle={handleSelectEvent} 
+                />
+            </>    
+        </MainContentWrap>
+    </>
     )
  }

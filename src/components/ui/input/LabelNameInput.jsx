@@ -10,7 +10,9 @@ export default function LabelNameInput({
     type, 
     error,
     invalid,
+    cityId,
     cityList, 
+    stateId,
     stateList,
     onChangeState,
     onChangeCity,
@@ -32,11 +34,13 @@ export default function LabelNameInput({
             value: state.id
         }))
         
-        optionCitiesList = cityList.map((state) => ({
-            label: state.name,
-            value: state.id
+        optionCitiesList = cityList.map((city) => ({
+            label: city.name,
+            value: city.id
         }))
     }
+
+    console.log({stateId, cityId})
 
     return (
         <>
@@ -48,8 +52,10 @@ export default function LabelNameInput({
                     {
                         (type != 'tel' && type != 'location') ? 
                             <input 
+                                // error != undefined && error != ''
+                                // invalid != undefined && invalid != ''
                                 className={`${checkBox === 1 ? 'h-8 w-8 lg:h-12 lg:w-12 accent-orange-300' : 'w-full appearance-none'} 
-                                ${invalid != undefined && invalid != '' || error != undefined && error != '' && 'border-red-500'} 
+                                ${error && 'border-red-500'} 
                                 block bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`} 
                                 id={id}
                                 name={name} 
@@ -58,7 +64,9 @@ export default function LabelNameInput({
                             />
                         : type === 'tel' ?
                             <PhoneInput
-                                className={`${invalid != undefined && invalid != '' || error != undefined && error != '' && 'border-red-500'} 
+                                // error != undefined && error != ''
+                                // invalid != undefined && invalid != ''
+                                className={`${error && 'border-red-500'} 
                                 w-full appearance-none block bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight 
                                 focus:outline-none focus:bg-white`}
                                 country="NL"
@@ -68,9 +76,11 @@ export default function LabelNameInput({
                         <>
                             <section className='flex w-full justify-evenly'>
                                     <NativeSelect
-                                        className={`w-full block text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`}
+                                        className={`${error && 'border-red-500 border '}w-full block text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`}
                                         onChange={onChangeState}
                                         placeholder='select state ...' 
+                                        value={stateId}
+                                        
                                     >
                                         {
                                             optionStateList instanceof Array && 
@@ -79,10 +89,11 @@ export default function LabelNameInput({
                                         }
                                     </NativeSelect>
                                     <NativeSelect
-                                        className={`w-full block text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`}
+                                        className={`${error && 'border-red-500 border '}w-full block text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`}
                                         onChange={onChangeCity}
                                         placeholder='select city ...'
-                                        autoFocus 
+                                        value={cityId}
+                                        // autoFocus 
                                     >
                                         {
                                             optionCitiesList instanceof Array && 

@@ -3,10 +3,11 @@ import {
     ApiFetchGetOptions,
     ApiFetchPostOptions,
     ApiFetch,
+    getLocalStorageItem,
     setLocalStorageItem,
     getToken
  } from "../../js/util/postUtil"
-import { useLoaderData, Form } from 'react-router-dom'
+import { useLoaderData, Form, redirect } from 'react-router-dom'
 
  import UserDataModal from '../../components/modal/UserDataModal'
  import UserChoosePaymentModal from '../../components/modal/UserChoosePaymentModal'
@@ -14,7 +15,7 @@ import { useLoaderData, Form } from 'react-router-dom'
 import UserOrderInfoForm from "../../components/forms/client/UserOrderInfoForm"
 import SelectedOrderForPaymentInterface from '../../components/interface/SelectedOrderForPaymentInterface'
 
-import { getLocalStorageItem } from '../../js/util/postUtil'
+import {  } from '../../js/util/postUtil'
 import { alpha } from "@mui/material"
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
@@ -31,7 +32,7 @@ const inputValidList = {
     email: false,
     phoneNumber: false,
     streetNumber: false,
-    unitNumber: false,
+    // unitNumber: false,
     addressLine: false,
     city: false,
     region: false,
@@ -61,9 +62,14 @@ const prepRequestFields = {
 
 const PaymentPage = () => {
 
+    // const getError = getLocalStorageItem('error')
+    // console.log({getError})
+    // if(){
+    //     redirect('/dashboard/login')            
+    // }
     const addressStorageName = 'user_address'
-
     const data = useLoaderData()
+    
     const [paymentType, setPaymentType] = useState({
         ideal : false,
         credit_card : false,
@@ -75,11 +81,11 @@ const PaymentPage = () => {
     const [stateList, setStateList] = useState([]) 
     const [cityList, setCityList] = useState([])
     
-    const getSelectedPaymentMethodIcon = (obj) => Object.keys(obj).find((i) => obj[i] === 'true')
+    // const getSelectedPaymentMethodIcon = (obj) => Object.keys(obj).find((i) => obj[i] === 'true')
     
     const userFormInfo = getUserInfoObjOrStorageData(addressStorageName)
     const [enteredInput, setEnteredInput] = useState(userFormInfo)
-    const [symbol, setSymbol] = useState(null)
+    // const [symbol, setSymbol] = useState(null)
     
     const dialogUserAddress = useRef()
     const dialogUserPaymentMethod = useRef()
@@ -125,8 +131,11 @@ const PaymentPage = () => {
             ['state_id']: Number(userData.userAddress.reactStateNr)
         }))
 
+        console.log({address_user: data.address})
+        
+        
         //set user data in local storage to keep most recent data
-
+        
         Object.keys(userData.userInfo).forEach(key => {
             const value = userData.userInfo[key]
             setEnteredInput((prevValue) => ({
@@ -134,7 +143,7 @@ const PaymentPage = () => {
                 [key]: value
             }))
         })
-
+        
         Object.keys(userData.userAddress).forEach(key => {
             const value = userData.userAddress[key]
             setEnteredInput((prevValue) => ({
@@ -142,7 +151,14 @@ const PaymentPage = () => {
                 [key]: value
             }))
         })
-
+        
+        if(!data.address.id){
+            const { firstAndLastName, email, phoneNumber, ...desctrInvalidList} = inputValidList 
+            // console.log({SetInvalid: data.address, inputValidList})
+            Object.keys(desctrInvalidList).forEach(key => {
+                setInvalidPropToTrue(key)                
+            })
+        }
     }, [userData.userAddress.reactStateNr])
 
     useEffect(() => {
@@ -214,13 +230,21 @@ const PaymentPage = () => {
         ]
     }
     
-    const ApiRequest = async () => {
+    const ApiRequest = useCallback(
+        async () => {
         const response = data        
         
         if(!response.lines){
             console.log({ apiResponseError : response})
             throw new {error: 'Not Found!'}
         }
+
+        // if(Array.isArray(response.address) && !response.address.length) {
+        //     setEnteredInputIsInvalid(() => {
+                
+        //     })
+            
+        // }
 
         updateUserData('userInfo', {...response.user})
         updateUserData('userAddress', {...response.address})
@@ -237,13 +261,15 @@ const PaymentPage = () => {
         setLocalStorageItem('amount',response.amount)
         setLocalStorageItem('locale',response.locale)
         setLocalStorageItem('description',response.description)
-        // setLocalStorageItem('orderNumber',response.orderId)
+        setLocalStorageItem('orderNumber',response.orderId)
         // setLocalStorageItem('consumerDateOfBirth',response.user.consumerDateOfBirth)
         setLocalStorageItem(response.curreny.name,response.curreny.symbol)  
             
         setLocalStorageItem('lines', response.lines)       
             
-    }
+    })
+
+    
     
     const userAddressModalHandler = useCallback(
         (event) =>  { 
@@ -259,6 +285,9 @@ const PaymentPage = () => {
 
     const payOrderHandler = async (event) => {
 
+
+        // use invalidEnteredInput setEnteredInputIsInvalid
+
         const mollieOrder = JSON.parse(localStorage.getItem(addressStorageName))
         const lines = JSON.parse(localStorage.getItem('lines'))
 
@@ -270,7 +299,7 @@ const PaymentPage = () => {
 
         // const consumerDateOfBirth = JSON.parse(localStorage.getItem('consumerDateOfBirth'))
         const amount = JSON.parse(localStorage.getItem('amount'))
-        // const orderNumber = JSON.parse(localStorage.getItem('orderNumber'))
+        const orderNumber = JSON.parse(localStorage.getItem('orderNumber'))
         const locale = JSON.parse(localStorage.getItem('locale'))
         const description = JSON.parse(localStorage.getItem('description'))
         let splitFullName = mollieOrder.firstAndLastName
@@ -296,13 +325,11 @@ const PaymentPage = () => {
         const confirmUserOrder = {
             description: description,
             amount: amount,
-            // redirectUrl: 'http://localhost:5173/',
             redirectUrl: 'http://localhost:5173/payment',
             webhookUrl: 'https://hkdk.events/8xzfpv28njjwx6',
-            // webhookUrl: 'https://smee.io/Xbaygp2A7TmD1ppz',
             billingAddress: billingAddress,
             shippingAddress: billingAddress,
-            metadata: { order_id : 'find out'},
+            metadata: { order_id : orderNumber},
             locale: locale,
             method: mollieOrder.paymentMethodId,
             lines: lines.map((line) => {
@@ -409,14 +436,7 @@ const PaymentPage = () => {
                 throw new PostError('Api error send order address error!', getResults)
             }
 
-            // setOnClose(true)
-            // closeUserAddressModalHandler()
-        //     deleteLocalStorageItem(nameStorageItem)
-        //     const reqResults = await response.json()
-        //     setToken(reqResults)
-        //     navigate('/dashboard') 
-        //     // redirect
-        // localStorage.removeItem(addressStorageName);
+            // close modal
 
         } catch (error) {
             
@@ -487,11 +507,20 @@ const PaymentPage = () => {
             }
     }
 
+    function setInvalidPropToTrue(identifier)
+    {
+        setEnteredInputIsInvalid((prevValues) => ({
+            ...prevValues,
+            [identifier]: true
+        }))
+    }
+
     function inputBlurHandle(identifier, event, type='text') {
         if(identifier == 'unitNumber'){
             return
         }
-
+        console.log({type})
+        
         if(type == 'text' || type == 'number')
             {
                 setEnteredInputIsInvalid((prevValues) => ({
@@ -500,6 +529,15 @@ const PaymentPage = () => {
                 }))
                 return
             }  
+            
+        if(type == 'location')
+            {
+            console.log({locationEvent:event})
+            setEnteredInputIsInvalid((prevValues) => ({
+                ...prevValues,
+                [identifier] : (event.target.value == '') ? true : false
+            })) 
+        }
 
         setEnteredInputIsInvalid((prevValues) => ({
             ...prevValues,
@@ -515,21 +553,31 @@ const PaymentPage = () => {
         userSelectedLocation: handleUserSelectLocation,
         onBlur: inputBlurHandle,
     }
+    console.log({getInvalidList: enteredInputIsInvalid})
 
+    // const checkInvalidAddress = () => {
+    //     console.log({befofre: enteredInputIsInvalid})
+    //     return Object.entries(enteredInputIsInvalid).find((invalid) => {
+    //         return invalid[0] == 'unitNumber' && invalid[1] === true || false
+    //     })
+    // }
+
+    console.log({enteredInput})
     console.log({enteredInputIsInvalid})
     return (
         <>
             <OrderContext.Provider value={ctxValue}>
-                {userData?.userAddress?.reactStateNr != undefined && 
                 <UserDataModal 
                     ref={dialogUserAddress} 
                     enteredInput={enteredInput} 
                     formSubmit={userAddressHandler} 
                     user={userData.userInfo} 
-                    address={userData.userAddress}
+                    address={userData?.userAddress}
                     addressStorageName={addressStorageName}
                     enteredInputIsInvalid={enteredInputIsInvalid}
                 />
+                {userData?.userAddress != true || userData?.userAddress == [] && 
+                <UserDataModal />
                 }
                 <UserChoosePaymentModal ref={dialogUserPaymentMethod} paymentMethodOptions={paymentMethodOptions} />
 

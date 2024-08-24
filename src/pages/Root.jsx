@@ -13,7 +13,7 @@ const patterns = [
 ]
 
 function Root(){
-  let navbarComponent = <MainNavigation />
+  const NavbarComponent = <MainNavigation />
   const { pathname } = useLocation()
   const proxyDashboardLogin = pathname === '/dashboard/login' ? '/login' : pathname
   // console.log({patname: pathname, proxy: proxyDashboardLogin})
@@ -21,7 +21,7 @@ function Root(){
 
   return (
   <>
-    {match !== true && navbarComponent}
+    {match !== true && NavbarComponent}
     <main className="flex flex-col items-center pt-12">
       <section className="min-w-[360px] w-full ml-2 mr-2 sm:w-full md:min-w-[601px] lg:w-full lg:min-w-[1024px] lg:max-w-[1920px]">
         <Outlet />

@@ -1,5 +1,5 @@
 import HomeBillboard from '../components/billboards/client/HomeBillboard.jsx'
-import FeatureCardsWrap from '../components/wraps/client/FeatureCardsWrap.jsx';
+import MainContentWrap from '../components/wraps/client/MainContentWrap.jsx';
 import ActionCallButton from '../components/ui/button/ActionCallButton.jsx';
 import HeroButtonWrap from '../components/wraps/client/HeroButtonWrap.jsx';
 import FeatureCard from '../components/cards/FeatureCard.jsx';
@@ -16,11 +16,11 @@ export default function HomePage() {
         <HeroButtonWrap>
           <ActionCallButton />
         </HeroButtonWrap>
-        <FeatureCardsWrap name={nameWrap}>
+        <MainContentWrap name={nameWrap}>
           <FeatureCard />
           <FeatureCard />
           <FeatureCard />
-        </FeatureCardsWrap>
+        </MainContentWrap>
         <ParagraphWrap>
           <ParagraphCard />
         </ParagraphWrap>

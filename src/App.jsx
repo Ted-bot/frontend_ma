@@ -14,7 +14,7 @@ import HomePage from './pages/HomePage.jsx'
 import SignUpPage from './pages/SignUpPage.jsx'
 import LoginPage from './pages/LoginPage.jsx'
 import DashboardPage from './pages/DashboardPage.jsx'
-import {logoutAction} from './pages/ActionLogout.jsx'
+import {logoutAction} from './action/ActionLogout.jsx'
 import CalendarPage from './pages/CalendarPage.jsx'
 import OrderPage from './pages/OrderPage.jsx'
 import PaymentPage from './pages/client/PaymentPage.jsx'
@@ -22,6 +22,7 @@ import { PaymentLoader } from './components/loader/PaymentLoader.jsx'
 
 import {tokenLoader} from './js/util/auth.js'
 import ContactPage from './pages/ContactPage.jsx'
+import ErrorPage from './pages/ErrorPage.jsx'
 // import UsersPage from './pages/admin/UsersPage.jsx'
 
 function App() {
@@ -35,6 +36,7 @@ function App() {
     { 
       path: '/', 
       element: <RootLayout />,
+      errorElement: <ErrorPage />,
       id: 'root',
       loader: tokenLoader,
       children: [
@@ -43,7 +45,7 @@ function App() {
         { path: '/login', element: <LoginPage /> },
         { path: '/logout', action: logoutAction },
         { path: '/calendar', element: <CalendarPage />},
-        { path: '/order', element: <OrderPage />},
+        { path: '/subscribe', element: <OrderPage />},
         { path: '/payment', element: <PaymentPage />, loader:  PaymentLoader},
         { path: '/dashboard/*', element: <DashboardPage />},
         { path: '/contact', element: <ContactPage />},

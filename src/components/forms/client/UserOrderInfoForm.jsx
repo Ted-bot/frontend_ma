@@ -13,8 +13,8 @@ const UserOrderInfoForm = ({userAddressModalHandler, user, address}) => {
                 >
                     <section className="grow-0 px-6 content-center"><IconUserLocation /></section>
                     <section className="grow flex-col">
-                        <section className="text-clip overflow-hidden">{address.streetName} {address.streetNumber} {address?.unitNumber}</section>
-                        <section>{address.postalCode} {user.city}</section>
+                        <section className="text-clip overflow-hidden">{address?.streetName} {address?.streetNumber} {address?.unitNumber}</section>
+                        <section>{address?.postalCode} {user.city}</section>
                         <section>{user.firstAndLastName}</section>
                         <section>{user.phoneNumber}</section>
                     </section>

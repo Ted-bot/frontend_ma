@@ -10,6 +10,7 @@ export default function LabelUserInfoFieldInput({
     type,
     value,
     invalid,
+    onBlur,
     ...props}){
 
         let optionStateList = []
@@ -48,6 +49,7 @@ export default function LabelUserInfoFieldInput({
                     // name={name} 
                     type={type}
                     defaultValue={value}
+                    onBlur={onBlur}
                     {...props}
                 />
                 : type == 'tel' ?
@@ -79,7 +81,7 @@ export default function LabelUserInfoFieldInput({
                             className={`${invalid && 'border-4 border-rose-500 '}w-full block text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`}
                             id={id}
                             onChange={(e) => userSelectedLocation('city', e)}
-                            // value={etst}
+                            // onClose{onBlur}
                             value={currentUserCity}
                         >
                             {

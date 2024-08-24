@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
-import FeatureCardsWrap from '../components/wraps/client/FeatureCardsWrap.jsx' 
+import MainContentWrap from '../components/wraps/client/MainContentWrap.jsx' 
 import OrderInterface from '../components/interface/OrderInterface.jsx'
 import { ApiFetch,
     ApiFetchGetOptions,
@@ -43,7 +43,7 @@ export default function OrderPage(){
       })
     },[])
 
-    const requestAvailableProducts = useMemo(() =>
+    const requestAvailableProducts = useCallback(
        async () => {
         const GetUrl = '/api/products?page=1&duration=month'
         // const requestOptions = ApiFetchGetOptions(GetUrl, {'X-Authorization': 'Bearer ' + token})
@@ -58,7 +58,7 @@ export default function OrderPage(){
           // console.log({reponse_api_dashboard: response})
           console.log({reponse_api_dashboard: getResults})
     
-          if(!response.ok && response.status === 401){ // 401
+          if(!response.ok){ // 401
             throw {response: { message: getResults.message, code: getResults.status }}
           }
 
@@ -78,9 +78,9 @@ export default function OrderPage(){
 
     return(
         <>
-            <FeatureCardsWrap name={wrapName}>
+            <MainContentWrap name={wrapName}>
                 {products && <OrderInterface products={products} />}
-            </FeatureCardsWrap>
+            </MainContentWrap>
         </>
     )
 }

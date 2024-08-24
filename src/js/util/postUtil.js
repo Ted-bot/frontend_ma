@@ -1,6 +1,6 @@
 const prepRequestFields = {
-    firstName: '',
-    lastName: '',
+    first_name: '',
+    last_name: '',
     email: '',
     gender: '',
     city: '',
@@ -9,19 +9,19 @@ const prepRequestFields = {
     state:'',
     state_id:'',
     state_list_nr:'',
-    dateOfBirth: '',
-    phoneNumber: '',
+    date_of_birth: '',
+    phone_number: '',
     conversion: '',
 }
 
 const inputValidList = {
     gender: false,
-    firstName: false,
-    lastName: false,
+    first_name: false,
+    last_name: false,
     email: false,
     city: false,
-    dateOfBirth: false,
-    phone: false,
+    date_of_birth: false,
+    phone_number: false, // returns as snakecase from backend
     conversion: false,
     password: false,
 }
@@ -116,17 +116,17 @@ export function reconstructPostInput(data, pw)
                 continue
             }
 
-            if( key === 'cityId' ){
-                newKey = 'location'
-                requiredPostRequestFields[newKey] = value
-                continue
-            }
+            // if( key === 'cityId' ){
+            //     newKey = 'location'
+            //     requiredPostRequestFields[newKey] = value
+            //     continue
+            // }
 
-            if( key === 'state_id' ){
-                newKey = 'stateId'
-                requiredPostRequestFields[newKey] = value
-                continue
-            }
+            // if( key === 'state_id' ){
+            //     newKey = 'stateId'
+            //     requiredPostRequestFields[newKey] = value
+            //     continue
+            // }
             
             requiredPostRequestFields[key] = value
 
@@ -135,14 +135,29 @@ export function reconstructPostInput(data, pw)
         return requiredPostRequestFields
 }
 
-export function foundInvalidInputData(dataIsInvalid)
+export function foundInvalidInputData(obj)
 {
-    for (const key in dataIsInvalid)
+    for (const key in obj)
     {
-        if(dataIsInvalid[key] === true)
+        if(obj[key] === true)
         {
+    
             return true
         }
+    }
+}
+    
+export function checkIfObjHasEmptyProperties(obj)
+{
+    let newObj = {}
+    for (const key in obj)
+        {
+            
+        if(obj[key] == '')
+        {
+            newObj[key] = true
+        }
+        return newObj
     }
 }
 
