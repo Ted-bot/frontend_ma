@@ -13,10 +13,12 @@ export default function SelectedOrderForPaymentInterface({latestOrder}){
         // console.log({line: orderLine.productName})
                 <OrderClosureInput
                     key={key}
-                    name={orderLine.name}
+                    name={orderLine.description}
                     totalPrice={orderLine.totalAmount.value}
                     price={orderLine.unitPrice.value}
                     qty={orderLine.quantity}
+                    subscriptionAmount={orderLine.productDetails.subscriptionDetails.subscriptionAmount}
+                    durationSubscription={orderLine.subscriptionLength}
                     subscriptionType={orderLine.productDetails.subscriptionDetails.productSubscription}
                     startSubscription={orderLine.productDetails.subscriptionDetails.productSubscriptionStart}                    
                     endSubscription={orderLine.productDetails.subscriptionDetails.productSubscriptionEnd}                    

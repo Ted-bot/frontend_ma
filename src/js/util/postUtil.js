@@ -112,7 +112,7 @@ export function reconstructPostInput(data, pw)
 
             if( key === 'city' ){
                 newKey = 'location'
-                requiredPostRequestFields[newKey] = value
+                requiredPostRequestFields[newKey] =  value instanceof String ? value.trim() : value
                 continue
             }
 
@@ -128,37 +128,161 @@ export function reconstructPostInput(data, pw)
             //     continue
             // }
             
-            requiredPostRequestFields[key] = value
+            requiredPostRequestFields[key] = value instanceof String ? value.trim() : value
 
         }
 
         return requiredPostRequestFields
 }
 
-export function foundInvalidInputData(obj)
+export function foundInvalidInputData(obj, setLockedSubmitButton, setEnteredInputIsInvalid)
 {
+    let foundInvalid = false
+
     for (const key in obj)
     {
-        if(obj[key] === true)
+        let value = obj[key]
+
+        const trimIfString = value instanceof String ? value.trim() : value
+
+        // console.log({checIfValueIsSTringOrInt: trimIfString})
+        if(key == 'city_id' ||  key == 'state_id' || key == 'city_list_nr' || key == 'state_list_nr' || key == 'state'  || key == 'region' || key == 'unitNumber'){
+            console.log({setPrepareRequest_key: key, value: obj[key]})
+            //  ||  key == 'state_id' || key == 'city_list_nr' || key == 'state_list_nr' || key == 'state'
+            continue
+        }
+        
+        if(Number.isInteger(trimIfString))
         {
-    
-            return true
+            // setLockedSubmitButton(false)
+            // console.log({lefOverIfCheck: key})
+            setEnteredInputIsInvalid((prevValue) => ({
+                ...prevValue,
+                [key] : false
+            }))
+            // return foundInvalid = true
+        } else if (trimIfString instanceof String) {
+            // setLockedSubmitButton(true)
+            setEnteredInputIsInvalid((prevValue) => ({
+                ...prevValue,
+                [key] : false
+            }))
+            // console.log({key: obj[key]})
+            // return foundInvalid = true
+        } else if (!value) {
+            setLockedSubmitButton(true)
+            setEnteredInputIsInvalid((prevValue) => ({
+                ...prevValue,
+                [key] : true
+            }))
+            // console.log({key: obj[key]})
+            foundInvalid = true
         }
     }
-}
     
-export function checkIfObjHasEmptyProperties(obj)
+    // setLockedSubmitButton(false)
+
+    return foundInvalid
+}
+
+export function getErrorFromRequest(obj, setLockedSubmitButton, setEnteredInputIsInvalid)
+{
+    let foundInvalid = false
+
+    for (const key in obj)
+    {
+        let value = obj[key]
+        console.log({key_getErrorAfterRequest: key, value: obj[key]})
+
+        const trimIfString = value instanceof String ? value.trim() : true
+
+        console.log({checIfValueIsSTringOrInt: trimIfString, key})
+        
+        if(trimIfString)
+        {
+            setLockedSubmitButton(true)
+            setEnteredInputIsInvalid((prevValue) => ({
+                ...prevValue,
+                [key] : true
+            }))
+            // console.log({key: obj[key]})
+            return foundInvalid = true
+        } 
+    }
+
+    setLockedSubmitButton(false)
+    return foundInvalid
+
+}   
+
+    
+export function setInputInvalidTrueWhenEnteredInputEmpty(enteredInput, setEnteredInputIsInvalid)
+{
+    let invalidInput = false
+    for (const key in enteredInput)
+        {            
+            if(key == 'city_id'){
+                console.log({setInvalidTrue_key: key, value: enteredInput[key]})
+                //  ||  key == 'state_id' || key == 'city_list_nr' || key == 'state_list_nr' || key == 'state'
+                continue
+            }
+            // identifier = enteredInput[key]
+            if(enteredInput[key] == '')
+                {
+                    if(!invalidInput){
+                        invalidInput = true
+                    }
+                    
+                    setEnteredInputIsInvalid((prevValue) => ({
+                        ...prevValue,
+                        [key] : true
+                    }))
+                }
+            }
+            
+    console.log({foundInvalidInput: invalidInput})
+    
+    // return invalidInput
+}
+
+
+// change function name
+export function prepareInputForRequest(enteredInput, setEnteredInputIsInvalid, cityId, availableCities, stateId, availableStates, updateState)
 {
     let newObj = {}
-    for (const key in obj)
-        {
-            
-        if(obj[key] == '')
-        {
-            newObj[key] = true
+    for (const [key, value] of Object.entries(enteredInput))
+    {
+        if(key === 'location'){
+            const city = availableCities.find((city) => city.id == Number(cityId) )
+            //if city not found ?? set invalid input field
+            if(value == '' || value == undefined){
+                setEnteredInputIsInvalid((prevValues) => ({
+                    ...prevValues,
+                    [key] : true})
+                )
+                return
+            }
+    
+            updateState(key)
+    
+            cityName = city.name
         }
-        return newObj
-    }
+    
+        if(key == 'stateLocation')
+        {
+            const state = availableStates.find((state) => state.id == Number(stateId) )
+            stateName = state.name
+            continue
+        }
+        // End For Registration
+
+        // FOr Payment
+
+    
+        newObj = { ...newObj, [key]: value}
+    }    
+
+    return newObj
 }
 
 export function CamelCaseToSnakeCase(string)

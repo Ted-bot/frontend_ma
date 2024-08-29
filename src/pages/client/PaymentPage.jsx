@@ -5,9 +5,12 @@ import {
     ApiFetch,
     getLocalStorageItem,
     setLocalStorageItem,
-    getToken
+    getToken,
+    prepareInputForRequest,
+    foundInvalidInputData,
+    setInputInvalidTrueWhenEnteredInputEmpty
  } from "../../js/util/postUtil"
-import { useLoaderData, Form, redirect } from 'react-router-dom'
+import { useLoaderData, Form, useNavigate } from 'react-router-dom'
 
  import UserDataModal from '../../components/modal/UserDataModal'
  import UserChoosePaymentModal from '../../components/modal/UserChoosePaymentModal'
@@ -15,7 +18,6 @@ import { useLoaderData, Form, redirect } from 'react-router-dom'
 import UserOrderInfoForm from "../../components/forms/client/UserOrderInfoForm"
 import SelectedOrderForPaymentInterface from '../../components/interface/SelectedOrderForPaymentInterface'
 
-import {  } from '../../js/util/postUtil'
 import { alpha } from "@mui/material"
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
@@ -69,6 +71,7 @@ const PaymentPage = () => {
     // }
     const addressStorageName = 'user_address'
     const data = useLoaderData()
+    const navigate = useNavigate()
     
     const [paymentType, setPaymentType] = useState({
         ideal : false,
@@ -77,7 +80,8 @@ const PaymentPage = () => {
     })    
 
     const [enteredInputIsInvalid, setEnteredInputIsInvalid] = useState(inputValidList)
-    
+    const [lockedSubmitButton, setLockedSubmitButton] = useState(false)
+
     const [stateList, setStateList] = useState([]) 
     const [cityList, setCityList] = useState([])
     
@@ -113,6 +117,8 @@ const PaymentPage = () => {
     useEffect(() => {
         ApiRequest()
 
+        console.log({userData})
+
         GetState(countryid).then((result) => {
             setStateList(result)
         })           
@@ -132,8 +138,6 @@ const PaymentPage = () => {
         }))
 
         console.log({address_user: data.address})
-        
-        
         //set user data in local storage to keep most recent data
         
         Object.keys(userData.userInfo).forEach(key => {
@@ -152,11 +156,11 @@ const PaymentPage = () => {
             }))
         })
         
-        if(!data.address.id){
-            const { firstAndLastName, email, phoneNumber, ...desctrInvalidList} = inputValidList 
+        if(!userData.userAddress.id){
+            const { id, firstAndLastName, email, phoneNumber, unitNumber, reactStateNr, reactCityNr, region, state, ...desctrInvalidList} = userFormInfo 
             // console.log({SetInvalid: data.address, inputValidList})
             Object.keys(desctrInvalidList).forEach(key => {
-                setInvalidPropToTrue(key)                
+                setInvalidTypeStatus(key, true)                
             })
         }
     }, [userData.userAddress.reactStateNr])
@@ -187,6 +191,17 @@ const PaymentPage = () => {
     
     const inputHandle = (identifier, event) => {
         event.preventDefault()
+
+        const checkInputUser = foundInvalidInputData(enteredInput, setLockedSubmitButton, setEnteredInputIsInvalid)
+
+        if(lockedSubmitButton && checkInputUser){
+            console.log({test: 'it came through!'})
+            console.log({invalidInputPaymentButton: enteredInputIsInvalid})
+
+            // setInputInvalidTrueWhenEnteredInputEmpty(enteredInput, setEnteredInputIsInvalid)
+            setEnteredInputIsInvalid(inputValidList)
+            // return
+        }
 
         Object.keys(paymentMethodOptions.fields).forEach(key => {
             const value = paymentMethodOptions.fields[key]
@@ -232,41 +247,34 @@ const PaymentPage = () => {
     
     const ApiRequest = useCallback(
         async () => {
-        const response = data        
-        
-        if(!response.lines){
-            console.log({ apiResponseError : response})
-            throw new {error: 'Not Found!'}
-        }
+            const response = data        
 
-        // if(Array.isArray(response.address) && !response.address.length) {
-        //     setEnteredInputIsInvalid(() => {
-                
-        //     })
+            console.log({data})
             
-        // }
+            if(!response.lines){
+                console.log({ apiResponseError : response})
+                throw new {error: 'Not Found!'}
+            }
 
-        updateUserData('userInfo', {...response.user})
-        updateUserData('userAddress', {...response.address})
-        updateUserData('userOrder', 
-            {
-                // orderId: response.orderId,
-                currency: response.currency,
-                lastOrder: response.lines,
-                orderTaxPrice: response.orderTaxPrice,
-                orderTotalAmount: response.amount.value,
-                orderTotalProductPrice: response.orderTotalProductPrice,
-            })
+            updateUserData('userInfo', {...response.user})
+            updateUserData('userAddress', {...response.address})
+            updateUserData('userOrder', 
+                {
+                    // orderId: response.orderId,
+                    currency: response.currency,
+                    lastOrder: response.lines,
+                    orderTaxPrice: response.orderTaxPrice,
+                    orderTotalAmount: response.amount.value,
+                    orderTotalProductPrice: response.orderTotalProductPrice,
+                })
 
-        setLocalStorageItem('amount',response.amount)
-        setLocalStorageItem('locale',response.locale)
-        setLocalStorageItem('description',response.description)
-        setLocalStorageItem('orderNumber',response.orderId)
-        // setLocalStorageItem('consumerDateOfBirth',response.user.consumerDateOfBirth)
-        setLocalStorageItem(response.curreny.name,response.curreny.symbol)  
-            
-        setLocalStorageItem('lines', response.lines)       
-            
+            setLocalStorageItem('amount',response.amount)
+            setLocalStorageItem('locale',response.locale)
+            setLocalStorageItem('description',response.description)
+            setLocalStorageItem('orderNumber',response.orderId)
+            // setLocalStorageItem('consumerDateOfBirth',response.user.consumerDateOfBirth)
+            setLocalStorageItem(response.curreny.name,response.curreny.symbol)                  
+            setLocalStorageItem('lines', response.lines)                   
     })
 
     
@@ -287,12 +295,23 @@ const PaymentPage = () => {
 
 
         // use invalidEnteredInput setEnteredInputIsInvalid
+        const checkInputUser = foundInvalidInputData(enteredInput, setLockedSubmitButton, setEnteredInputIsInvalid)
+
+        if(checkInputUser){
+            console.log({test: 'it came through!'})
+            console.log({invalidInputPaymentButton: enteredInputIsInvalid})
+
+            // setInputInvalidTrueWhenEnteredInputEmpty(enteredInput, setEnteredInputIsInvalid)
+            return
+        }
+        // setEnteredInputIsInvalid(inputValidList)
+
 
         const mollieOrder = JSON.parse(localStorage.getItem(addressStorageName))
         const lines = JSON.parse(localStorage.getItem('lines'))
 
-        const stateId = mollieOrder.state_id
-        const state = ctxValue.availableStates.find((state) => state.id == stateId )
+        // const stateId = mollieOrder.state_id
+        // const state = ctxValue.availableStates.find((state) => state.id == stateId )
 
         // console.log({state:state, stateName: state.name})
         // stateName = state.name
@@ -318,34 +337,28 @@ const PaymentPage = () => {
             email : mollieOrder.email,
             phone : mollieOrder.phoneNumber,
             city : mollieOrder.city,
-            region : state.name,
+            region : mollieOrder.state,
             country : mollieOrder.country,
         }
 
         const confirmUserOrder = {
             description: description,
             amount: amount,
+            order_id: orderNumber.toString(),
             redirectUrl: 'http://localhost:5173/payment',
             webhookUrl: 'https://hkdk.events/8xzfpv28njjwx6',
             billingAddress: billingAddress,
             shippingAddress: billingAddress,
-            metadata: { order_id : orderNumber},
+            metadata: { order_id : orderNumber.toString()},
             locale: locale,
             method: mollieOrder.paymentMethodId,
             lines: lines.map((line) => {
                 delete line.productDetails
-                return  line
+                return line
             }) ,
         }
             
         console.log({createOrderMollie: confirmUserOrder})
-
-
-        // console.log({paymentApiPost:enteredInput.paymentMethodId})
-        // create for loop to check if every field in enteredInput
-        // send message back whick fields are required to confirm need user information
-
-        //also check if selected payment method is valid
 
         const paymentOption = { url: '/api/v1/payment', method: 'POST'}
         const ApiPayOptions = ApiFetchPostOptions(paymentOption, confirmUserOrder, {'X-Authorization': 'Bearer ' + token})
@@ -373,6 +386,7 @@ const PaymentPage = () => {
 
         const redirectIDeal = getPayResults.redirect
         window.location.replace(redirectIDeal)
+        // navigate(redirectIDeal)
 
         } catch (error) {
             
@@ -384,45 +398,21 @@ const PaymentPage = () => {
     const userAddressHandler = async (event) => {
         event.preventDefault()
 
-        let userAddressInfo = {}
-        let cityName = ''
-        let stateName = ''
-
-        for (let i = 0; i < 9; i++){
-            if(event.target[i].id == 'location'){
-                const city = ctxValue.availableCities.find((city) => city.id == Number(event.target[i].value) )
-                //if city not found ?? set invalid input field
-                console.log({API_CITY: event.target[i].value == ''})
-                if(event.target[i].value == '' || event.target[i].value == undefined){
-                    setEnteredInputIsInvalid((prevValues) => ({
-                        ...prevValues,
-                        [event.target[i].id] : true})
-                    )
-                    return
-                }
-
-                checkLocationStatus(event.target[i].id)
-
-                cityName = city.name
-            }
-
-            if(event.target[i].id == 'stateLocation')
+        if(lockedSubmitButton)
             {
-                const state = ctxValue.availableStates.find((state) => state.id == Number(event.target[i].value) )
-                stateName = state.name
-                continue
+                const { firstAndLastName, email, phoneNumber, ...desctrInvalidList} = inputValidList 
+                setEnteredInputIsInvalid(desctrInvalidList)
+                setLockedSubmitButton(false)
             }
 
-            userAddressInfo = { ...userAddressInfo, [event.target[i].id]: event.target[i].value}
-        }
-
-        userAddressInfo = { ...userAddressInfo, ['location']: cityName}
-        userAddressInfo = { ...userAddressInfo, ['region']: stateName}
+        let userAddressInfo = prepareInputForRequest(enteredInput, setEnteredInputIsInvalid, enteredInput.cityId, ctxValue.availableCities, enteredInput.stateId, ctxValue.availableStates, setEnteredInputIsInvalid)
+        
+        userAddressInfo = { ...userAddressInfo, ['location']: enteredInput.city}
+        userAddressInfo = { ...userAddressInfo, ['region']: enteredInput.state}
         userAddressInfo = { ...userAddressInfo, ['reactStateNr']: ctxValue.currentUserState.toString()}
         userAddressInfo = { ...userAddressInfo, ['reactCityNr']: ctxValue.currentUserCity.toString()}
-
         console.log({formAddress: userAddressInfo})
-
+        
         const options = { url: '/api/v1/order/address', method: 'POST'}
         const ApiOptions = ApiFetchPostOptions(options, userAddressInfo, {'X-Authorization': 'Bearer ' + token})            
 
@@ -455,6 +445,9 @@ const PaymentPage = () => {
     }
 
     const handleUserSelectLocation = (identifier, event) => {
+
+
+
         if(identifier == 'state')
             {
                 const state = stateList.find((state) => state.id == Number(event.target.value)); //here you will get full state object.
@@ -463,6 +456,7 @@ const PaymentPage = () => {
                 GetCity(countryid, state.id).then((result) => {
                     setCityList(result)
                 })
+                setInvalidTypeStatus(identifier, false)
                 return
             }
             
@@ -472,6 +466,7 @@ const PaymentPage = () => {
                 updateEnteredInputState('city_id', city.id)
                 updateEnteredInputState(identifier, city.name)
                 checkLocationStatus('location')
+                setInvalidTypeStatus(identifier, false)
                 return
             }
     
@@ -487,10 +482,8 @@ const PaymentPage = () => {
                     }))
                     return
                 } else {
-
                     updateEnteredInputState(identifier, event.target.value)
                     return
-
                 }                
             }
         
@@ -507,11 +500,11 @@ const PaymentPage = () => {
             }
     }
 
-    function setInvalidPropToTrue(identifier)
+    function setInvalidTypeStatus(identifier, value)
     {
         setEnteredInputIsInvalid((prevValues) => ({
             ...prevValues,
-            [identifier]: true
+            [identifier]: value
         }))
     }
 
@@ -564,6 +557,7 @@ const PaymentPage = () => {
 
     console.log({enteredInput})
     console.log({enteredInputIsInvalid})
+    console.log({userData_lastOrder: userData.userOrder})
     return (
         <>
             <OrderContext.Provider value={ctxValue}>
@@ -576,18 +570,26 @@ const PaymentPage = () => {
                     addressStorageName={addressStorageName}
                     enteredInputIsInvalid={enteredInputIsInvalid}
                 />
-                {userData?.userAddress != true || userData?.userAddress == [] && 
-                <UserDataModal />
-                }
+
                 <UserChoosePaymentModal ref={dialogUserPaymentMethod} paymentMethodOptions={paymentMethodOptions} />
 
                 <section className="flex-col shadow-md w-full bg-slate-100 py-5 rounded-md px-3 sm:mx-2 sm:px-5 md:grid md:mx-2 md:shadow-xl">
 
                     <h1 className={`pt-3 pb-6 mt-12 text-2xl text-center`}>Address & Peronsal Information</h1>
-                    {userData?.userInfo && userData?.userAddress && <UserOrderInfoForm userAddressModalHandler={userAddressModalHandler} user={userData.userInfo} address={userData.userAddress} />}
+                    {userData?.userInfo && userData?.userAddress && 
+                    <UserOrderInfoForm 
+                            errorClass={`${lockedSubmitButton && 'border-red-300'}`}
+                            userAddressModalHandler={userAddressModalHandler} 
+                            user={userData.userInfo} 
+                            address={userData.userAddress} />}
 
                     <h1 className={`pt-3 pb-6 mt-8 text-2xl text-center`}>Choose Payment Method</h1>
-                    <UserSelectPaymentMethodForm symbol={enteredInput.paymentMethodId} paymentMethodModalHandler={paymentMethodModalHandler}  selectedType={enteredInput.paymentMethodName} />
+                    <UserSelectPaymentMethodForm 
+                        errorClass={`${lockedSubmitButton && !enteredInput.paymentMethodId && 'border-red-300'}`}
+                        symbol={enteredInput.paymentMethodId} 
+                        paymentMethodModalHandler={paymentMethodModalHandler}  
+                        selectedType={enteredInput.paymentMethodName}
+                    />
 
                     <h1 className={`pt-3 pb-6 mt-8 text-2xl text-center`}>Order</h1>
                     { userData.userOrder?.lastOrder != undefined && <SelectedOrderForPaymentInterface latestOrder={userData.userOrder.lastOrder} />}
@@ -641,9 +643,13 @@ const PaymentPage = () => {
 
                             <input type="hidden" id="paymentMethod" value={enteredInput.paymentMethodName}/>
 
+                            {/* lockedSubmitButton */}
                             <button
-                                className="text-slate-100 h-16 px-8 w-full rounded-b-full text-2xl rounded-t-full border-0 ring-2 shadow-xl ring-red-500 bg-red-500 bg-gradient-to-r from-red-500 to-yellow-500 transition-all duration-300 md:w-1/2 hover:from-orange-400 hover:text-yellow-200 hover:to-red-400 hover:ring-red-400 hover:shadow-2xl"
+                                disabled={lockedSubmitButton}
+                                className={`text-slate-100 h-16 px-8 w-full rounded-b-full text-2xl rounded-t-full border-0 ring-2 shadow-xl ${ !lockedSubmitButton ? 'ring-red-500 bg-red-500 bg-gradient-to-r from-red-500 to-yellow-500' : 'bg-gray-300'} md:w-1/2  
+                                   ${!lockedSubmitButton && 'transition-all duration-300 hover:from-orange-400 hover:text-yellow-200 hover:to-red-400 hover:ring-red-400 hover:shadow-2xl'} `}
                             >
+                                {/* Order and Pay amount {enteredInput?.paymentMethodName ? 'with ' + enteredInput.paymentMethodName : ''} {paymentCurrency} {userData?.userOrder.lastOrder[1]?.productDetails.subscriptionDetails.subscriptionAmount} {userData?.userOrder.orderTotalAmount} */}
                                 Order and Pay amount {enteredInput?.paymentMethodName ? 'with ' + enteredInput.paymentMethodName : ''} {paymentCurrency} {userData?.userOrder.orderTotalAmount}
                             </button>
                         </Form>

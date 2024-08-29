@@ -38,9 +38,9 @@ export default function LabelNameInput({
             label: city.name,
             value: city.id
         }))
+        console.log({stateId, cityId})
     }
 
-    console.log({stateId, cityId})
 
     return (
         <>
@@ -77,20 +77,22 @@ export default function LabelNameInput({
                             <section className='flex w-full justify-evenly'>
                                     <NativeSelect
                                         className={`${error && 'border-red-500 border '}w-full block text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`}
-                                        onChange={onChangeState}
+                                        id={stateId}
+                                        onChange={(e) => onChangeState(e)}
                                         placeholder='select state ...' 
-                                        value={stateId}
+                                        value={stateId }
                                         
                                     >
                                         {
                                             optionStateList instanceof Array && 
                                             optionStateList.length > 0 && 
-                                            optionStateList.map((value, index) => (<option key={index} value={index}>{value.label}</option>))
+                                            optionStateList.map((value, index) => (<option key={index} value={value.value}>{value.label}</option>))
                                         }
                                     </NativeSelect>
                                     <NativeSelect
                                         className={`${error && 'border-red-500 border '}w-full block text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`}
-                                        onChange={onChangeCity}
+                                        id={id}
+                                        onChange={(e) => onChangeCity(e)}
                                         placeholder='select city ...'
                                         value={cityId}
                                         // autoFocus 
@@ -98,15 +100,18 @@ export default function LabelNameInput({
                                         {
                                             optionCitiesList instanceof Array && 
                                             optionCitiesList.length > 0 && 
-                                            optionCitiesList.map((value, index) => (<option key={index} value={index}>{value.label}</option>))
+                                            optionCitiesList.map((value, index) => (<option key={index} value={value.value}>{value.label}</option>))
                                         }
                                     </NativeSelect>
                                 </ section> 
                         </>
                     }
                 </label>
-                {invalid && type === 'password' &&  <p className="text-red-500 text-xs italic">Please fill in a {lowerCaseName} </p>}
-                {invalid && type === 'text' &&  <p className="text-red-500 text-xs italic">Please fill in your {lowerCaseName} </p>}
+                {invalid && type == 'password' &&  <p className="text-red-500 text-xs italic">Please fill in a {lowerCaseName} </p>}
+                {/* {invalid && type == 'checkbox' &&  <p className="text-red-500 text-xs italic">Please set a {lowerCaseName} </p>}
+                {invalid && type == 'gender' &&  <p className="text-red-500 text-xs italic">Please set a {lowerCaseName} </p>} */}
+                {invalid && type == 'location' &&  <p className="text-red-500 text-xs italic">Please fill in a {lowerCaseName} </p>}
+                {invalid && type == 'text' &&  <p className="text-red-500 text-xs italic">Please fill in your {lowerCaseName} </p>}
                 {invalid && type == 'checkbox' &&  <p className="text-red-500 text-xs italic">Please fill gender</p>}
                 {invalid && type == 'date' &&  <p className="text-red-500 text-xs italic">Sorry, only between the age of 7 and 60 years can sign in!</p>}
                 {invalid && type == 'tel' &&  <p className="text-red-500 text-xs italic">Please fill in your {lowerCaseName}</p>}

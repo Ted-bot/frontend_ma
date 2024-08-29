@@ -19,5 +19,7 @@ export async function PaymentLoader()
         throw {error: 'Not Found!'}           
     }   
 
+    console.log({paymentLoader: getResults})
+
     return getResults
 }
