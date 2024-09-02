@@ -28,11 +28,12 @@ import Modal from '@mui/material/Modal'
 //     // countryId: false,
 // }
 
-const UserDataModal = forwardRef(function UserDataModal({ enteredInput, enteredInputIsInvalid, formSubmit}, ref){
+const UserDataModal = forwardRef(function UserDataModal({ errors, enteredInput, enteredInputIsInvalid, formSubmit}, ref){
     
     const {userSelectedLocation, onBlur} = useContext(OrderContext)
     const dialog = useRef()
     const typeLocation = 'location'
+    const typeText = 'text'
     
     useImperativeHandle(ref, () => {
     
@@ -52,11 +53,11 @@ const UserDataModal = forwardRef(function UserDataModal({ enteredInput, enteredI
             {
                 name: 'First- and LastName', 
                 id: 'firstAndLastName', 
-                type: 'text', 
+                type: typeText, 
                 placeholder: 'type first and last name', 
                 value: enteredInput?.firstAndLastName,
                 invalid: enteredInputIsInvalid.firstAndLastName, 
-                error: 'error', 
+                error: errors?.first_and_last_name, 
                 required : true, 
                 onChange: (e) => userSelectedLocation('firstAndLastName', e), 
                 onBlur: (e) => onBlur('firstAndLastName', e)
@@ -69,7 +70,7 @@ const UserDataModal = forwardRef(function UserDataModal({ enteredInput, enteredI
                 autoComplete: 'email',
                 value: enteredInput?.email,
                 invalid: enteredInputIsInvalid.email, 
-                error: 'error', 
+                error: errors?.email, 
                 required : true, 
                 onChange: (e) => userSelectedLocation('email', e), 
                 onBlur: (e) => onBlur('email', e)
@@ -81,7 +82,7 @@ const UserDataModal = forwardRef(function UserDataModal({ enteredInput, enteredI
                 placeholder: 'type in phone number', 
                 value: enteredInput?.phoneNumber,
                 invalid: enteredInputIsInvalid.phoneNumber, 
-                error: 'error', 
+                error: errors?.phone_number, 
                 required : true, 
                 onChange: (e) => userSelectedLocation('phoneNumber', e, 'tel'), 
                 onBlur: (e) => onBlur('phoneNumber', e)
@@ -95,11 +96,11 @@ const UserDataModal = forwardRef(function UserDataModal({ enteredInput, enteredI
             {
                 name: 'Unit Number',
                 id: 'unitNumber',
-                type: 'text',
+                type: typeText,
                 placeholder: 'unit number',
                 value: enteredInput?.unitNumber,
                 invalid: enteredInputIsInvalid.unitNumber,
-                error: 'error',
+                error: errors?.unit_number,
                 onChange: (e) => userSelectedLocation('unitNumber', e),
                 onBlur: (e) => onBlur('unitNumber', e)},
             {
@@ -110,29 +111,29 @@ const UserDataModal = forwardRef(function UserDataModal({ enteredInput, enteredI
                 min: 0, 
                 value: enteredInput?.streetNumber,
                 invalid: enteredInputIsInvalid.streetNumber,
-                error: 'error',
+                error: errors?.street_number,
                 required : true,
                 onChange: (e) => userSelectedLocation('streetNumber', e),
                 onBlur: (e) => onBlur('streetNumber', e, 'number')},
             {
                 name: 'Street Name',
                 id: 'addressLine',
-                type: 'text',
+                type: typeText,
                 placeholder: 'address line',
                 value: enteredInput?.addressLine,
                 invalid: enteredInputIsInvalid.addressLine,
-                error: 'error',
+                error: errors?.address_line,
                 required : true,
                 onChange: (e) => userSelectedLocation('addressLine', e),
                 onBlur: (e) => onBlur('addressLine', e)},
             {
                 name: 'Postal Code',
                 id: 'postalCode',
-                type: 'text',
+                type: typeText,
                 placeholder: 'postal code',
                 value: enteredInput?.postalCode,
                 invalid: enteredInputIsInvalid.postalCode,
-                error: 'error',
+                error: errors?.postalCode,
                 required : true,
                 onChange: (e) => userSelectedLocation('postalCode', e),
                 onBlur: (e) => onBlur('postalCode', e)
@@ -141,6 +142,8 @@ const UserDataModal = forwardRef(function UserDataModal({ enteredInput, enteredI
                 name: 'Location',
                 id: typeLocation,
                 state_id: 'stateLocation',
+                error: errors?.location,
+                errorRegion: errors?.region,
                 type: typeLocation, 
                 invalid: enteredInputIsInvalid.city,
                 required: true,

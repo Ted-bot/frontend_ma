@@ -11,6 +11,8 @@ export default function LabelUserInfoFieldInput({
     value,
     invalid,
     onBlur,
+    error,
+    errorRegion,
     ...props}){
 
         let optionStateList = []
@@ -29,6 +31,8 @@ export default function LabelUserInfoFieldInput({
                 value: city.id
             }))
         }
+
+        console.log({indiError: error})
         
     return (
         <>
@@ -41,7 +45,7 @@ export default function LabelUserInfoFieldInput({
                 (type != 'location' && type != 'tel') ?
                 <input 
                 // ${ error != undefined && error != '' && 'border-red-500'} 
-                    className={`${invalid && id != 'unitNumber' && 'border-4 border-rose-500'}
+                    className={`${error && id != 'unitNumber' && 'border-4 border-rose-500'}
                         w-full appearance-none block bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`
                     } 
                     ref={ref}
@@ -54,7 +58,7 @@ export default function LabelUserInfoFieldInput({
                 />
                 : type == 'tel' ?
                     <PhoneInput
-                        className={`${invalid && 'border-4 border-rose-500'} 
+                        className={`${error && 'border-4 border-rose-500'} 
                         w-full appearance-none block bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight 
                         focus:outline-none focus:bg-white`}
                         country="NL"
@@ -66,7 +70,7 @@ export default function LabelUserInfoFieldInput({
                 :
                     <section className='flex w-full justify-evenly'>
                         <NativeSelect
-                            className={`${invalid && 'border-4 border-rose-500 '}w-full block text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`}
+                            className={`${errorRegion && 'border-4 border-rose-500 '}w-full block text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`}
                             id={state_id}
                             onChange={(e) => userSelectedLocation('state', e)}
                             value={currentUserState}
@@ -78,7 +82,7 @@ export default function LabelUserInfoFieldInput({
                             }
                         </NativeSelect>
                         <NativeSelect
-                            className={`${invalid && 'border-4 border-rose-500 '}w-full block text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`}
+                            className={`${error && 'border-4 border-rose-500 '}w-full block text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`}
                             id={id}
                             onChange={(e) => userSelectedLocation('city', e)}
                             // onClose{onBlur}
@@ -93,8 +97,17 @@ export default function LabelUserInfoFieldInput({
                     </ section>
                 }
             </label>
-            {invalid && id != 'unit_number' && ref?.current?.value == '' && <p className="text-rose-300 text-lg italic">Please fill in a {name} </p>}
+
+            {/* {invalid && id != 'unit_number' && ref?.current?.value == '' && <p className="text-rose-300 text-lg italic">Please fill in a {name} </p>} */}
             {invalid && id == 'location' && <p className="text-rose-300 text-lg italic">Please set a {name} </p>}
+            {invalid && type == 'email' &&  <p className="text-rose-300 text-lg italic">Please fill in a {id} </p>}
+            {invalid && type == 'text' &&  <p className="text-rose-300 text-lg italic">Please fill in your {id} </p>}
+            {invalid && type == 'number' &&  <p className="text-rose-300 text-lg italic">Please fill in your {id} </p>}
+            {invalid && type == 'tel' &&  <p className="text-rose-300 text-lg italic">Please fill in your {id}</p>}
+            {invalid && type == 'checkbox' &&  <p className="text-rose-300 text-lg italic">Please fill gender</p>}
+            {invalid && type == 'date' &&  <p className="text-rose-300 text-lg italic">Sorry, only between the age of 7 and 60 years can sign in!</p>}
+            {(error != undefined && error != '') && <section className="text-rose-300 text-lg italic">{error}</section>}
+            {(errorRegion != undefined && error != '') && <section className="text-rose-300 text-lg italic">{errorRegion}</section>}
         </section>
         </>
     )

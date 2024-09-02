@@ -79,7 +79,7 @@ export default function OrderCard(props){
         const sku = event.target.subscription.value
         console.log({sku})
         // const requestData = reconstructPostInput(enteredInput, pw)
-        // foundInvalidInputData(enteredInputIsInvalid)
+        // findAndUpdateInvalidList(enteredInputIsInvalid)
         postRequest({sku})
     }
     

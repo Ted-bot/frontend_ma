@@ -8,7 +8,7 @@ import OrderClosureInput from "../ui/input/OrderClosureInput"
 
 export default function SelectedOrderForPaymentInterface({latestOrder}){
 
-    console.log({enterInputPayment: latestOrder})
+    // console.log({enterInputPayment: latestOrder})
     return latestOrder.map((orderLine, key) => (
         // console.log({line: orderLine.productName})
                 <OrderClosureInput

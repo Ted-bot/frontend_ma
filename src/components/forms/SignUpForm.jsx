@@ -7,7 +7,7 @@ import { PostError } from '../../js/error/PostError.js'
 import { reconstructPostInput,
     ApiFetch,
     ApiFetchPostOptions,
-    foundInvalidInputData,
+    findAndUpdateInvalidList,
     setInputInvalidTrueWhenEnteredInputEmpty,
     // prepRequestFields,
     inputValidList,
@@ -278,7 +278,7 @@ export default function SignUpForm() {
         
         const pw = event.target.password.value
         const requestData = reconstructPostInput(enteredInput, pw)
-        const checkInputUser = foundInvalidInputData(enteredInput, setLockedSubmitButton, setEnteredInputIsInvalid) 
+        const checkInputUser = findAndUpdateInvalidList(enteredInput, setLockedSubmitButton, setEnteredInputIsInvalid) 
         
         if(!checkInputUser){
             postRequest(requestData)

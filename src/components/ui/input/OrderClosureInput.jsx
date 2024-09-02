@@ -36,7 +36,12 @@ export default function OrderClosureInput({name, qty, price,subscriptionAmount, 
                         <Divider sx={{ borderBottomWidth: 1, marginTop: 1, marginBottom: 1, backgroundColor: alpha('#90caf9', 0.5) }} />
                     </section>}
                     <section className="font-bold text-neutral-500/80 sm:text-base md:text-xl">
-                        {getLocalStorageItem(currencyType)} {subscriptionType != 'unavailable' ? (subscriptionAmount) + ` p/${subscriptionType}  \(${getLocalStorageItem(currencyType)} ${totalPrice} \)` : totalPrice}
+                        {getLocalStorageItem(currencyType)} 
+                        {
+                            subscriptionType != 'unavailable' 
+                            ? (subscriptionAmount) + ` p/${subscriptionType}  \(${getLocalStorageItem(currencyType)} ${totalPrice} \)` 
+                            : totalPrice
+                        }
                     </section>
                         {/* {getLocalStorageItem(currencyType)} {totalPrice} */}
                 </section>

@@ -12,7 +12,7 @@ const UserSelectPaymentMethodForm = ({selectedType, symbol, paymentMethodModalHa
             <section className="grid justify-items-center">
                 <section 
                     onClick={paymentMethodModalHandler}
-                    className={`${errorClass ?? errorClass} inline-flex border-4 rounded-lg border-slate-300 py-10 cursor-pointer sm:w-full md:w-3/5 hover:bg-slate-200`}
+                    className={`${errorClass ? errorClass : 'border-slate-300'} inline-flex border-4 rounded-lg  py-10 cursor-pointer sm:w-full md:w-3/5 hover:bg-slate-200`}
                 >
                     <section className="grow-0 px-6 content-center">
                         {symbol == 'ideal' && <img src={IconIdeal} alt="Your SVG iDeal" />}

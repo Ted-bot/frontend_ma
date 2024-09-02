@@ -10,6 +10,8 @@ export default function UserOrderInfoInterface({array}) {
             name={item.name}
             type={item.type}
             key={item.id}
+            error={item?.error}
+            errorRegion={item?.errorRegion}
             {...item}
         />
         ))

@@ -135,7 +135,25 @@ export function reconstructPostInput(data, pw)
         return requiredPostRequestFields
 }
 
-export function foundInvalidInputData(obj, setLockedSubmitButton, setEnteredInputIsInvalid)
+export function findInvalidInput(obj){
+
+    for (const key in obj)
+    {
+        const value = obj[key]
+
+        const avoid_keys = ["state_id", "paymentMethodName", "paymentMethodId", "country", "countryId", "city_id"]
+
+        if(avoid_keys.includes(key)) continue
+
+        if(value === true) {
+            return true
+        }
+    }
+
+    return false
+}
+
+export function findAndUpdateInvalidList(obj, setLockedSubmitButton, setEnteredInputIsInvalid)
 {
     let foundInvalid = false
 
