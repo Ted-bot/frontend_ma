@@ -2,7 +2,7 @@ import LabelNameInput from '../ui/input/LabelNameInput.jsx'
 import { useState } from 'react'
 // import { useNavigate } from 'react-router-dom'
 // import { PostError } from '../../js/error/PostError.js'
-import { foundInvalidInputData } from '../../js/util/postUtil.js'
+import { findAndUpdateInvalidList } from '../../js/util/postUtil.js'
 // import { getAuthToken } from '../js/util/auth.js'
 // import { ApiFetch, ApiFetchOptions } from '../../js/util/postUtil.js'
 import { useLogin, useNotify, Login} from 'react-admin'
@@ -113,7 +113,7 @@ export default function LoginForm() {
         const email = enteredInput.email
         const password = enteredInput.password
         console.log(enteredInput)
-        foundInvalidInputData(enteredInputIsInvalid)
+        findAndUpdateInvalidList(enteredInputIsInvalid)
         // postRequest(enteredInput)
         login({ email, password }).catch((error) => {
             if(error.response != undefined ){
@@ -121,6 +121,7 @@ export default function LoginForm() {
                         setErrors(error.response.errors)
                     }
                 } else {
+                    // "code":401,"message":"JWT Token not found"
                     console.log(error)
                 }
             notify('Invalid email or password')

@@ -1,4 +1,4 @@
-import { json } from "react-router-dom"
+import { json, redirect } from "react-router-dom"
 
 import { 
     ApiFetchGetOptions,
@@ -11,15 +11,15 @@ import {
 export async function PaymentLoader()
 {
     const token = getToken()
-    const ApiOptions = ApiFetchGetOptions('/api/v1/order',{'X-Authorization': 'Bearer ' + token})
-        const response = await ApiFetch(ApiOptions)
-        const getResults = await response.json()        
-        
-        // if(!getResults.lines){
-        if(!response.ok){
-            console.log({ response : response})
-            throw {error: 'Not Found!'}
-        }   
+    const ApiOptions = ApiFetchGetOptions('/api/v1/order/payment',{'X-Authorization': 'Bearer ' + token})
+    const response = await ApiFetch(ApiOptions)
+    const getResults = await response.json()       
 
-        return getResults
+    if(!response.ok){
+        throw {error: 'Not Found!'}           
+    }   
+
+    console.log({paymentLoader: getResults})
+
+    return getResults
 }

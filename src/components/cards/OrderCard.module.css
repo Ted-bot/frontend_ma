@@ -1,0 +1,190 @@
+/* 
+  GET PRODUCT CARD 
+*/
+.cardSubscription
+{
+  /* background-color: aqua; */
+  /* border-width: thick;
+  border-color: red; */
+  /* transition: all 0.4s ease-in-out .15s; */
+  transition: all 0.4s ease-in-out .15s;
+}
+
+/* |
+  Card Title
+| */
+.cardSubscription:hover h1
+{
+  /* background-color: aqua; */
+  /* color: rgb(16, 93, 48); */
+  /* color: rgb(16, 48, 93); */
+  color: rgb(16, 48, 88, 80%);
+}
+
+
+/* 
+  HOVER::PRODUCT CARD 
+*/
+.cardSubscription:hover
+{
+  border-width: medium;
+  /* border-color: rgb(16, 93, 48); */
+  border-color: rgb(16, 48, 93);
+  transform: scale(1.05);
+
+}
+
+/* CLASS::PRICE CONTENT */
+.spSection {
+  transition: all 0.4s ease-in-out .15s;
+  /* border-color: blue; */
+}
+
+/* HOVER::PRICE CARD */
+/* .cardSubcription */
+section:hover > .spSection
+{
+  /* background-color: rgb(16, 93, 48, 85%); */
+  background-color: rgb(16, 48, 93, 85%);
+  border-width: thick;
+  /* border-color: rgb(16, 93, 48); */
+  border-color: rgb(16, 48, 93);
+  color: rgba(106, 242, 176, 0.8);
+}
+
+/* |
+  CARD BUTTON MAIN STYLE
+| */
+section > section > .spAllRefBtns:has(button) {
+  border-radius: 7px;
+  display: flex;
+  justify-content: center;
+}
+
+/* |
+  FIRST BUTTON IN CARD
+*/
+section .spAllRefBtns:nth-child(3) {
+  
+  /* align-items: center; */
+  /* text-align: center; */
+  margin-top: 1rem;
+  text-decoration: none;
+  color: white;
+  background-color: rgb(16, 48, 93);
+  /* background-color: rgb(16, 93, 48); */
+  font-weight: 300;
+  font-size: 1rem;
+  -webkit-transition: all 0.3s ease-in-out .15s;
+  -moz-transition: all 0.3s ease-in-out .15s;
+  -o-transition: all 0.3s ease-in-out .15s;
+  transition: all 0.3s ease-in-out .15s;
+}
+
+/* |
+HOVER::FIRST BUTTON free trail a:3rd nested element in card 1st section
+has method get prev a (in this case free trail)
+*/
+
+section .spAllRefBtns:hover:nth-child(3) {
+  text-decoration: underline;
+  text-decoration-thickness: 3px;
+  text-underline-offset: 8px;
+  background-color: transparent;
+  /* color: rgb(16, 48, 93); */
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: rgb(22, 101, 52);
+}
+
+section .spAllRefBtns:hover .spHiddenFaIcon {
+  visibility: visible;
+  width: 2rem;
+}
+
+.spAllRefBtns:has(+ form:is(:hover, :focus-visible)) {
+  font-size: 0.7rem;
+  opacity: 0.3;
+}
+
+section:hover > .spAllRefBtns:nth-child(3)
+{
+  color: rgba(224, 231, 94, 0.85);
+}
+
+section > .spAllRefBtns:nth-child(3):hover
+{
+  /* color: rgb(16, 93, 48); */
+  color: rgb(16, 48, 93);
+}
+
+
+/* GET ICON::FIRST BUTTON CLASS */
+/* section a .spHiddenFaIcon { */
+section section > form .spHiddenFaIcon {
+  visibility: hidden;
+  -webkit-transition: all 0.01s ease-in-out .10s;
+  -moz-transition: all 0.01s ease-in-out .10s;
+  -o-transition: all 0.01s ease-in-out .10s;
+  transition: all 0.01s ease-in-out .10s;
+}
+
+/* |
+GET SECOND BUTTON IN CARD
+4th (nth child) is 'order a'
+| */
+section .spAllRefBtns:nth-child(4) {
+  text-align: center;
+  margin-top: 1rem;
+  height: 4rem;
+  border: thin;
+  background-color: transparent;
+  font-weight: 300;
+  text-decoration: underline;
+  text-decoration-thickness: 3px;
+  text-underline-offset: 8px;
+  /* color: rgb(16, 93, 48); */
+  color: rgb(16, 48, 93);
+  font-size: 1rem;
+  transition: all 0.3s ease-in-out .15s;
+  -webkit-transition: all 0.3s ease-in-out .15s;
+  -moz-transition: all 0.3s ease-in-out .15s;
+  -o-transition: all 0.3s ease-in-out .15s;
+}
+
+/* |
+  HOVER::SECOND BUTTON while hover over 'free trail a' do this to the 'order a'
+| */
+section .spAllRefBtns:hover:nth-child(4) {
+  font-weight: 700;
+  text-decoration: none;
+  /* background-color: rgb(16, 93, 48); */
+  background-color: rgb(16, 48, 93);
+  /* color: rgba(224, 231, 94, 0.85); */
+  color: rgba(106, 242, 176, 0.8);
+  font-size: 1.1rem;
+}
+
+.spAllRefBtns:hover:nth-child(3) + form:nth-child(4) {
+  opacity: 0.3;
+  font-size: 0.7rem;
+}
+
+/* GET ICON::SECOND BUTTON (awesome icon obj) */
+/* section a .spFaIcon { */
+section > form .spFaIcon {
+  visibility: visible;
+  display: inline-flex;
+  -webkit-transition: color 0.2s ease-in-out 0.10s;
+  -moz-transition: color 0.2s ease-in-out 0.10s;
+  -o-transition: color 0.1s ease-in-out 0.10s;
+  transition: color 0.02s ease-in-out 0.10s;
+}
+
+/* GET ICON */
+section .spAllRefBtns:hover .spFaIcon {
+  /* color: rgb(16, 93, 48); */
+  visibility: hidden;
+  display: none;
+  width: 2rem;
+}

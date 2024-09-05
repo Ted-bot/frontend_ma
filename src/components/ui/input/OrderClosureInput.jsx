@@ -4,7 +4,7 @@ import {
 import Divider from '@mui/material/Divider'
 import { alpha } from "@mui/material"
 
-export default function OrderClosureInput({name, qty, price, totalPrice, subscriptionType, startSubscription, endSubscription}){
+export default function OrderClosureInput({name, qty, price,subscriptionAmount, durationSubscription, totalPrice, subscriptionType, startSubscription, endSubscription}){
     const currencyType = 'EUR'
     // console.log({price})
     return (
@@ -23,10 +23,10 @@ export default function OrderClosureInput({name, qty, price, totalPrice, subscri
                             defaultValue={qty}
                         />
                     </section>
-                    {subscriptionType !== 'no_duration' && <section>
+                    {subscriptionType != 'unavailable' && <section>
                         <Divider sx={{ borderBottomWidth: 1, marginTop: 1, marginBottom: 1, backgroundColor: alpha('#90caf9', 0.5) }} />
                             <section className="text-neutral-700 font-medium">
-                             valid for {subscriptionType == 'month' &&  qty}   {subscriptionType} 
+                             valid for {subscriptionType == 'month' &&  durationSubscription}   {subscriptionType} 
                             </section>
                                 <section className="inline-flex text-sm">
                                     <span className="text-rose-500 font-semibold">{startSubscription}</span>
@@ -36,8 +36,14 @@ export default function OrderClosureInput({name, qty, price, totalPrice, subscri
                         <Divider sx={{ borderBottomWidth: 1, marginTop: 1, marginBottom: 1, backgroundColor: alpha('#90caf9', 0.5) }} />
                     </section>}
                     <section className="font-bold text-neutral-500/80 sm:text-base md:text-xl">
-                    {getLocalStorageItem(currencyType)} {totalPrice}
+                        {getLocalStorageItem(currencyType)} 
+                        {
+                            subscriptionType != 'unavailable' 
+                            ? (subscriptionAmount) + ` p/${subscriptionType}  \(${getLocalStorageItem(currencyType)} ${totalPrice} \)` 
+                            : totalPrice
+                        }
                     </section>
+                        {/* {getLocalStorageItem(currencyType)} {totalPrice} */}
                 </section>
 
             </section>

@@ -1,11 +1,13 @@
+import {useCallback} from 'react'
 import {redirect} from 'react-router-dom'
 // import {useState} from 'react'
-import { PostError } from '../js/error/PostError'
+import { PostError } from '../js/error/PostError.js'
 import { getAuthToken } from '../js/util/auth.js'
 
 export function logoutAction(){
 
-    const postRequest = async () => {
+    const postRequest = useCallback(
+        async () => {
         // console.log({req_input:data})
         try {
             const response = await fetch("/api/v1/logout",{ 
@@ -28,9 +30,7 @@ export function logoutAction(){
         } catch (error) {
                 console.log(error)
         }
-    }
+    })
 
     postRequest()
-    // localStorage.removeItem('auth')
-    // return redirect('/')
 }

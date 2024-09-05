@@ -8,7 +8,8 @@ import { alpha } from "@mui/material"
 
 import './CalendarModal.css'
 
- const UserChoosePaymentModal = forwardRef(function UserDataModal({ paymentMethodOptions}, ref){
+const UserChoosePaymentModal = forwardRef(function UserDataModal({ paymentMethodOptions}, ref){
+    
     const dialog = useRef()
 
     useImperativeHandle(ref, () => {

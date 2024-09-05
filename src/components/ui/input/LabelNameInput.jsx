@@ -10,7 +10,9 @@ export default function LabelNameInput({
     type, 
     error,
     invalid,
+    cityId,
     cityList, 
+    stateId,
     stateList,
     onChangeState,
     onChangeCity,
@@ -32,11 +34,13 @@ export default function LabelNameInput({
             value: state.id
         }))
         
-        optionCitiesList = cityList.map((state) => ({
-            label: state.name,
-            value: state.id
+        optionCitiesList = cityList.map((city) => ({
+            label: city.name,
+            value: city.id
         }))
+        console.log({stateId, cityId})
     }
+
 
     return (
         <>
@@ -48,8 +52,10 @@ export default function LabelNameInput({
                     {
                         (type != 'tel' && type != 'location') ? 
                             <input 
+                                // error != undefined && error != ''
+                                // invalid != undefined && invalid != ''
                                 className={`${checkBox === 1 ? 'h-8 w-8 lg:h-12 lg:w-12 accent-orange-300' : 'w-full appearance-none'} 
-                                ${invalid != undefined && invalid != '' || error != undefined && error != '' && 'border-red-500'} 
+                                ${error && 'border-red-500'} 
                                 block bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`} 
                                 id={id}
                                 name={name} 
@@ -58,7 +64,9 @@ export default function LabelNameInput({
                             />
                         : type === 'tel' ?
                             <PhoneInput
-                                className={`${invalid != undefined && invalid != '' || error != undefined && error != '' && 'border-red-500'} 
+                                // error != undefined && error != ''
+                                // invalid != undefined && invalid != ''
+                                className={`${error && 'border-red-500'} 
                                 w-full appearance-none block bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight 
                                 focus:outline-none focus:bg-white`}
                                 country="NL"
@@ -68,34 +76,42 @@ export default function LabelNameInput({
                         <>
                             <section className='flex w-full justify-evenly'>
                                     <NativeSelect
-                                        className={`w-full block text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`}
-                                        onChange={onChangeState}
+                                        className={`${error && 'border-red-500 border '}w-full block text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`}
+                                        id={stateId}
+                                        onChange={(e) => onChangeState(e)}
                                         placeholder='select state ...' 
+                                        value={stateId }
+                                        
                                     >
                                         {
                                             optionStateList instanceof Array && 
                                             optionStateList.length > 0 && 
-                                            optionStateList.map((value, index) => (<option key={index} value={index}>{value.label}</option>))
+                                            optionStateList.map((value, index) => (<option key={index} value={value.value}>{value.label}</option>))
                                         }
                                     </NativeSelect>
                                     <NativeSelect
-                                        className={`w-full block text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`}
-                                        onChange={onChangeCity}
+                                        className={`${error && 'border-red-500 border '}w-full block text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`}
+                                        id={id}
+                                        onChange={(e) => onChangeCity(e)}
                                         placeholder='select city ...'
-                                        autoFocus 
+                                        value={cityId}
+                                        // autoFocus 
                                     >
                                         {
                                             optionCitiesList instanceof Array && 
                                             optionCitiesList.length > 0 && 
-                                            optionCitiesList.map((value, index) => (<option key={index} value={index}>{value.label}</option>))
+                                            optionCitiesList.map((value, index) => (<option key={index} value={value.value}>{value.label}</option>))
                                         }
                                     </NativeSelect>
                                 </ section> 
                         </>
                     }
                 </label>
-                {invalid && type === 'password' &&  <p className="text-red-500 text-xs italic">Please fill in a {lowerCaseName} </p>}
-                {invalid && type === 'text' &&  <p className="text-red-500 text-xs italic">Please fill in your {lowerCaseName} </p>}
+                {invalid && type == 'password' &&  <p className="text-red-500 text-xs italic">Please fill in a {lowerCaseName} </p>}
+                {/* {invalid && type == 'checkbox' &&  <p className="text-red-500 text-xs italic">Please set a {lowerCaseName} </p>}
+                {invalid && type == 'gender' &&  <p className="text-red-500 text-xs italic">Please set a {lowerCaseName} </p>} */}
+                {invalid && type == 'location' &&  <p className="text-red-500 text-xs italic">Please fill in a {lowerCaseName} </p>}
+                {invalid && type == 'text' &&  <p className="text-red-500 text-xs italic">Please fill in your {lowerCaseName} </p>}
                 {invalid && type == 'checkbox' &&  <p className="text-red-500 text-xs italic">Please fill gender</p>}
                 {invalid && type == 'date' &&  <p className="text-red-500 text-xs italic">Sorry, only between the age of 7 and 60 years can sign in!</p>}
                 {invalid && type == 'tel' &&  <p className="text-red-500 text-xs italic">Please fill in your {lowerCaseName}</p>}

@@ -3,14 +3,15 @@ import { AdminGuesser,
     hydraSchemaAnalyzer,
     ResourceGuesser,
 } from '@api-platform/admin'
-import { Layout } from 'react-admin'
-// import { redirect } from 'react-router-dom'
+import { Layout, CustomRoutes } from 'react-admin'
+import { Route } from 'react-router-dom'
 // import { createTheme } from '@mui/material/styles'
 
+import SignUpForm from '../components/forms/SignUpForm.jsx'
 import MyMenu from '../components/navigations/DashboardNavigation.jsx'
 import ProfileList from '../dataProvider/Profile/ProfileList.jsx'
 import UserCreate from '../dataProvider/User/UserCreate.jsx'
-import MyLoginForm from '../components/forms/dashboardLogin.jsx'
+import LoginDashboardLoader from '../components/loader/LoginDashboardLoader.jsx'
 import { ApiFetch,
      ApiFetchPostOptions,
     //  ApiFetchGetOptions,
@@ -49,7 +50,7 @@ export default function DashboardPage() {
     const itemLocalstorage = 'user'
 
     const MyLogin = () => (
-            <MyLoginForm />
+            <LoginDashboardLoader />
     )
 
     const authProvider = {
@@ -112,6 +113,9 @@ export default function DashboardPage() {
                 loginPage={MyLogin}
                 authProvider={authProvider}
             >
+                <CustomRoutes noLayout >
+                    <Route path="/register" element={<SignUpForm />} />
+                </CustomRoutes>
                 <ResourceGuesser name={"users"} create={UserCreate} />
                 <ResourceGuesser name={"classes"} />
                 <ResourceGuesser name={"trainingsessions"} />

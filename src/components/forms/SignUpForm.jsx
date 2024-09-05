@@ -1,20 +1,21 @@
 import { useState, useEffect } from 'react'
 import { useNavigate,
     useNavigation,
-    // useLocation 
 } from 'react-router-dom'
 import CreateFormInterface from '../interface/CreateFormInterface.jsx'
 import { PostError } from '../../js/error/PostError.js'
 import { reconstructPostInput,
     ApiFetch,
     ApiFetchPostOptions,
-    foundInvalidInputData,
-    prepRequestFields,
+    findAndUpdateInvalidList,
+    setInputInvalidTrueWhenEnteredInputEmpty,
+    // prepRequestFields,
     inputValidList,
     setLocalStorageItem,
     deleteLocalStorageItem,
     getNewUserObjOrStorageData,
     setToken,
+    getErrorFromRequest,
 } from '../../js/util/postUtil.js'
 import { GetState, GetCity } from "react-country-state-city"
 
@@ -39,7 +40,7 @@ export default function SignUpForm() {
 
     const navigate = useNavigate()
     const navigation = useNavigation()
-    // const locationNav = useLocation()
+    const [lockedSubmitButton, setLockedSubmitButton] = useState(false)
     
     let isSubmitting = navigation.state === 'submitting'
 
@@ -50,7 +51,7 @@ export default function SignUpForm() {
     const [singleRequest, setSingleRequest] = useState(true)
     const [stateList, setStateList] = useState([])
     const [cityList, setCityList] = useState([])
-    const [errors, setErrors] = useState(prepRequestFields)
+    const [errors, setErrors] = useState(inputValidList)
     
     useEffect(() => {
         if(singleRequest){
@@ -58,51 +59,83 @@ export default function SignUpForm() {
             GetState(countryid).then((result) => {
                 setStateList(result)
             })
-
+        } else {
+            setLocalStorageItem(nameStorageItem,enteredInput)
         }
-    }, [singleRequest])
+    }, [singleRequest, enteredInput])
     
     useEffect(() => {
-        setLocalStorageItem(nameStorageItem,enteredInput)
-    }, [enteredInput])
+        getErrorFromRequest(errors,setLockedSubmitButton,setEnteredInputIsInvalid)
+    }, [errors])
 
-    function inputHandle(identifier, event){
+    const inputHandle = (identifier, event) => {
+
+        if(lockedSubmitButton)
+        {
+            setErrors(inputValidList)
+            setEnteredInputIsInvalid(inputValidList)
+            setLockedSubmitButton(false)
+        }
+
+        if(identifier == 'password')
+        {
+            const passwordNotEmpty = event != "" ? true : false
+            updateEnteredInputState(identifier, passwordNotEmpty)
+            return
+        }
 
         if(identifier == 'gender' && event == 'male' || event == 'female')
-            {
-                genderStatusRequired === true ? setGenderStatusRequired(false) : ''
-                setEnteredInputIsInvalid((prevValues) => ({
-                    ...prevValues,
-                    [identifier] : event ? false : true
-                }))
-            }
+        {
+            // genderStatusRequired: keep it ternary to allow one to selected
+            genderStatusRequired === true ? setGenderStatusRequired(false) : ''
+            const genderSelected = event ? false : true
+
+            setEnteredInputIsInvalid((prevValues) => ({
+                ...prevValues,
+                [identifier] : event ? false : true
+            }))
+            updateEnteredInputState(identifier, genderSelected)
+        }
 
         if(identifier == 'state')
-            {
-                const state = stateList[event.target.value]; //here you will get full state object.
-                updateEnteredInputState('state_list_nr', event.target.value)
-                updateEnteredInputState('state_id', state.id)       
-                updateEnteredInputState(identifier, state.name)
-                GetCity(countryid,state.id).then((result) => {
-                    setCityList(result)
-                })
-                return
-            }
+        {
+            console.log({stateEvent: event, identifier})
+            const state = stateList.find((state) => state.id == Number(event));
+            // const state = stateList[event]; //here you will get full state object.
+            console.log({state})
+            updateEnteredInputState('state_list_nr', event)
+            updateEnteredInputState('state_id', state.id)       
+            updateEnteredInputState(identifier, state.name)
+            GetCity(countryid,state.id).then((result) => {
+                setCityList(result)
+            })
+            return
+        }
 
         if(identifier == 'city')
-            {
-                const city = cityList[event.target.value]
-                updateEnteredInputState(identifier, city.name)
-                updateEnteredInputState('city_id', city.id)
-                updateEnteredInputState('city_list_nr', event.target.value)
-                return
-            }
+        {
+            const city = cityList.find((city) => city.id == Number(event))
+            updateEnteredInputState(identifier, city.name)
+            // updateEnteredInputState('city_list_nr', event)
+            updateEnteredInputState('city_id', city.id)
+            return
+        }
         updateEnteredInputState(identifier, event)
     }
 
     function inputBlurHandle(identifier, event) {
-        if(identifier == 'firstName' || identifier == 'lastName')
+
+        if(identifier == 'gender')
             {
+                setEnteredInputIsInvalid((prevValues) => ({
+                    ...prevValues,
+                    [identifier] : event ? false : true
+                }))
+            }        
+        
+        if(identifier == 'first_name' || identifier == 'last_name')
+            {
+                console.log({[identifier]: regexSearch.test(event)})
                 setEnteredInputIsInvalid((prevValues) => ({
                     ...prevValues,
                     [identifier] : regexSearch.test(event) ? false : true
@@ -117,7 +150,7 @@ export default function SignUpForm() {
                 }))
             }
 
-        if(identifier == 'dateOfBirth' )
+        if(identifier == 'date_of_birth' )
             {
                 const currentYear = new Date().getFullYear();
                 const yearOfBirth = event.split("-")[0]
@@ -128,8 +161,16 @@ export default function SignUpForm() {
                     [identifier] : (age < 6) || (age > 60) ? true : false
                 }))
             }
+            
+        if(identifier == 'password' )
+            {
+                setEnteredInputIsInvalid((prevValues) => ({
+                    ...prevValues,
+                    [identifier] : (event.length < 6)   ? true : false
+                }))
+            }
 
-        if(identifier == 'password' || identifier == 'phone' || identifier == 'conversion')
+        if(identifier == 'phone_number' || identifier == 'conversion')
             {
                 setEnteredInputIsInvalid((prevValues) => ({
                     ...prevValues,
@@ -153,46 +194,47 @@ export default function SignUpForm() {
         titleTextArea: 'Message',
         descriptionToJoinTextArea: 'What caught your interest to join our training sessions',
         setItems : [
-            { name: 'FirstName', id: 'first_name', type: typeText, placeholder: 'first name', value: enteredInput.firstName, error: errors.firstName, invalid: enteredInputIsInvalid.firstName, required:true , onChange: (e) => inputHandle('firstName', e.target.value), onBlur : (e) => inputBlurHandle('firstName', e.target.value)},
-            { name: 'LastName', id: 'last_name', type: typeText, placeholder: 'last name', value: enteredInput.lastName, error: errors.lastName, invalid: enteredInputIsInvalid.lastName, required:true , onChange: (e) => inputHandle('lastName', e.target.value), onBlur : (e) => inputBlurHandle('lastName', e.target.value)},
+            { name: 'FirstName', id: 'first_name', type: typeText, placeholder: 'first name', value: enteredInput.first_name, error: errors.first_name, invalid: enteredInputIsInvalid.first_name, required:true , onChange: (e) => inputHandle('first_name', e.target.value), onBlur : (e) => inputBlurHandle('first_name', e.target.value)},
+            { name: 'LastName', id: 'last_name', type: typeText, placeholder: 'last name', value: enteredInput.last_name, error: errors.last_name, invalid: enteredInputIsInvalid.last_name, required:true , onChange: (e) => inputHandle('last_name', e.target.value), onBlur : (e) => inputBlurHandle('last_name', e.target.value)},
             { name: 'Email', id: 'email', type: typeEmail, placeholder: 'email', value: enteredInput.email, error: errors.email, invalid: enteredInputIsInvalid.email, autoComplete: 'email', required:true, onChange: (e) => inputHandle('email', e.target.value), onBlur : (e) => inputBlurHandle('email', e.target.value)},
-            { name: 'Male', id: 'male', type: typeCheckBox, checked: (enteredInput.gender == 'male' ? true : false), value: 'male', required: genderStatusRequired, error: errors.male, onChange: (e) => inputHandle('gender', e.target.value)},
-            { name: 'Female', id: 'female', type: typeCheckBox, checked: (enteredInput.gender == 'female' ? true : false), value: 'female', required: genderStatusRequired, error: errors.female, onChange: (e) => inputHandle('gender', e.target.value)},
-            { name: 'DateOfBirth', id: 'date_of_birth', type: typeDate, value: enteredInput.dateOfBirth, invalid: enteredInputIsInvalid.dateOfBirth, error: errors.dateOfBirth, required:true, onChange: (e) => inputHandle('dateOfBirth', e.target.value), onBlur : (e) => inputBlurHandle('dateOfBirth', e.target.value)},            
-            { name: 'PhoneNumber', id: 'phone_number', type: typePhone, placeholder: 'phone number', value: enteredInput.phoneNumber, error: errors.phoneNumber, invalid: enteredInputIsInvalid.phone, required:true, onChange: (value) => inputHandle('phoneNumber', value), onBlur : (e) => inputBlurHandle('phone', e.target.value)},
-            { name: 'Password', id: 'password', type: typePassword, placeholder: 'passord', error: errors.password, autoComplete: 'current-password', required: true, onBlur : (e) => inputBlurHandle('password', e.target.value)},
-            { name: 'Location', id: 'location', type: typeLocation, value: enteredInput.city, cityList, stateList, stateId: enteredInput.state_id, error: errors.location, invalid: enteredInputIsInvalid.city, required:true , onChangeState: (e) => inputHandle('state', e), onChangeCity: (e) => inputHandle('city', e), onBlur : (e) => inputBlurHandle('city', e.target.value)},
+            { name: 'Male', id: 'male', type: typeCheckBox, checked: (enteredInput.gender == 'male' ? true : false), value: 'male', required: genderStatusRequired, error: errors.gender, onChange: (e) => inputHandle('gender', e.target.value)},
+            { name: 'Female', id: 'female', type: typeCheckBox, checked: (enteredInput.gender == 'female' ? true : false), value: 'female', required: genderStatusRequired, error: errors.gender, onChange: (e) => inputHandle('gender', e.target.value)},
+            { name: 'DateOfBirth', id: 'date_of_birth', type: typeDate, value: enteredInput.date_of_birth, invalid: enteredInputIsInvalid.date_of_birth, error: errors.date_of_birth, required:true, onChange: (e) => inputHandle('date_of_birth', e.target.value), onBlur : (e) => inputBlurHandle('date_of_birth', e.target.value)},            
+            { name: 'PhoneNumber', id: 'phone_number', type: typePhone, placeholder: 'phone number', value: enteredInput.phone_number, error: errors.phone_number, invalid: enteredInputIsInvalid.phone_number, required:true, onChange: (value) => inputHandle('phone_number', value), onBlur : (e) => inputBlurHandle('phone_number', e.target.value)},
+            { name: 'Password', id: 'password', type: typePassword, placeholder: 'passord', error: errors.password, invalid: enteredInputIsInvalid.password,autoComplete: 'current-password', required: true, onChange: (e) => inputHandle('password', e.target.value), onBlur : (e) => inputBlurHandle('password', e.target.value)},
+            { name: 'Location', id: 'location', type: typeLocation, value: enteredInput.city, cityList, stateList, cityId: enteredInput.city_id, stateId: enteredInput.state_id, error: errors.location, invalid: enteredInputIsInvalid.city,
+                required:true , onChangeState: (e) => inputHandle('state', e.target.value), onChangeCity: (e) => inputHandle('city', e.target.value), onBlur : (e) => inputBlurHandle('city', e.target.value)},
         ]
     }
 
     const postRequest = async (data) => {
+        
+        const options = { url: '/api/v2/register', method: 'POST'}
+        const ApiOptions = ApiFetchPostOptions(options,data)            
+
         try {
-            const options = { url: '/api/v2/register', method: 'POST'}
-            const ApiOptions = ApiFetchPostOptions(options,data)            
-            const response = ApiFetch(ApiOptions)
+            const response = await ApiFetch(ApiOptions)
+            const getResults = await response.json()
         
             if(!response.ok)
             { //if(response.status >= 400 && response.status <= 600)
-                const errorJson = await response.json()
-                throw new PostError('Api Sign up error', errorJson)
+                // throw {error: getResults.error, property: getResults.property, message: getResults.message, sql_state: getResults.sql_state}
+                throw {errors: getResults.errors}
             }
 
+            setErrors(inputValidList)            
             deleteLocalStorageItem(nameStorageItem)
-            const reqResults = await response.json()
-            setToken(reqResults)
-            navigate('/dashboard') 
-            // redirect
-
+            setToken(getResults.token)
+            navigate('/dashboard', {replace: true})
+            
         } catch (error) {
 
             if(
-                error.response != undefined && 
-                error.response != '' &&
-                !error.response.errors.error
+                Array.isArray(error.errors) && (error.errors.length > 1)
             )
             {
-                error.response.errors instanceof Array &&
-                error.response.errors.map((error) => {
+                console.log({entere_with_multiple_errors: error.errors})
+                error.errors.map((error) => {
                     setErrors((prevValues) => {
                         return {
                             ...prevValues,
@@ -200,37 +242,51 @@ export default function SignUpForm() {
                         }
                     })
                 })
-            } else {
 
-                if(error.response instanceof Object){
-                    const arrayProperties = error.response.errors.property[0]
-                    const messageError = error.response.errors.message
+
+            } else if(Array.isArray(error.errors) && (error.errors.length == 1) ){
+
+                    const arrayProperties = error.errors[0].property
+                    const messageError = error.errors[0].message
                     
-                    setErrors((prevValues) => {
+                    setErrors(() => {
                         return {
-                            ...prevValues,
                             [arrayProperties] : messageError
                         }
                     })
+                    
                 } else {
-                    console.log(error)
+                    
+                    if(error.errors?.property instanceof Array){
+                        const arrayProperties = error.errors.property[0]
+                        const messageError = error.errors.message
+                        
+                        setErrors(() => {
+                            return {
+                                [arrayProperties] : messageError
+                            }
+                        })
                 }
+                console.log({unHandledError: error})
             }
-
         }
     }
 
-    function handleSubmit(event, enteredInput, enteredInputIsInvalid) {
+    function handleSubmit(event, enteredInput, setEnteredInputIsInvalid) {
         event.preventDefault()        
-        // console.log({redirect: redirect})
+        delete enteredInput.password
+        
         const pw = event.target.password.value
         const requestData = reconstructPostInput(enteredInput, pw)
-        foundInvalidInputData(enteredInputIsInvalid)
-        postRequest(requestData)
-    }
+        const checkInputUser = findAndUpdateInvalidList(enteredInput, setLockedSubmitButton, setEnteredInputIsInvalid) 
+        
+        if(!checkInputUser){
+            postRequest(requestData)
 
-    console.log({state: navigate})
-    console.log({submitting: isSubmitting})
+        } else {
+            setInputInvalidTrueWhenEnteredInputEmpty(enteredInput, setEnteredInputIsInvalid)
+        }
+    }
 
     return (
         <>
@@ -238,7 +294,7 @@ export default function SignUpForm() {
 
                 <h1 className="pt-3 pb-6 text-2xl">{InterfaceConfiguration.title}</h1>
 
-                <form onSubmit={(e) => handleSubmit(e, enteredInput, enteredInputIsInvalid)} name='sign-up' id='sign-up'>
+                <form onSubmit={(e) => handleSubmit(e, enteredInput, setEnteredInputIsInvalid)} name='sign-up' id='sign-up'>
 
                     <section className="flex flex-wrap -mx-3 mb-6">
                        <CreateFormInterface array={InterfaceConfiguration.setItems} />                        
@@ -262,15 +318,13 @@ export default function SignUpForm() {
                     {enteredInput.conversion && <p className="text-red-500 text-xs italic">
                         {errors.conversion}
                     </p>}
-                    {enteredInput.conversion.error}
 
                     <button 
-                        className="w-full py-3 mt-10 bg-[#063970] rounded-md
-                        font-medium text-white uppercase
-                        focus:outline-none hover:shadow-none"
-                        disabled={isSubmitting}
+                        className={`${lockedSubmitButton && 'opacity-50'} ${!lockedSubmitButton && 'hover:bg-[#686c6f] '} w-full py-3 mt-10 bg-[#063070] rounded-md
+                        font-medium text-white uppercase focus:outline-none hover:shadow-none `}
+                        disabled={isSubmitting || lockedSubmitButton}
                     >
-                        {isSubmitting  ? 'Submitting...' : InterfaceConfiguration.buttonname}
+                        {isSubmitting ? 'Submitting...' : InterfaceConfiguration.buttonname}
                     </button>
 
                     <section className="flex justify-center pt-6 pb-4">

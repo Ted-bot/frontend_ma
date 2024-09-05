@@ -3,7 +3,7 @@ import { Form, redirect } from 'react-router-dom'
 import { useLogin } from 'react-admin'
 import { setToken } from '../../js/util/postUtil'
 
-const MyLoginForm = () => {
+const LoginDashboardLoader = () => {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [errors, setErrors] = useState('')
@@ -18,9 +18,16 @@ const MyLoginForm = () => {
         }).then((response) => {
             setToken(response.token)
             redirect('/dashboard')
+            console.log({ fullReponse: response, authToken: response.token })
         })
         .catch((error) => {
 
+            console.log({ possible_401_status:error})
+            // "code":401,"message":"JWT Token not found"
+            if(error.response != undefined ){
+                error.response.code != undefined && setErrors(error.response.message)
+            }      
+            
             if(error.response != undefined ){
                 error.response.errors != undefined && setErrors(error.response.errors)
             }      
@@ -66,4 +73,4 @@ const MyLoginForm = () => {
     )
 }
 
-export default MyLoginForm
+export default LoginDashboardLoader
