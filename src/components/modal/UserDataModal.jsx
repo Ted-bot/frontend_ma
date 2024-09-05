@@ -4,29 +4,11 @@ import { createPortal } from 'react-dom'
 import { Form } from 'react-router-dom'
 
 import Divider from '@mui/material/Divider'
-import './CalendarModal.css'
 import { alpha } from "@mui/material"
-
 import {OrderContext} from '../../store/shop-order-context'
 import UserOrderInfoInterface from '../interface/UserOrderInfoInterface'
-import { setLocalStorageItem } from '../../js/util/postUtil'
 
-import Modal from '@mui/material/Modal'
-
-// const inputValidList = {
-//     firstAndLastName: false,
-//     email: false,
-//     phoneNumber: false,
-//     streetNumber: false,
-//     unitNumber: false,
-//     addressLine: false,
-//     city: false,
-//     region: false,
-//     postalCode: false,
-//     state: false,
-//     city: false,
-//     // countryId: false,
-// }
+import './CalendarModal.css'
 
 const UserDataModal = forwardRef(function UserDataModal({ errors, enteredInput, enteredInputIsInvalid, formSubmit}, ref){
     
@@ -34,6 +16,7 @@ const UserDataModal = forwardRef(function UserDataModal({ errors, enteredInput, 
     const dialog = useRef()
     const typeLocation = 'location'
     const typeText = 'text'
+    const typeMixed = 'mixed'
     
     useImperativeHandle(ref, () => {
     
@@ -60,7 +43,7 @@ const UserDataModal = forwardRef(function UserDataModal({ errors, enteredInput, 
                 error: errors?.first_and_last_name, 
                 required : true, 
                 onChange: (e) => userSelectedLocation('firstAndLastName', e), 
-                onBlur: (e) => onBlur('firstAndLastName', e)
+                onBlur: (e) => onBlur('firstAndLastName', e, typeText)
             },
             {
                 name: 'E-mail', 
@@ -73,7 +56,7 @@ const UserDataModal = forwardRef(function UserDataModal({ errors, enteredInput, 
                 error: errors?.email, 
                 required : true, 
                 onChange: (e) => userSelectedLocation('email', e), 
-                onBlur: (e) => onBlur('email', e)
+                onBlur: (e) => onBlur('email', e, 'email')
             },
             {
                 name: 'Phone Number', 
@@ -85,7 +68,7 @@ const UserDataModal = forwardRef(function UserDataModal({ errors, enteredInput, 
                 error: errors?.phone_number, 
                 required : true, 
                 onChange: (e) => userSelectedLocation('phoneNumber', e, 'tel'), 
-                onBlur: (e) => onBlur('phoneNumber', e)
+                onBlur: (e) => onBlur('phoneNumber', e, 'tel')
             },
         ],
     }
@@ -102,7 +85,7 @@ const UserDataModal = forwardRef(function UserDataModal({ errors, enteredInput, 
                 invalid: enteredInputIsInvalid.unitNumber,
                 error: errors?.unit_number,
                 onChange: (e) => userSelectedLocation('unitNumber', e),
-                onBlur: (e) => onBlur('unitNumber', e)},
+                onBlur: (e) => onBlur('unitNumber', e, typeText)},
             {
                 name: 'Street Number',
                 id: 'streetNumber',
@@ -125,23 +108,22 @@ const UserDataModal = forwardRef(function UserDataModal({ errors, enteredInput, 
                 error: errors?.address_line,
                 required : true,
                 onChange: (e) => userSelectedLocation('addressLine', e),
-                onBlur: (e) => onBlur('addressLine', e)},
+                onBlur: (e) => onBlur('addressLine', e, typeText)},
             {
                 name: 'Postal Code',
                 id: 'postalCode',
-                type: typeText,
+                type: typeMixed,
                 placeholder: 'postal code',
                 value: enteredInput?.postalCode,
                 invalid: enteredInputIsInvalid.postalCode,
                 error: errors?.postalCode,
                 required : true,
                 onChange: (e) => userSelectedLocation('postalCode', e),
-                onBlur: (e) => onBlur('postalCode', e)
+                onBlur: (e) => onBlur('postalCode', e, typeMixed)
             },
             {
                 name: 'Location',
                 id: typeLocation,
-                state_id: 'stateLocation',
                 error: errors?.location,
                 errorRegion: errors?.region,
                 type: typeLocation, 

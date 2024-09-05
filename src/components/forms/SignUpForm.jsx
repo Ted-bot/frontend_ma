@@ -116,7 +116,7 @@ export default function SignUpForm() {
         {
             const city = cityList.find((city) => city.id == Number(event))
             updateEnteredInputState(identifier, city.name)
-            updateEnteredInputState('city_list_nr', event)
+            // updateEnteredInputState('city_list_nr', event)
             updateEnteredInputState('city_id', city.id)
             return
         }
@@ -202,7 +202,7 @@ export default function SignUpForm() {
             { name: 'DateOfBirth', id: 'date_of_birth', type: typeDate, value: enteredInput.date_of_birth, invalid: enteredInputIsInvalid.date_of_birth, error: errors.date_of_birth, required:true, onChange: (e) => inputHandle('date_of_birth', e.target.value), onBlur : (e) => inputBlurHandle('date_of_birth', e.target.value)},            
             { name: 'PhoneNumber', id: 'phone_number', type: typePhone, placeholder: 'phone number', value: enteredInput.phone_number, error: errors.phone_number, invalid: enteredInputIsInvalid.phone_number, required:true, onChange: (value) => inputHandle('phone_number', value), onBlur : (e) => inputBlurHandle('phone_number', e.target.value)},
             { name: 'Password', id: 'password', type: typePassword, placeholder: 'passord', error: errors.password, invalid: enteredInputIsInvalid.password,autoComplete: 'current-password', required: true, onChange: (e) => inputHandle('password', e.target.value), onBlur : (e) => inputBlurHandle('password', e.target.value)},
-            { name: 'Location', id: 'location', stateId: 'stateLocation',type: typeLocation, value: enteredInput.city, cityList, stateList, cityId: enteredInput.city_id, stateId: enteredInput.state_id, error: errors.location, invalid: enteredInputIsInvalid.city,
+            { name: 'Location', id: 'location', type: typeLocation, value: enteredInput.city, cityList, stateList, cityId: enteredInput.city_id, stateId: enteredInput.state_id, error: errors.location, invalid: enteredInputIsInvalid.city,
                 required:true , onChangeState: (e) => inputHandle('state', e.target.value), onChangeCity: (e) => inputHandle('city', e.target.value), onBlur : (e) => inputBlurHandle('city', e.target.value)},
         ]
     }

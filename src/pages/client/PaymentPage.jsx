@@ -73,6 +73,8 @@ const PaymentPage = () => {
     const addressStorageName = 'user_address'
     const data = useLoaderData()
     const navigate = useNavigate()
+    const regexSearchText = /^[A-Za-z]+$/
+    const regexSearchInt = /^\d+$/
     
     const [paymentType, setPaymentType] = useState({
         ideal : false,
@@ -147,7 +149,7 @@ const PaymentPage = () => {
             ['state_id']: Number(userData.userAddress.reactStateNr)
         }))
 
-        console.log({address_user: data.address})
+        console.log({'address_user': data.address})
         //set user data in local storage to keep most recent data
         
         Object.keys(userData.userInfo).forEach(key => {
@@ -168,10 +170,12 @@ const PaymentPage = () => {
         
         if(!userData.userAddress.id){
             const { id, firstAndLastName, email, phoneNumber, unitNumber, reactStateNr, reactCityNr, region, state, ...desctrInvalidList} = userFormInfo 
-            // console.log({SetInvalid: data.address, inputValidList})
-            Object.keys(desctrInvalidList).forEach(key => {
-                setInvalidTypeStatus(key, true)                
-            })
+            
+            for (const [key, value] of Object.entries(desctrInvalidList)) {
+                if(!value){
+                    setInvalidTypeStatus(key, true)
+                }
+            }
         }
     }, [userData.userAddress.reactStateNr])
 
@@ -199,16 +203,16 @@ const PaymentPage = () => {
     
     const [nameType, setNameType] = useState('no payment method selected')
     
-    const inputHandle = (identifier, event) => {
+    const inputHandlePaymentMethod = (identifier, event) => {
         event.preventDefault()
 
+        // console.log({passesThrough})
         const checkInputUser = findAndUpdateInvalidList(enteredInput, setLockedSubmitButton, setEnteredInputIsInvalid)
 
         if(lockedSubmitButton && checkInputUser){
             console.log({test: 'it came through!'})
             console.log({invalidInputPaymentButton: enteredInputIsInvalid})
 
-            // setInputInvalidTrueWhenEnteredInputEmpty(enteredInput, setEnteredInputIsInvalid)
             setEnteredInputIsInvalid(inputValidList)
             // return
         }
@@ -236,21 +240,21 @@ const PaymentPage = () => {
                 id: 'ideal', 
                 type: 'text', 
                 value: paymentType.ideal, 
-                onClick: (e) => inputHandle('ideal', e), 
+                onClick: (e) => inputHandlePaymentMethod('ideal', e), 
             },
             {
                 name: 'CreditCard', 
                 id: 'credit_card', 
                 type: 'text', 
                 value: paymentType.credit_card, 
-                onClick: (e) => inputHandle('credit_card', e), 
+                onClick: (e) => inputHandlePaymentMethod('credit_card', e), 
             },
             {
                 name: 'PayPal', 
                 id: 'pay_pal', 
                 type: 'text', 
                 value: paymentType.pay_pal, 
-                onClick: (e) => inputHandle('pay_pal', e), 
+                onClick: (e) => inputHandlePaymentMethod('pay_pal', e), 
             }
         ]
     }
@@ -298,7 +302,8 @@ const PaymentPage = () => {
     )
 
     const payOrderHandler = async (event) => {
-
+        event.preventDefault()
+        
         const checkInputUser = findAndUpdateInvalidList(enteredInput, setLockedSubmitButton, setEnteredInputIsInvalid)
 
         if(checkInputUser){
@@ -345,7 +350,7 @@ const PaymentPage = () => {
             amount: amount,
             order_id: orderNumber.toString(),
             redirectUrl: 'http://localhost:5173/payment',
-            webhookUrl: 'https://hkdk.events/8xzfpv28njjwx6',
+            webhookUrl: 'https://aafc-95-96-151-55.ngrok-free.app',
             billingAddress: billingAddress,
             shippingAddress: billingAddress,
             metadata: { order_id : orderNumber.toString()},
@@ -389,14 +394,14 @@ const PaymentPage = () => {
     const userAddressHandler = async (event) => {
         event.preventDefault()
 
-        if(lockedSubmitButton)
+        if(lockedSubmitButton || findInvalidInput(enteredInputIsInvalid))
             {
-                const { firstAndLastName, email, phoneNumber, ...desctrInvalidList} = inputValidList 
-                setEnteredInputIsInvalid(desctrInvalidList)
+                const { firstAndLastName, email, phoneNumber, ...deconstructInvalidList} = inputValidList 
+                setEnteredInputIsInvalid(deconstructInvalidList)
                 setLockedSubmitButton(false)
             }
 
-        let userAddressInfo = prepareInputForRequest(enteredInput, setEnteredInputIsInvalid, enteredInput.cityId, ctxValue.availableCities, enteredInput.stateId, ctxValue.availableStates, setEnteredInputIsInvalid)
+        let userAddressInfo = prepareInputForRequest(enteredInput, setEnteredInputIsInvalid, enteredInput.cityId, ctxValue.availableCities, enteredInput.stateId, ctxValue.availableStates)
         
         userAddressInfo = { ...userAddressInfo, ['location']: enteredInput.city}
         userAddressInfo = { ...userAddressInfo, ['region']: enteredInput.state}
@@ -507,7 +512,9 @@ const PaymentPage = () => {
                 updateEnteredInputState('city_id', city.id)
                 updateEnteredInputState(identifier, city.name)
                 checkLocationStatus('location')
+                
                 setInvalidTypeStatus(identifier, false)
+                setInvalidTypeStatus('city_id', false)
                 return
             }
     
@@ -549,22 +556,33 @@ const PaymentPage = () => {
         }))
     }
 
-    function inputBlurHandle(identifier, event, type='text') {
+    function inputBlurHandle(identifier, event, type) {
+
+        console.log({test: identifier, value: event.target.value, type: type})
         if(identifier == 'unitNumber'){
             return
         }
-        console.log({type})
         
-        if(type == 'text' || type == 'number')
+        if(type === 'text')
             {
                 setEnteredInputIsInvalid((prevValues) => ({
                     ...prevValues,
-                    [identifier] : event.target.value != '' ? false : true
+                    [identifier] : regexSearchText.test(event.target.value) ? false : true
+                }))
+                return
+            }  
+
+        if(type === 'number')
+            {
+                console.log({regex: event.target.value})
+                setEnteredInputIsInvalid((prevValues) => ({
+                    ...prevValues,
+                    [identifier] : regexSearchInt.test(event.target.value) ? false : true
                 }))
                 return
             }  
             
-        if(type == 'location')
+        if(type === 'location')
             {
             console.log({locationEvent:event})
             setEnteredInputIsInvalid((prevValues) => ({
@@ -573,9 +591,13 @@ const PaymentPage = () => {
             })) 
         }
 
+        if(type === 'mixed'){
+            console.log({inputBlurPostalCode: event.target.value})
+        }
+
         setEnteredInputIsInvalid((prevValues) => ({
             ...prevValues,
-            [identifier] : (event.target.value == '') ? true : false
+            [identifier] : (!event.target.value) ? true : false
         }))            
     }
 
@@ -590,6 +612,7 @@ const PaymentPage = () => {
 
     console.log({errors})
     console.log({enteredInputIsInvalid})
+    console.log({enteredInput})
     // console.log({userData_lastOrder: userData.userOrder})
     return (
         <>
@@ -612,14 +635,17 @@ const PaymentPage = () => {
                     <h1 className={`pt-3 pb-6 mt-12 text-2xl text-center`}>Address & Peronsal Information</h1>
                     {userData?.userInfo && userData?.userAddress && 
                     <UserOrderInfoForm 
-                            errorClass={`${lockedSubmitButton || Object.keys(errors.userAddress).length > 0 || findInvalidInput(enteredInputIsInvalid) && 'border-red-300'}`}
-                            userAddressModalHandler={userAddressModalHandler} 
-                            user={userData.userInfo} 
-                            address={userData.userAddress} />}
+                        // errorClass={`${lockedSubmitButton || (Object.keys(errors.userAddress).length > 0) && 'border-red-300'}`}
+                        errorClass={`${findInvalidInput(enteredInputIsInvalid) && 'border-red-300'}`}
+                        userAddressModalHandler={userAddressModalHandler} 
+                        user={userData.userInfo} 
+                        address={userData.userAddress} 
+                    />}
 
                     <h1 className={`pt-3 pb-6 mt-8 text-2xl text-center`}>Choose Payment Method</h1>
                     <UserSelectPaymentMethodForm 
-                        errorClass={`${lockedSubmitButton || !enteredInput.paymentMethodId && 'border-red-300'}`}
+                        // errorClass={`${lockedSubmitButton || !enteredInput.paymentMethodId && 'border-red-300'}`}
+                        errorClass={`${!enteredInput.paymentMethodId && 'border-red-300'}`}
                         symbol={enteredInput.paymentMethodId} 
                         paymentMethodModalHandler={paymentMethodModalHandler}  
                         selectedType={enteredInput.paymentMethodName}

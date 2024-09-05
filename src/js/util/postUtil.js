@@ -106,7 +106,8 @@ export function reconstructPostInput(data, pw)
             let newKey
             // key === 'state_id' || 
             // key === 'city_id' ||
-            if( key === 'city_list_nr' || key === 'state_list_nr' || key === 'state'){
+            // key === 'city_list_nr' || key === 'state_list_nr' || 
+            if( key === 'state'){
                 continue
             }
 
@@ -141,11 +142,12 @@ export function findInvalidInput(obj){
     {
         const value = obj[key]
 
-        const avoid_keys = ["state_id", "paymentMethodName", "paymentMethodId", "country", "countryId", "city_id"]
+        const avoid_keys = ["paymentMethodName","paymentMethodId", "country", "countryId", "location", "state_id", "state", "unitNumber"]
 
         if(avoid_keys.includes(key)) continue
 
-        if(value === true) {
+        if(value) {
+            console.log({key: key, findInvalidINput: value})
             return true
         }
     }
@@ -163,37 +165,28 @@ export function findAndUpdateInvalidList(obj, setLockedSubmitButton, setEnteredI
 
         const trimIfString = value instanceof String ? value.trim() : value
 
-        // console.log({checIfValueIsSTringOrInt: trimIfString})
-        if(key == 'city_id' ||  key == 'state_id' || key == 'city_list_nr' || key == 'state_list_nr' || key == 'state'  || key == 'region' || key == 'unitNumber'){
-            console.log({setPrepareRequest_key: key, value: obj[key]})
-            //  ||  key == 'state_id' || key == 'city_list_nr' || key == 'state_list_nr' || key == 'state'
-            continue
-        }
+        // 'city_list_nr' && state_list_nr
+        const avoid_keys = ["city_id", "region", "state_id", "state","city_id","unitNumber"]
+        if(avoid_keys.includes(key)) continue
         
         if(Number.isInteger(trimIfString))
         {
-            // setLockedSubmitButton(false)
-            // console.log({lefOverIfCheck: key})
             setEnteredInputIsInvalid((prevValue) => ({
                 ...prevValue,
                 [key] : false
             }))
-            // return foundInvalid = true
         } else if (trimIfString instanceof String) {
-            // setLockedSubmitButton(true)
             setEnteredInputIsInvalid((prevValue) => ({
                 ...prevValue,
                 [key] : false
             }))
-            // console.log({key: obj[key]})
-            // return foundInvalid = true
         } else if (!value) {
             setLockedSubmitButton(true)
             setEnteredInputIsInvalid((prevValue) => ({
                 ...prevValue,
                 [key] : true
             }))
-            // console.log({key: obj[key]})
+            
             foundInvalid = true
         }
     }
@@ -265,11 +258,13 @@ export function setInputInvalidTrueWhenEnteredInputEmpty(enteredInput, setEntere
 
 
 // change function name
-export function prepareInputForRequest(enteredInput, setEnteredInputIsInvalid, cityId, availableCities, stateId, availableStates, updateState)
+export function prepareInputForRequest(enteredInput, setEnteredInputIsInvalid, cityId, availableCities, stateId, availableStates)
 {
     let newObj = {}
     for (const [key, value] of Object.entries(enteredInput))
     {
+        let newValue = value
+        
         if(key === 'location'){
             const city = availableCities.find((city) => city.id == Number(cityId) )
             //if city not found ?? set invalid input field
@@ -281,23 +276,15 @@ export function prepareInputForRequest(enteredInput, setEnteredInputIsInvalid, c
                 return
             }
     
-            updateState(key)
-    
             cityName = city.name
+            newValue = cityName
         }
-    
-        if(key == 'stateLocation')
-        {
-            const state = availableStates.find((state) => state.id == Number(stateId) )
-            stateName = state.name
-            continue
-        }
-        // End For Registration
 
-        // FOr Payment
+        const avoid_keys = ["id","country", "country", "countryId", "paymentMethodId", "state_id", "state", "unitNumber", "city_id", "paymentMethodName"]
 
-    
-        newObj = { ...newObj, [key]: value}
+        if(avoid_keys.includes(key)) continue
+
+        newObj = { ...newObj, [key]: newValue}
     }    
 
     return newObj

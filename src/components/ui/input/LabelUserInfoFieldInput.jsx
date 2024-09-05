@@ -31,8 +31,6 @@ export default function LabelUserInfoFieldInput({
                 value: city.id
             }))
         }
-
-        console.log({indiError: error})
         
     return (
         <>
