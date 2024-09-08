@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { 
-    ApiFetchGetOptions,
     ApiFetchPostOptions,
     ApiFetch,
     getLocalStorageItem,
@@ -9,7 +8,6 @@ import {
     prepareInputForRequest,
     findAndUpdateInvalidList,
     findInvalidInput,
-    setInputInvalidTrueWhenEnteredInputEmpty
  } from "../../js/util/postUtil"
 import { useLoaderData, Form, useNavigate } from 'react-router-dom'
 
@@ -19,7 +17,7 @@ import { useLoaderData, Form, useNavigate } from 'react-router-dom'
 import UserOrderInfoForm from "../../components/forms/client/UserOrderInfoForm"
 import SelectedOrderForPaymentInterface from '../../components/interface/SelectedOrderForPaymentInterface'
 
-import { alpha, formControlClasses } from "@mui/material"
+import { alpha } from "@mui/material"
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
 import Box from '@mui/material/Box'
@@ -65,15 +63,12 @@ const prepRequestFields = {
 
 const PaymentPage = () => {
 
-    // const getError = getLocalStorageItem('error')
-    // console.log({getError})
-    // if(){
-    //     redirect('/dashboard/login')            
-    // }
+    const typeFirstAndLastName = 'firstAndLastName'
     const addressStorageName = 'user_address'
     const data = useLoaderData()
     const navigate = useNavigate()
     const regexSearchText = /^[A-Za-z]+$/
+    const regexSearchFirstAndLastName = /^[a-zA-Z]+\s[a-zA-Z]+$/
     const regexSearchInt = /^\d+$/
     
     const [paymentType, setPaymentType] = useState({
@@ -88,12 +83,8 @@ const PaymentPage = () => {
     const [stateList, setStateList] = useState([]) 
     const [cityList, setCityList] = useState([])
     
-    // const getSelectedPaymentMethodIcon = (obj) => Object.keys(obj).find((i) => obj[i] === 'true')
-    
     const userFormInfo = getUserInfoObjOrStorageData(addressStorageName)
     const [enteredInput, setEnteredInput] = useState(userFormInfo)
-    // const [symbol, setSymbol] = useState(null)
-    
     const dialogUserAddress = useRef()
     const dialogUserPaymentMethod = useRef()
     const token = getToken()
@@ -172,6 +163,12 @@ const PaymentPage = () => {
             const { id, firstAndLastName, email, phoneNumber, unitNumber, reactStateNr, reactCityNr, region, state, ...desctrInvalidList} = userFormInfo 
             
             for (const [key, value] of Object.entries(desctrInvalidList)) {
+                
+                if(key === 'addressLine'){                    
+                    !regexSearchText.test(value) && setInvalidTypeStatus(key, true)
+                    continue
+                }
+
                 if(!value){
                     setInvalidTypeStatus(key, true)
                 }
@@ -307,13 +304,8 @@ const PaymentPage = () => {
         const checkInputUser = findAndUpdateInvalidList(enteredInput, setLockedSubmitButton, setEnteredInputIsInvalid)
 
         if(checkInputUser){
-            console.log({test: 'it came through!'})
-            console.log({invalidInputPaymentButton: enteredInputIsInvalid})
-
-            // setInputInvalidTrueWhenEnteredInputEmpty(enteredInput, setEnteredInputIsInvalid)
             return
         }
-        // setEnteredInputIsInvalid(inputValidList)
 
         const mollieOrder = JSON.parse(localStorage.getItem(addressStorageName))
         const lines = JSON.parse(localStorage.getItem('lines'))
@@ -326,7 +318,7 @@ const PaymentPage = () => {
         const userNameArray = splitFullName.split(" ")
         const streetAndNumber = mollieOrder.addressLine + ' ' + mollieOrder.streetNumber
         const addintionalNumber = mollieOrder.unitNumber
-        const subscription = lines.find((line) => line.productDetails.subscriptionDetails.productSubscription === "month")
+        const subscription = lines.find((line) => line.productDetails.subscriptionDetails.subscriptionTimeUnit === "month")
         const { productDetails } = subscription
         const { subscriptionDetails } = productDetails
 
@@ -350,7 +342,7 @@ const PaymentPage = () => {
             amount: amount,
             order_id: orderNumber.toString(),
             redirectUrl: 'http://localhost:5173/payment',
-            webhookUrl: 'https://aafc-95-96-151-55.ngrok-free.app',
+            webhookUrl: 'https://2810-95-96-151-55.ngrok-free.app',
             billingAddress: billingAddress,
             shippingAddress: billingAddress,
             metadata: { order_id : orderNumber.toString()},
@@ -423,11 +415,8 @@ const PaymentPage = () => {
                 
             }
 
-            // close modal
-
         } catch (error) {
             
-            // console.log({API_updateUserOrder:error})
             if(Array.isArray(error.errors) && (error.errors.length > 1))
             {
                 let collectErrors = [];
@@ -558,7 +547,8 @@ const PaymentPage = () => {
 
     function inputBlurHandle(identifier, event, type) {
 
-        console.log({test: identifier, value: event.target.value, type: type})
+        console.log({OnBlurRegexType: type, identifier})
+
         if(identifier == 'unitNumber'){
             return
         }
@@ -568,6 +558,15 @@ const PaymentPage = () => {
                 setEnteredInputIsInvalid((prevValues) => ({
                     ...prevValues,
                     [identifier] : regexSearchText.test(event.target.value) ? false : true
+                }))
+                return
+            }  
+            
+        if(type === typeFirstAndLastName)
+            {
+                setEnteredInputIsInvalid((prevValues) => ({
+                    ...prevValues,
+                    [identifier] : regexSearchFirstAndLastName.test(event.target.value) ? false : true
                 }))
                 return
             }  
@@ -621,7 +620,7 @@ const PaymentPage = () => {
                     ref={dialogUserAddress} 
                     enteredInput={enteredInput} 
                     formSubmit={userAddressHandler} 
-                    user={userData.userInfo} 
+                    user={userData?.userInfo} 
                     address={userData?.userAddress}
                     addressStorageName={addressStorageName}
                     enteredInputIsInvalid={enteredInputIsInvalid}
@@ -638,6 +637,7 @@ const PaymentPage = () => {
                         // errorClass={`${lockedSubmitButton || (Object.keys(errors.userAddress).length > 0) && 'border-red-300'}`}
                         errorClass={`${findInvalidInput(enteredInputIsInvalid) && 'border-red-300'}`}
                         userAddressModalHandler={userAddressModalHandler} 
+                        enteredInput={enteredInput}
                         user={userData.userInfo} 
                         address={userData.userAddress} 
                     />}
@@ -652,7 +652,9 @@ const PaymentPage = () => {
                     />
 
                     <h1 className={`pt-3 pb-6 mt-8 text-2xl text-center`}>Order</h1>
-                    { userData.userOrder?.lastOrder != undefined && <SelectedOrderForPaymentInterface latestOrder={userData.userOrder.lastOrder} />}
+                    { userData.userOrder?.lastOrder != undefined && 
+                        <SelectedOrderForPaymentInterface latestOrder={userData.userOrder.lastOrder} 
+                    />}
                     
                     <section>
                         <Box sx={{ display: 'grid', gridTemplateRows: 'repeat(4, 1fr)' }}>

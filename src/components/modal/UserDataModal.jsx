@@ -16,6 +16,7 @@ const UserDataModal = forwardRef(function UserDataModal({ errors, enteredInput, 
     const dialog = useRef()
     const typeLocation = 'location'
     const typeText = 'text'
+    const typeFirstAndLastName = 'firstAndLastName'
     const typeMixed = 'mixed'
     
     useImperativeHandle(ref, () => {
@@ -36,14 +37,14 @@ const UserDataModal = forwardRef(function UserDataModal({ errors, enteredInput, 
             {
                 name: 'First- and LastName', 
                 id: 'firstAndLastName', 
-                type: typeText, 
+                type: typeFirstAndLastName, 
                 placeholder: 'type first and last name', 
                 value: enteredInput?.firstAndLastName,
                 invalid: enteredInputIsInvalid.firstAndLastName, 
                 error: errors?.first_and_last_name, 
                 required : true, 
                 onChange: (e) => userSelectedLocation('firstAndLastName', e), 
-                onBlur: (e) => onBlur('firstAndLastName', e, typeText)
+                onBlur: (e) => onBlur('firstAndLastName', e, typeFirstAndLastName)
             },
             {
                 name: 'E-mail', 

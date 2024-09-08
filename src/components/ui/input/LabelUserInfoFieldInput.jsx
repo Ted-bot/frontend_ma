@@ -15,6 +15,7 @@ export default function LabelUserInfoFieldInput({
     errorRegion,
     ...props}){
 
+        const typeFirstAndLastName = 'firstAndLastName'
         let optionStateList = []
         let optionCitiesList = []
         const ref = useRef()
@@ -98,10 +99,11 @@ export default function LabelUserInfoFieldInput({
 
             {/* {invalid && id != 'unit_number' && ref?.current?.value == '' && <p className="text-rose-300 text-lg italic">Please fill in a {name} </p>} */}
             {invalid && id == 'location' && <p className="text-rose-300 text-lg italic">Please set a {name} </p>}
-            {invalid && type == 'email' &&  <p className="text-rose-300 text-lg italic">Please fill in a {id} </p>}
-            {invalid && type == 'text' &&  <p className="text-rose-300 text-lg italic">Please fill in your {id} </p>}
-            {invalid && type == 'number' &&  <p className="text-rose-300 text-lg italic">Please fill in your {id} </p>}
-            {invalid && type == 'tel' &&  <p className="text-rose-300 text-lg italic">Please fill in your {id}</p>}
+            {invalid && type === typeFirstAndLastName &&  <p className="text-rose-300 text-lg italic">Please fill in your {name} </p>}
+            {invalid && type == 'email' &&  <p className="text-rose-300 text-lg italic">Please fill in a {name} </p>}
+            {invalid && type == 'text' &&  <p className="text-rose-300 text-lg italic">Please fill in your {name} </p>}
+            {invalid && type == 'number' &&  <p className="text-rose-300 text-lg italic">Please fill in your {name} </p>}
+            {invalid && type == 'tel' &&  <p className="text-rose-300 text-lg italic">Please fill in your {name}</p>}
             {invalid && type == 'checkbox' &&  <p className="text-rose-300 text-lg italic">Please fill gender</p>}
             {invalid && type == 'date' &&  <p className="text-rose-300 text-lg italic">Sorry, only between the age of 7 and 60 years can sign in!</p>}
             {(error != undefined && error != '') && <section className="text-rose-300 text-lg italic">{error}</section>}

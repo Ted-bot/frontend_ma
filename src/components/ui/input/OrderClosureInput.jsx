@@ -39,7 +39,7 @@ export default function OrderClosureInput({name, qty, price,subscriptionAmount, 
                         {getLocalStorageItem(currencyType)} 
                         {
                             subscriptionType != 'unavailable' 
-                            ? (subscriptionAmount) + ` p/${subscriptionType}  \(${getLocalStorageItem(currencyType)} ${totalPrice} \)` 
+                            ? (subscriptionAmount) + ` p/${subscriptionType} ` 
                             : totalPrice
                         }
                     </section>

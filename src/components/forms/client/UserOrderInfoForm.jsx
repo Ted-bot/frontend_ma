@@ -1,7 +1,7 @@
 import IconRight from "../../../assets/IconRight"
 import IconUserLocation from "../../../assets/IconUserLocation"
 
-const UserOrderInfoForm = ({userAddressModalHandler, user, errorClass, address}) => {
+const UserOrderInfoForm = ({userAddressModalHandler, enteredInput, user, errorClass, address}) => {
 
     console.log({setUpdateRedBorder: errorClass})
     return (
@@ -14,10 +14,10 @@ const UserOrderInfoForm = ({userAddressModalHandler, user, errorClass, address})
                 >
                     <section className="grow-0 px-6 content-center"><IconUserLocation /></section>
                     <section className="grow flex-col">
-                        <section className="text-clip overflow-hidden">{address?.addressLine} {address?.streetNumber} {address?.unitNumber}</section>
-                        <section>{address?.postalCode} {user.city}</section>
-                        <section>{user.firstAndLastName}</section>
-                        <section>{user.phoneNumber}</section>
+                        <section className="text-clip overflow-hidden">{enteredInput.addressLine ?? address?.addressLine} {enteredInput.streetNumber ?? address?.streetNumber} {enteredInput.unitNumber ?? address?.unitNumber}</section>
+                        <section>{enteredInput.postalCode ?? address?.postalCode} {user.city}</section>
+                        <section>{enteredInput.firstAndLastName ?? user.firstAndLastName}</section>
+                        <section>{enteredInput.phoneNumber ?? user.phoneNumber}</section>
                     </section>
                     <section className="grow-0 px-6 content-center"><IconRight /></section>
                 </section>

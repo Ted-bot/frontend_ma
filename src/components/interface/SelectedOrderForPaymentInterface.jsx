@@ -11,7 +11,7 @@ export default function SelectedOrderForPaymentInterface({latestOrder}){
                     qty={orderLine.quantity}
                     subscriptionAmount={orderLine.productDetails.subscriptionDetails.subscriptionAmount}
                     durationSubscription={orderLine.subscriptionLength}
-                    subscriptionType={orderLine.productDetails.subscriptionDetails.productSubscription}
+                    subscriptionType={orderLine.productDetails.subscriptionDetails.subscriptionTimeUnit}
                     startSubscription={orderLine.productDetails.subscriptionDetails.productSubscriptionStart}                    
                     endSubscription={orderLine.productDetails.subscriptionDetails.productSubscriptionEnd}
                 />
