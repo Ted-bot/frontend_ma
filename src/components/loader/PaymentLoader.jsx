@@ -1,16 +1,20 @@
+import { useCallback } from "react"
 import { json, redirect } from "react-router-dom"
 
-import { 
-    ApiFetchGetOptions,
-    ApiFetchPostOptions,
-    ApiFetch,
-    setLocalStorageItem,
-    getToken
- } from "../../js/util/postUtil"
+import { ApiFetch } from "../../js/util/postUtil.js"
+import {ApiFetchGetOptions, deleteLocalStorageItem  } from "../../js/util/getUtil.js"
+import { getAuthToken} from "../../js/util/auth.js"
 
 export async function PaymentLoader()
 {
-    const token = getToken()
+    const deleteStorageValeus = ['amount', 'locale', 'description', 'order_number', 'EUR', 'lines', 'user_address']
+
+    deleteStorageValeus.forEach(key => {
+        deleteLocalStorageItem(key)
+        // console.log({deleteSuccessExample_Lines: localStorage.getItem(`${key}`), key})
+    })
+
+    const token = getAuthToken()
     const ApiOptions = ApiFetchGetOptions('/api/v1/order/payment',{'X-Authorization': 'Bearer ' + token})
     const response = await ApiFetch(ApiOptions)
     const getResults = await response.json()       
@@ -18,8 +22,6 @@ export async function PaymentLoader()
     if(!response.ok){
         throw {error: 'Not Found!'}           
     }   
-
-    console.log({paymentLoader: getResults})
 
     return getResults
 }

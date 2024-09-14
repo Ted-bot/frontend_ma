@@ -1,15 +1,17 @@
 import React from 'react'
 import { Link, Form, Navigate, useNavigate } from 'react-router-dom'
 import TextWithLineBreaks from "../ui/text/TextWithLineBreaks"
-import Box from '@mui/material/Box'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faArrowRightLong } from "@fortawesome/free-solid-svg-icons"
-import { getAuthToken } from '../../js/util/auth'
-import classes from "./OrderCard.module.css"
+
 import { ApiFetch,
     ApiFetchPostOptions,
 } from '../../js/util/postUtil.js'
+import { deleteAuthToken, getAuthToken } from '../../js/util/auth.js'
 
+import Box from '@mui/material/Box'
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faArrowRightLong } from "@fortawesome/free-solid-svg-icons"
+import classes from "./OrderCard.module.css"
 // export default function OrderCard({id,name, description,category, duration, durationLength, price, directOrPeriodic }){
 export default function OrderCard(props){
 
@@ -65,7 +67,7 @@ export default function OrderCard(props){
                     })
                 } else {
                     if(error.code === 401){
-                        localStorage.removeItem('auth')
+                        deleteAuthToken()
                         navigate("/sign-up", {replace: true}) 
                     }
                 }

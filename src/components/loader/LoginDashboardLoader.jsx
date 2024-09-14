@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Form, redirect } from 'react-router-dom'
 import { useLogin } from 'react-admin'
-import { setToken } from '../../js/util/postUtil'
+import { setAuthToken } from '../../js/util/auth.js'
 
 const LoginDashboardLoader = () => {
     const [email, setEmail] = useState('')
@@ -16,7 +16,7 @@ const LoginDashboardLoader = () => {
         .then((response) => {
             return response.json()
         }).then((response) => {
-            setToken(response.token)
+            setAuthToken(response.token)
             redirect('/dashboard')
             console.log({ fullReponse: response, authToken: response.token })
         })

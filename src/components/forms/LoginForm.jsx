@@ -1,10 +1,6 @@
 import LabelNameInput from '../ui/input/LabelNameInput.jsx'
 import { useState } from 'react'
-// import { useNavigate } from 'react-router-dom'
-// import { PostError } from '../../js/error/PostError.js'
 import { findAndUpdateInvalidList } from '../../js/util/postUtil.js'
-// import { getAuthToken } from '../js/util/auth.js'
-// import { ApiFetch, ApiFetchOptions } from '../../js/util/postUtil.js'
 import { useLogin, useNotify, Login} from 'react-admin'
 
 export default function LoginForm() {

@@ -1,7 +1,7 @@
 import {redirect} from 'react-router-dom'
 // import {useState} from 'react'
 import { PostError } from '../js/error/PostError.js'
-import { getAuthToken } from '../js/util/auth.js'
+import { getAuthToken, setAuthToken, deleteAuthToken } from '../js/util/auth.js'
 
 export function logoutAction(){
 
@@ -15,23 +15,20 @@ export function logoutAction(){
         
             if(response.ok)
             {
-                const reqResults = await response.json()
-                console.log({total_response:reqResults})
-                const contentParse = JSON.parse(reqResults)
-                console.log({token_only: contentParse})
-                localStorage.setItem('auth', JSON.stringify(reqResults))
+                const reqResults = await response.json()              
+                
+                // localStorage.setItem('auth', JSON.stringify(reqResults))
+                setAuthToken(reqResults)
                 redirect('/')
             } else { //if(response.status >= 400 && response.status <= 600)
                 const errorJson = await response.json()
                 throw new PostError(response, errorJson)
             }
         } catch (error) {
-            localStorage.removeItem('auth')
-            console.log({error, token: localStorage.getItem('auth')})
+
+            deleteAuthToken()
         }
     }
 
     postRequest()
-    // localStorage.removeItem('auth')
-    // return redirect('/')
 }

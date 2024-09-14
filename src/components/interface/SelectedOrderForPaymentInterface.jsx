@@ -1,20 +1,21 @@
 import OrderClosureInput from "../ui/input/OrderClosureInput"
+import { getLocalStorageItem } from "../../js/util/getUtil"
 
 export default function SelectedOrderForPaymentInterface({latestOrder}){
 
-    return latestOrder.map((orderLine, key) => (
-                <OrderClosureInput
+
+    return latestOrder.map((orderLine, key) => {
+                
+                const localStorageSubscription = getLocalStorageItem(`selected_subscription_${key}`)
+
+                return <OrderClosureInput
                     key={key}
                     name={orderLine.description}
                     totalPrice={orderLine.totalAmount.value}
                     price={orderLine.unitPrice.value}
                     qty={orderLine.quantity}
-                    subscriptionAmount={orderLine.productDetails.subscriptionDetails.subscriptionAmount}
-                    durationSubscription={orderLine.subscriptionLength}
-                    subscriptionType={orderLine.productDetails.subscriptionDetails.subscriptionTimeUnit}
-                    startSubscription={orderLine.productDetails.subscriptionDetails.productSubscriptionStart}                    
-                    endSubscription={orderLine.productDetails.subscriptionDetails.productSubscriptionEnd}
+                    subscriptionData={localStorageSubscription}
                 />
-            )
+            }
         )
 }

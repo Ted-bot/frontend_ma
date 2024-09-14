@@ -1,12 +1,10 @@
-import { 
-    getLocalStorageItem
- } from "../../../js/util/postUtil"
+import { getLocalStorageItem } from "../../../js/util/getUtil.js"
 import Divider from '@mui/material/Divider'
 import { alpha } from "@mui/material"
 
-export default function OrderClosureInput({name, qty, price,subscriptionAmount, durationSubscription, totalPrice, subscriptionType, startSubscription, endSubscription}){
+export default function OrderClosureInput({name, qty, price, subscriptionData, totalPrice }){
     const currencyType = 'EUR'
-    // console.log({price})
+    // console.log({checkSubcriptionLength:subscriptionData?.length})
     return (
         <>
             <section className="flex-col grid justify-items-center justify-self-center rounded-lg border-4 border-slate-300 my-2 py-8 text-left sm:w-full md:w-3/5">
@@ -23,23 +21,24 @@ export default function OrderClosureInput({name, qty, price,subscriptionAmount, 
                             defaultValue={qty}
                         />
                     </section>
-                    {subscriptionType != 'unavailable' && <section>
+                    {subscriptionData?.time_unit != 'unavailable' && <section>
                         <Divider sx={{ borderBottomWidth: 1, marginTop: 1, marginBottom: 1, backgroundColor: alpha('#90caf9', 0.5) }} />
                             <section className="text-neutral-700 font-medium">
-                             valid for {subscriptionType == 'month' &&  durationSubscription}   {subscriptionType} 
+                             valid for {subscriptionData?.time_unit === 'month' &&  `${subscriptionData?.length} ${subscriptionData?.time_unit}`}
                             </section>
                                 <section className="inline-flex text-sm">
-                                    <span className="text-rose-500 font-semibold">{startSubscription}</span>
-                                    <span className="text-neutral-500 font-semibold">&nbsp; t/m &nbsp;</span>                            
-                                    <span className="text-rose-500 font-semibold">{endSubscription}</span>
+                                    <span className="text-rose-500 font-semibold">{subscriptionData?.start}</span>
+                                    <span className="text-neutral-500 font-semibold">&nbsp; t/m &nbsp;</span>          
+                                    <span className="text-rose-500 font-semibold">{subscriptionData?.end}</span>
                                 </section>
                         <Divider sx={{ borderBottomWidth: 1, marginTop: 1, marginBottom: 1, backgroundColor: alpha('#90caf9', 0.5) }} />
                     </section>}
                     <section className="font-bold text-neutral-500/80 sm:text-base md:text-xl">
                         {getLocalStorageItem(currencyType)} 
                         {
-                            subscriptionType != 'unavailable' 
-                            ? (subscriptionAmount) + ` p/${subscriptionType} ` 
+                            subscriptionData?.time_unit != 'unavailable' 
+                            ? (subscriptionData?.amount) + ` p/${subscriptionData?.time_unit} ` 
+                            // ? (subscriptionAmount) + ` p/${subscriptionType} ` 
                             : totalPrice
                         }
                     </section>

@@ -3,6 +3,7 @@ import {redirect} from 'react-router-dom'
 // import {useState} from 'react'
 import { PostError } from '../js/error/PostError.js'
 import { getAuthToken } from '../js/util/auth.js'
+import { setLocalStorageItem } from '../js/util/getUtil.js'
 
 export function logoutAction(){
 
@@ -21,7 +22,9 @@ export function logoutAction(){
                 console.log({total_response:reqResults})
                 const contentParse = JSON.parse(reqResults)
                 console.log({token_only: contentParse})
-                localStorage.setItem('auth', JSON.stringify(reqResults))
+
+                setLocalStorageItem('auth', reqResults)
+                // localStorage.setItem('auth', JSON.stringify(reqResults))
                 redirect('/')
             } else { //if(response.status >= 400 && response.status <= 600)
                 const errorJson = await response.json()

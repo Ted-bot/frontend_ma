@@ -1,22 +1,22 @@
 import { useState, useEffect } from 'react'
-import { useNavigate,
-    useNavigation,
-} from 'react-router-dom'
+import { useNavigate, useNavigation } from 'react-router-dom'
 import CreateFormInterface from '../interface/CreateFormInterface.jsx'
-import { PostError } from '../../js/error/PostError.js'
+// import { PostError } from '../../js/error/PostError.js'
+
 import { reconstructPostInput,
     ApiFetch,
     ApiFetchPostOptions,
     findAndUpdateInvalidList,
     setInputInvalidTrueWhenEnteredInputEmpty,
-    // prepRequestFields,
-    inputValidList,
-    setLocalStorageItem,
-    deleteLocalStorageItem,
     getNewUserObjOrStorageData,
-    setToken,
-    getErrorFromRequest,
+    getErrorFromPostRequest,
 } from '../../js/util/postUtil.js'
+
+import { inputValidList, countryid } from '../../js/util/auth.js'
+
+import {setLocalStorageItem, deleteLocalStorageItem } from "../../js/util/getUtil.js"
+import { setAuthToken} from "../../js/util/auth.js"
+
 import { GetState, GetCity } from "react-country-state-city"
 
 const typeText = 'text'
@@ -34,7 +34,6 @@ const typeLocation = 'location'
 
 export default function SignUpForm() {
 
-    const countryid = 156
     const regexSearch = /^[A-Za-z]+$/
     const nameStorageItem = 'new_user'
 
@@ -65,7 +64,7 @@ export default function SignUpForm() {
     }, [singleRequest, enteredInput])
     
     useEffect(() => {
-        getErrorFromRequest(errors,setLockedSubmitButton,setEnteredInputIsInvalid)
+        getErrorFromPostRequest(errors,setLockedSubmitButton,setEnteredInputIsInvalid)
     }, [errors])
 
     const inputHandle = (identifier, event) => {
@@ -224,7 +223,7 @@ export default function SignUpForm() {
 
             setErrors(inputValidList)            
             deleteLocalStorageItem(nameStorageItem)
-            setToken(getResults.token)
+            setAuthToken(getResults.token)
             navigate('/dashboard', {replace: true})
             
         } catch (error) {

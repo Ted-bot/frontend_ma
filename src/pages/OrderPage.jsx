@@ -1,12 +1,9 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import MainContentWrap from '../components/wraps/client/MainContentWrap.jsx' 
 import OrderInterface from '../components/interface/OrderInterface.jsx'
-import { ApiFetch,
-    ApiFetchGetOptions,
-   getToken,
-   setLocalStorageItem,
-   getLocalStorageItem
-  } from '../js/util/postUtil.js'
+import { ApiFetch } from '../js/util/postUtil.js'
+
+import {ApiFetchGetOptions} from "../js/util/getUtil"
 
 export default function OrderPage(){
     const wrapName = 'Choose AccessCard for our events'

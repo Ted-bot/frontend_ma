@@ -1,41 +1,5 @@
-const prepRequestFields = {
-    first_name: '',
-    last_name: '',
-    email: '',
-    gender: '',
-    city: '',
-    city_id: '',
-    city_list_nr:'',
-    state:'',
-    state_id:'',
-    state_list_nr:'',
-    date_of_birth: '',
-    phone_number: '',
-    conversion: '',
-}
+import {  prepRequestFields } from "./auth"
 
-const inputValidList = {
-    gender: false,
-    first_name: false,
-    last_name: false,
-    email: false,
-    city: false,
-    date_of_birth: false,
-    phone_number: false, // returns as snakecase from backend
-    conversion: false,
-    password: false,
-}
-
-export function ApiFetchGetOptions(url,headerOptions = null) {
-    return {
-        url: url, 
-        method: 'GET',
-        headers: {
-            "Content-Type":"application/json",
-            ...headerOptions
-        },
-    }
-}
 
 export function ApiFetchPostOptions(defineRequest = {url : '', method : 'POST'}, data, headerOptions = null) {
     return {
@@ -58,34 +22,6 @@ export async function ApiFetch(data){
     return res
 }
 
-export function setLocalStorageItem(name,data){
-    localStorage.setItem(name, JSON.stringify(data))
-}
-
-export function getLocalStorageItem(name){
-
-    return localStorage.getItem(name) != null ? JSON.parse(localStorage.getItem(name)) : null
-}
-
-export function deleteLocalStorageItem(name){
-    localStorage.removeItem(name)
-}
-
-export function setToken(data){
-    if(localStorage.getItem('auth') != null){
-        localStorage.removeItem('auth')
-    }
-    localStorage.setItem('auth', JSON.stringify(data))
-}
-
-export function getToken(){
-    return  localStorage.getItem('auth') != null ? JSON.parse(localStorage.getItem('auth')) : null
-}
-
-export function deleteToken(){
-    localStorage.removeItem("auth")
-}
-
 export function getNewUserObjOrStorageData(name){
     const storedValues = localStorage.getItem(name)
 
@@ -104,9 +40,7 @@ export function reconstructPostInput(data, pw)
 
         for (const [key, value] of Object.entries(data)) {
             let newKey
-            // key === 'state_id' || 
-            // key === 'city_id' ||
-            // key === 'city_list_nr' || key === 'state_list_nr' || 
+
             if( key === 'state'){
                 continue
             }
@@ -116,18 +50,6 @@ export function reconstructPostInput(data, pw)
                 requiredPostRequestFields[newKey] =  value instanceof String ? value.trim() : value
                 continue
             }
-
-            // if( key === 'cityId' ){
-            //     newKey = 'location'
-            //     requiredPostRequestFields[newKey] = value
-            //     continue
-            // }
-
-            // if( key === 'state_id' ){
-            //     newKey = 'stateId'
-            //     requiredPostRequestFields[newKey] = value
-            //     continue
-            // }
             
             requiredPostRequestFields[key] = value instanceof String ? value.trim() : value
 
@@ -196,7 +118,7 @@ export function findAndUpdateInvalidList(obj, setLockedSubmitButton, setEnteredI
     return foundInvalid
 }
 
-export function getErrorFromRequest(obj, setLockedSubmitButton, setEnteredInputIsInvalid)
+export function getErrorFromPostRequest(obj, setLockedSubmitButton, setEnteredInputIsInvalid)
 {
     let foundInvalid = false
 
@@ -331,5 +253,3 @@ export function camelCaseToLoWithSpace(data)
     }
     return newKey
 }
-
-export {prepRequestFields, inputValidList}

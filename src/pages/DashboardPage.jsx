@@ -12,14 +12,11 @@ import MyMenu from '../components/navigations/DashboardNavigation.jsx'
 import ProfileList from '../dataProvider/Profile/ProfileList.jsx'
 import UserCreate from '../dataProvider/User/UserCreate.jsx'
 import LoginDashboardLoader from '../components/loader/LoginDashboardLoader.jsx'
-import { ApiFetch,
-     ApiFetchPostOptions,
-    //  ApiFetchGetOptions,
-    // setLocalStorageItem,
-    deleteToken, 
-    getToken,
-    getLocalStorageItem
-} from '../js/util/postUtil.js'
+import { ApiFetch, ApiFetchPostOptions } from '../js/util/postUtil.js'
+
+import { getLocalStorageItem} from "../js/util/getUtil.js"
+import { getAuthToken, deleteAuthToken } from '../js/util/auth.js'
+
 import { PostError } from '../js/error/PostError.js'
 
 import UsersDashboardPage from './client/UsersDashboardPage'
@@ -73,17 +70,17 @@ export default function DashboardPage() {
 
         },
         logout: () => {
-            deleteToken()
+            deleteAuthToken()
             // localStorage.removeItem('email');
             return Promise.resolve()
         },
         checkAuth: () =>
-                getToken() != null ? Promise.resolve() : Promise.reject(),
+                getAuthToken() != null ? Promise.resolve() : Promise.reject(),
             // localStorage.getItem('email') ? Promise.resolve() : Promise.reject(),
         checkError:  (error) => {
             const status = error.status;
             if (status === 401 || status === 403) {
-                deleteToken()
+                deleteAuthToken()
                 // localStorage.removeItem('email');
                 return Promise.reject();
             }
@@ -97,7 +94,7 @@ export default function DashboardPage() {
                 id: userData?.id,
                 fullName: userData?.firstName + ' ' + userData?.lastName,
             })},
-        getPermissions: () => Promise.resolve(''),
+        getPermissions: () => Promise.resolve(),
     }    
 
     const MyLayout = props => <Layout {...props} menu={MyMenu} />

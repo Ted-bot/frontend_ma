@@ -1,7 +1,11 @@
 import {useState, useEffect, useCallback, useMemo, useRef} from 'react'
 import MainContentWrap from '../components/wraps/client/MainContentWrap' 
 import CalendarInterface from '../components/interface/CalendarInterface.jsx'
-import { ApiFetchGetOptions, ApiFetchPostOptions, ApiFetch, getToken } from '../js/util/postUtil'
+
+import { ApiFetchPostOptions, ApiFetch } from '../js/util/postUtil.js'
+import {ApiFetchGetOptions} from "../js/util/getUtil.js"
+import {getAuthToken} from "../js/util/auth.js"
+
 import { PostError } from '../js/error/PostError'
 
 import CalendarModal from '../components/modal/CalendarModal.jsx'
@@ -16,7 +20,7 @@ export default function CalendarPage(){
         startDateTime: '',
         endTime: '',
     })
-    const token = getToken()
+    const token = getAuthToken()
     const dialog = useRef()
     
 
