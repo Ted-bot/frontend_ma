@@ -10,14 +10,15 @@ import UserOrderInfoInterface from '../interface/UserOrderInfoInterface'
 
 import './CalendarModal.css'
 
-const UserDataModal = forwardRef(function UserDataModal({ errors, enteredInput, enteredInputIsInvalid, formSubmit}, ref){
+const UserDataModal = forwardRef(function UserDataModal({ handleKeyDown,errors, enteredInput, enteredInputIsInvalid, formSubmit}, ref){
     
-    const {userSelectedLocation, onBlur} = useContext(OrderContext)
+    const {updateUserInput, onBlur} = useContext(OrderContext)
     const dialog = useRef()
     const typeLocation = 'location'
     const typeText = 'text'
     const typeFirstAndLastName = 'firstAndLastName'
     const typeMixed = 'mixed'
+    
     
     useImperativeHandle(ref, () => {
     
@@ -43,7 +44,7 @@ const UserDataModal = forwardRef(function UserDataModal({ errors, enteredInput, 
                 invalid: enteredInputIsInvalid.firstAndLastName, 
                 error: errors?.first_and_last_name, 
                 required : true, 
-                onChange: (e) => userSelectedLocation('firstAndLastName', e), 
+                onChange: (e) => updateUserInput('firstAndLastName', e), 
                 onBlur: (e) => onBlur('firstAndLastName', e, typeFirstAndLastName)
             },
             {
@@ -56,7 +57,7 @@ const UserDataModal = forwardRef(function UserDataModal({ errors, enteredInput, 
                 invalid: enteredInputIsInvalid.email, 
                 error: errors?.email, 
                 required : true, 
-                onChange: (e) => userSelectedLocation('email', e), 
+                onChange: (e) => updateUserInput('email', e), 
                 onBlur: (e) => onBlur('email', e, 'email')
             },
             {
@@ -68,7 +69,7 @@ const UserDataModal = forwardRef(function UserDataModal({ errors, enteredInput, 
                 invalid: enteredInputIsInvalid.phoneNumber, 
                 error: errors?.phone_number, 
                 required : true, 
-                onChange: (e) => userSelectedLocation('phoneNumber', e, 'tel'), 
+                onChange: (e) => updateUserInput('phoneNumber', e, 'tel'), 
                 onBlur: (e) => onBlur('phoneNumber', e, 'tel')
             },
         ],
@@ -85,7 +86,7 @@ const UserDataModal = forwardRef(function UserDataModal({ errors, enteredInput, 
                 value: enteredInput?.unitNumber,
                 invalid: enteredInputIsInvalid.unitNumber,
                 error: errors?.unit_number,
-                onChange: (e) => userSelectedLocation('unitNumber', e),
+                onChange: (e) => updateUserInput('unitNumber', e),
                 onBlur: (e) => onBlur('unitNumber', e, typeText)},
             {
                 name: 'Street Number',
@@ -97,7 +98,7 @@ const UserDataModal = forwardRef(function UserDataModal({ errors, enteredInput, 
                 invalid: enteredInputIsInvalid.streetNumber,
                 error: errors?.street_number,
                 required : true,
-                onChange: (e) => userSelectedLocation('streetNumber', e),
+                onChange: (e) => updateUserInput('streetNumber', e),
                 onBlur: (e) => onBlur('streetNumber', e, 'number')},
             {
                 name: 'Street Name',
@@ -108,7 +109,7 @@ const UserDataModal = forwardRef(function UserDataModal({ errors, enteredInput, 
                 invalid: enteredInputIsInvalid.addressLine,
                 error: errors?.address_line,
                 required : true,
-                onChange: (e) => userSelectedLocation('addressLine', e),
+                onChange: (e) => updateUserInput('addressLine', e),
                 onBlur: (e) => onBlur('addressLine', e, typeText)},
             {
                 name: 'Postal Code',
@@ -119,7 +120,7 @@ const UserDataModal = forwardRef(function UserDataModal({ errors, enteredInput, 
                 invalid: enteredInputIsInvalid.postalCode,
                 error: errors?.postalCode,
                 required : true,
-                onChange: (e) => userSelectedLocation('postalCode', e),
+                onChange: (e) => updateUserInput('postalCode', e),
                 onBlur: (e) => onBlur('postalCode', e, typeMixed)
             },
             {
@@ -152,12 +153,12 @@ const UserDataModal = forwardRef(function UserDataModal({ errors, enteredInput, 
                 >
                     <section>
                         <h1 className={`flex justify-center pt-3 pb-6 text-2xl`}>{userForm?.name}</h1>
-                        {userForm && <UserOrderInfoInterface array={userForm.fields} />}
+                        {userForm && <UserOrderInfoInterface array={userForm.fields} handleKeyDown={handleKeyDown} />}
                     </section>
                     <Divider sx={{marginRight: '1.2rem', marginLeft: '1.2rem' , borderBottomWidth: 2, marginTop: 2, marginBottom: 1, backgroundColor: alpha('#90caf9', 0.8) }} />
                     <section>
                         <h1 className={`flex justify-center pt-3 pb-6 text-2xl`}>{addressForm?.name}</h1>
-                        {userForm && <UserOrderInfoInterface array={addressForm.fields} />}
+                        {userForm && <UserOrderInfoInterface array={addressForm.fields} handleKeyDown={handleKeyDown}/>}
                     </section>
                     <button 
                         className="text-slate-100 h-16 w-42 mt-8 px-8 align-content-center w-full rounded-b-full text-2xl rounded-t-full border-0 ring-2 shadow-xl ring-red-500 bg-red-500 bg-gradient-to-r from-red-500 to-yellow-500 transition-all duration-300 hover:from-orange-400 hover:text-yellow-200 hover:to-red-400 hover:ring-red-400 hover:shadow-2xl"

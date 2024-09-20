@@ -101,7 +101,7 @@ const inputPaymentValidList = {
     postalCode: false,
     state: false,
     city: false,
-    // countryId: false,
+    paymentMethodId: false,
 }
 
 /* 

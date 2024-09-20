@@ -3,14 +3,12 @@ import IconUserLocation from "../../../assets/IconUserLocation"
 
 const UserOrderInfoForm = ({userAddressModalHandler, enteredInput, user, errorClass, address}) => {
 
-    console.log({setUpdateRedBorder: errorClass})
     return (
         <>
-            <section className="grid justify-items-center">
-            {/* <section className={`${errorClass ?? errorClass}`}> */}
+            <section className="grid md:justify-items-center">
                 <section 
                     onClick={userAddressModalHandler}
-                    className={`inline-flex border-4 ${errorClass ? errorClass : 'border-slate-300'} rounded-lg  py-5 cursor-pointer sm:w-full md:w-3/5 hover:bg-slate-200`}
+                    className={`inline-flex border-4 ${errorClass !== 'false' ? errorClass : 'border-slate-300'} rounded-lg py-5 cursor-pointer sm:w-full md:w-3/5 hover:bg-slate-200`}
                 >
                     <section className="grow-0 px-6 content-center"><IconUserLocation /></section>
                     <section className="grow flex-col">

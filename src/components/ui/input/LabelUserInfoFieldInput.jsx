@@ -13,13 +13,18 @@ export default function LabelUserInfoFieldInput({
     onBlur,
     error,
     errorRegion,
+    handleKeyDown,
     ...props}){
 
         const typeFirstAndLastName = 'firstAndLastName'
         let optionStateList = []
         let optionCitiesList = []
         const ref = useRef()
-        const {availableCities, availableStates, currentUserState, currentUserCity, userSelectedLocation} = useContext(OrderContext)
+        const {availableCities, availableStates, currentUserState, currentUserCity, updateUserInput} = useContext(OrderContext)
+
+        if(value === undefined){
+            console.log({nan_value: value, id, currentUserCity, currentUserState})
+        }
     
         if(type === 'location'){
             optionStateList = availableStates.map((state) => ({
@@ -41,7 +46,7 @@ export default function LabelUserInfoFieldInput({
                     {name}
                 </section>
             {
-                (type != 'location' && type != 'tel') ?
+                (type !== 'location' && type !== 'tel') ?
                 <input 
                 // ${ error != undefined && error != '' && 'border-red-500'} 
                     className={`${error && id != 'unitNumber' && 'border-4 border-rose-500'}
@@ -49,13 +54,13 @@ export default function LabelUserInfoFieldInput({
                     } 
                     ref={ref}
                     id={id}
-                    // name={name} 
+                    onKeyDown={(e) => handleKeyDown(id,e)}
                     type={type}
                     defaultValue={value}
                     onBlur={onBlur}
                     {...props}
                 />
-                : type == 'tel' ?
+                : (type === 'tel') ?
                     <PhoneInput
                         className={`${error && 'border-4 border-rose-500'} 
                         w-full appearance-none block bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight 
@@ -71,7 +76,7 @@ export default function LabelUserInfoFieldInput({
                         <NativeSelect
                             className={`${errorRegion && 'border-4 border-rose-500 '}w-full block text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`}
                             id={state_id}
-                            onChange={(e) => userSelectedLocation('state', e)}
+                            onChange={(e) => updateUserInput('state', e)}
                             value={currentUserState}
                         >
                             {
@@ -83,7 +88,7 @@ export default function LabelUserInfoFieldInput({
                         <NativeSelect
                             className={`${error && 'border-4 border-rose-500 '}w-full block text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`}
                             id={id}
-                            onChange={(e) => userSelectedLocation('city', e)}
+                            onChange={(e) => updateUserInput('city', e)}
                             // onClose{onBlur}
                             value={currentUserCity}
                         >

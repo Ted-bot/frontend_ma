@@ -19,6 +19,7 @@ import CalendarPage from './pages/CalendarPage.jsx'
 import OrderPage from './pages/OrderPage.jsx'
 import PaymentPage from './pages/client/PaymentPage.jsx'
 import { PaymentLoader } from './components/loader/PaymentLoader.jsx'
+import PaymentErrorBoundary from './components/class/errorHandler/PaymentErrorBoundary.jsx'
 
 import {tokenLoader} from './js/util/auth.js'
 import ContactPage from './pages/ContactPage.jsx'
@@ -37,6 +38,7 @@ function App() {
       path: '/', 
       element: <RootLayout />,
       errorElement: <ErrorPage />,
+      // errorElement: <PaymentErrorBoundary fallback={<p>Something went wrong</p>}/>,
       id: 'root',
       loader: tokenLoader,
       children: [

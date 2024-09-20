@@ -5,6 +5,6 @@ export const OrderContext = createContext({
     availableCities: [],
     currentUserState: '', 
     currentUserCity: '', 
-    userSelectedLocation: () => {},
+    updateUserInput: () => {},
     onBlur: () => {},
 })

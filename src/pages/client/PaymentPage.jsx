@@ -1,10 +1,11 @@
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef, createRef } from 'react'
 import { 
     ApiFetchPostOptions,
     ApiFetch,
     prepareInputForRequest,
     findAndUpdateInvalidList,
-    findInvalidInput
+    findInvalidInput,
+    findInvalidOrErrorInput
 } from "../../js/util/postUtil"
 
 import {
@@ -14,7 +15,7 @@ import {
     getUserInfoObjOrStorageData,
 } from "../../js/util/getUtil.js"
 
-import { getAuthToken, countryid, inputPaymentValidList } from "../../js/util/auth.js"
+import { getAuthToken, countryid, inputPaymentValidList } from '../../js/util/auth.js'
 
 import { useLoaderData, Form, useNavigate } from 'react-router-dom'
 
@@ -22,11 +23,11 @@ import UserDataModal from '../../components/modal/UserDataModal'
 import UserChoosePaymentModal from '../../components/modal/UserChoosePaymentModal'
 import UserOrderInfoForm from "../../components/forms/client/UserOrderInfoForm"
 import SelectedOrderForPaymentInterface from '../../components/interface/SelectedOrderForPaymentInterface'
+import PaymentLineSection from '../../components/section/PaymentLineSection'
 
-import { alpha } from "@mui/material"
-import Divider from '@mui/material/Divider'
-import Grid from '@mui/material/Grid'
-import Box from '@mui/material/Box'
+// import PaymentErrorBoundary from '../../components/class/errorHandler/PaymentErrorBoundary.jsx'
+
+import { validateAndSetStatus } from '../../components/ui/input/ValidateIBAN.jsx'
 
 import { GetState, GetCity } from "react-country-state-city"
 import UserSelectPaymentMethodForm from '../../components/forms/client/UserSelectPaymentMethodForm'
@@ -50,7 +51,6 @@ const PaymentPage = () => {
     })    
 
     const [enteredInputIsInvalid, setEnteredInputIsInvalid] = useState(inputPaymentValidList)
-    const [lockedSubmitButton, setLockedSubmitButton] = useState(false)
 
     const [stateList, setStateList] = useState([]) 
     const [cityList, setCityList] = useState([])
@@ -59,6 +59,11 @@ const PaymentPage = () => {
     const [enteredInput, setEnteredInput] = useState(userFormInfo)
     const dialogUserAddress = useRef()
     const dialogUserPaymentMethod = useRef()
+
+    const refPaymentSection = useRef([])
+    refPaymentSection.current = [...Array(refPaymentSection.current.length).keys()].map((index) => refPaymentSection.current[index] ?? createRef())
+    const pushRef = (index) => refPaymentSection.current.push(index)
+
     const token = getAuthToken()
     const [currencyType, setCurrencyType] = useState('EUR')
     const [userData, setUserData] = useState({
@@ -71,6 +76,7 @@ const PaymentPage = () => {
     })
     
     const paymentCurrency = getLocalStorageItem(currencyType)
+    const {paymentMethodId, iban, ...enteredAddress} = enteredInputIsInvalid
 
     function updateUserData(identifier, value){
         setUserData((prevState) => ({
@@ -81,7 +87,6 @@ const PaymentPage = () => {
     )}
     
     function updateErrors(identifier, value){
-
         setErrors((prevState) => ({
             ...prevState,
             [identifier]: value
@@ -101,9 +106,17 @@ const PaymentPage = () => {
         }) 
     ,[countryid, userData.userAddress.reactStateNr])
 
+    function updateEnteredInputState(identifier, value){
+        setEnteredInput((prevValues) => {
+            return {
+                ...prevValues,
+                [identifier]: value
+            }
+        })
+    }
+
     useEffect(() => {
         ApiData()
-
         getState()
         getCity()
 
@@ -160,6 +173,14 @@ const PaymentPage = () => {
         setLocalStorageItem(addressStorageName,enteredInput)
     }
     ,[enteredInput])
+
+    const scrollSmoothHandler = (invalidKey) => {
+        console.log({invalidKeyPayment: invalidKey})
+        let targetSection = 0
+        if(invalidKey === 'paymentMethodId') targetSection = 1 // console.log({testRefIfInvalid: invalidKey, targetSection: targetSection, refPaymentSection: refPaymentSection.current})
+        if(invalidKey === 'iban') targetSection = 1 // console.log({testRefIfInvalid: invalidKey, targetSection: targetSection, refPaymentSection: refPaymentSection.current})
+        refPaymentSection.current[targetSection].scrollIntoView({ behavior: "smooth", block: "start"})
+    }
     
     function checkLocationStatus(id){
         setEnteredInputIsInvalid((prevValues) => ({
@@ -169,16 +190,11 @@ const PaymentPage = () => {
     }
     
     const inputHandlePaymentMethod = (identifier, event) => {
-        event.preventDefault()
+        event.preventDefault() 
 
-        const checkInputUser = findAndUpdateInvalidList(enteredInput, setLockedSubmitButton, setEnteredInputIsInvalid)
+        const checkInvalidInput = findAndUpdateInvalidList(enteredInput, setEnteredInputIsInvalid)
 
-        if(lockedSubmitButton || checkInputUser){
-            console.log({test: 'it came through!'})
-            console.log({invalidInputPaymentButton: enteredInputIsInvalid})
-
-            setEnteredInputIsInvalid(inputPaymentValidList)
-        }
+        if(checkInvalidInput.bool) setEnteredInputIsInvalid(inputPaymentValidList)
 
         Object.keys(paymentMethodOptions.fields).forEach(key => {
             const value = paymentMethodOptions.fields[key]
@@ -187,6 +203,13 @@ const PaymentPage = () => {
                 updateEnteredInputState('paymentMethodId', identifier)
             }
         })
+
+        if(!enteredInput.iban && getLocalStorageItem('selected_subscription_0') !== null){
+            setEnteredInput((prevValues) => ({
+                ...prevValues,
+                iban: ''
+            }))
+        }
 
         setPaymentType((prevValues) => ({
             [identifier]: true
@@ -239,7 +262,7 @@ const PaymentPage = () => {
                 {
                     // orderId: response.orderId,
                     currency: response.currency,
-                    lastOrder: response.lines,
+                    lines: response.lines,
                     orderTaxPrice: response.orderTaxPrice,
                     orderTotalAmount: response.amount.value,
                     orderTotalProductPrice: response.orderTotalProductPrice,
@@ -265,16 +288,22 @@ const PaymentPage = () => {
         }
     )
 
+    
+
     const payOrderHandler = async (event) => {
         event.preventDefault()
         
-        const checkInputUser = findAndUpdateInvalidList(enteredInput, setLockedSubmitButton, setEnteredInputIsInvalid)
+        const mollieOrder = JSON.parse(localStorage.getItem(addressStorageName))
+        // const checkInvalidInput = findInvalidOrErrorInput(enteredInputIsInvalid, errors.userAddress)         
+        const checkInvalidInput = findAndUpdateInvalidList(mollieOrder, setEnteredInputIsInvalid)         
+        console.log({whatEntered: checkInvalidInput, enteredInput})
 
-        if(checkInputUser){
+        if(checkInvalidInput.bool){
+            console.log({whyNot: checkInvalidInput})
+            scrollSmoothHandler(checkInvalidInput.invalidKey)
             return
         }
 
-        const mollieOrder = JSON.parse(localStorage.getItem(addressStorageName))
         const lines = JSON.parse(localStorage.getItem('lines'))
         const amount = JSON.parse(localStorage.getItem('amount'))
         const orderNumber = JSON.parse(localStorage.getItem('order_number'))
@@ -307,8 +336,8 @@ const PaymentPage = () => {
             description: description,
             amount: amount,
             order_id: orderNumber.toString(),
-            redirectUrl: 'http://localhost:5173/payment',
-            webhookUrl: 'https://6f4d-95-96-151-55.ngrok-free.app',
+            redirectUrl: 'http://localhost:5173/dashboard', // set user dashbpoard {id}
+            webhookUrl: 'https://e111-95-96-151-55.ngrok-free.app',
             billingAddress: billingAddress,
             shippingAddress: billingAddress,
             metadata: { order_id : orderNumber.toString()},
@@ -319,7 +348,8 @@ const PaymentPage = () => {
                 return line
             }) ,
             subscriptionDetail: subscriptionDetails,
-            sequenceType: ''
+            sequenceType: '',
+            iban: mollieOrder.iban
         }
 
         const paymentOption = { url: '/api/v1/payment', method: 'POST'}
@@ -348,11 +378,10 @@ const PaymentPage = () => {
     const userAddressHandler = async (event) => {
         event.preventDefault()
 
-        if(lockedSubmitButton || findInvalidInput(enteredInputIsInvalid))
+        if(findInvalidInput(enteredAddress))
             {
                 const { firstAndLastName, email, phoneNumber, ...deconstructInvalidList} = inputPaymentValidList 
                 setEnteredInputIsInvalid(deconstructInvalidList)
-                setLockedSubmitButton(false)
             }
 
         let userAddressInfo = prepareInputForRequest(enteredInput, setEnteredInputIsInvalid, enteredInput.cityId, ctxValue.availableCities, enteredInput.stateId, ctxValue.availableStates)
@@ -361,7 +390,6 @@ const PaymentPage = () => {
         userAddressInfo = { ...userAddressInfo, ['region']: enteredInput.state}
         userAddressInfo = { ...userAddressInfo, ['reactStateNr']: ctxValue.currentUserState.toString()}
         userAddressInfo = { ...userAddressInfo, ['reactCityNr']: ctxValue.currentUserCity.toString()}
-        console.log({formAddress: userAddressInfo})
         
         const options = { url: '/api/v1/order/address', method: 'POST'}
         const ApiUserAddressOptions = ApiFetchPostOptions(options, userAddressInfo, {'X-Authorization': 'Bearer ' + token})            
@@ -413,24 +441,14 @@ const PaymentPage = () => {
                 console.log({unHandledError: error})
             }
         }
-    }
-
-    function updateEnteredInputState(identifier, value){
-        setEnteredInput((prevValues) => {
-            return {
-                ...prevValues,
-                [identifier]: value
-            }
-        })
-    }
+    }    
 
     const handleUserSelectLocation = (identifier, event) => {
 
-        console.log({ lockedSubmitButton, errorsLength: errors.userAddress.length, errors: errors.userAddress})
-        if(lockedSubmitButton || Object.keys(errors.userAddress).length !== 0)
+        console.log({ errorsLength: errors.userAddress.length, errors: errors.userAddress})
+        if(Object.keys(errors.userAddress).length !== 0)
             {
                 setErrors({userAddress: {}})
-                setLockedSubmitButton(false)
             }
 
         if(identifier === 'state')
@@ -497,9 +515,7 @@ const PaymentPage = () => {
 
     function inputBlurHandle(identifier, event, type) {
 
-        if(identifier === 'unitNumber'){
-            return
-        }
+        if(identifier === 'unitNumber') return
         
         if(type === 'text')
             {
@@ -539,10 +555,6 @@ const PaymentPage = () => {
             })) 
         }
 
-        if(type === 'mixed'){
-            console.log({inputBlurPostalCode: event.target.value})
-        }
-
         setEnteredInputIsInvalid((prevValues) => ({
             ...prevValues,
             [identifier] : (!event.target.value) ? true : false
@@ -554,120 +566,87 @@ const PaymentPage = () => {
         availableCities: cityList,
         currentUserState: enteredInput.state_id,
         currentUserCity: enteredInput.city_id,
-        userSelectedLocation: handleUserSelectLocation,
+        updateUserInput: handleUserSelectLocation,
         onBlur: inputBlurHandle,
     }
 
-    const findInvalidOrError = (invalidInputList, errorResponse) => {
-        if(findInvalidInput(invalidInputList))
-        {
-            return true
-        }
-
-        if(Object.keys(errorResponse).length !== 0){
-            return true
-        }
-
-        return false
+    const handleKeyDown = (identifier,event) => {
+        if(event.key !== "Backspace") return
+        const eniProperty = enteredInput[identifier]
+        const backspaceInput = eniProperty.substring(0, eniProperty.length - 1)
+        // console.log({keyPressed: event.key, identifier, eniProperty, checkLength: eniProperty.length, backspaceInput})
+        if(eniProperty.length > 0) updateUserData( identifier, backspaceInput)
     }
 
+    console.log({enteredInputIsInvalid, enteredInput})
     return (
-        <>
+        <>     
             <OrderContext.Provider value={ctxValue}>
-                <UserDataModal 
-                    ref={dialogUserAddress} 
-                    enteredInput={enteredInput} 
-                    formSubmit={userAddressHandler} 
-                    user={userData?.userInfo} 
-                    address={userData?.userAddress}
-                    addressStorageName={addressStorageName}
-                    enteredInputIsInvalid={enteredInputIsInvalid}
-                    errors={errors.userAddress}
-                />
-
-                <UserChoosePaymentModal ref={dialogUserPaymentMethod} paymentMethodOptions={paymentMethodOptions} />
-
-                <section className="flex-col shadow-md w-full bg-slate-100 py-5 rounded-md px-3 sm:mx-2 sm:px-5 md:grid md:mx-2 md:shadow-xl">
-
-                    <h1 className={`pt-3 pb-6 mt-12 text-2xl text-center`}>Address & Peronsal Information</h1>
-                    {userData?.userInfo && userData?.userAddress && 
-                    <UserOrderInfoForm 
-                        errorClass={`${findInvalidOrError(enteredInputIsInvalid, errors.userAddress) && 'border-red-300'}`}
-                        // errorClass={`${findInvalidInput(enteredInputIsInvalid) && 'border-red-300'}`}
-                        userAddressModalHandler={userAddressModalHandler} 
-                        enteredInput={enteredInput}
-                        user={userData.userInfo} 
-                        address={userData.userAddress} 
-                    />}
-
-                    <h1 className={`pt-3 pb-6 mt-8 text-2xl text-center`}>Choose Payment Method</h1>
-                    <UserSelectPaymentMethodForm 
-                        // errorClass={`${lockedSubmitButton || !enteredInput.paymentMethodId && 'border-red-300'}`}
-                        errorClass={`${!enteredInput.paymentMethodId && 'border-red-300'}`}
-                        symbol={enteredInput.paymentMethodId} 
-                        paymentMethodModalHandler={paymentMethodModalHandler}  
-                        selectedType={enteredInput.paymentMethodName}
+                    <UserDataModal 
+                        ref={dialogUserAddress} 
+                        enteredInput={enteredInput} 
+                        formSubmit={userAddressHandler} 
+                        handleKeyDown={handleKeyDown}
+                        // user={userData?.userInfo} 
+                        // address={userData?.userAddress}
+                        // addressStorageName={addressStorageName}
+                        enteredInputIsInvalid={enteredInputIsInvalid}
+                        errors={errors.userAddress}
                     />
 
-                    <h1 className={`pt-3 pb-6 mt-8 text-2xl text-center`}>Order</h1>
-                    { userData.userOrder?.lastOrder != undefined && <SelectedOrderForPaymentInterface latestOrder={userData.userOrder.lastOrder}/> }
-                    
-                    <section>
-                        <Box sx={{ display: 'grid', gridTemplateRows: 'repeat(4, 1fr)' }}>
-                            <Grid 
-                                container 
-                                direction="row"
-                                sx={{ display: 'flex'}}
-                            >
-                                <Box sx={{ paddingLeft: '1.2rem' }}>
-                                    <section className="font-medium text-neutral-500/80 sm:text-base md:text-lg">price : </section>
-                                </Box>
-                                <Box sx={{ marginRight: '0px', marginLeft: 'auto', paddingRight: '1.2rem' }}>
-                                    <section className="font-medium text-neutral-500/80 sm:text-base md:text-lg">{paymentCurrency} {userData?.userOrder?.orderTotalProductPrice}</section>
-                                </Box>
-                            </Grid>
-                            <Grid
-                                container 
-                                direction="row"
-                                sx={{ flexGrow: 1}}
-                            >
-                                <Box sx={{ paddingLeft: '1.2rem' }}>
-                                    <section className="font-medium text-neutral-500/80 sm:text-base md:text-lg">tax (9%): </section>
-                                </Box>
-                                <Box sx={{ marginRight: '0px', marginLeft: 'auto', paddingRight: '1.2rem' }}>
-                                    <section className="font-medium text-neutral-500/80 sm:text-base md:text-lg">{paymentCurrency} {userData?.userOrder?.orderTaxPrice}</section>
-                                </Box>
-                            </Grid>
+                    <UserChoosePaymentModal ref={dialogUserPaymentMethod} paymentMethodOptions={paymentMethodOptions} />
 
-                            <Divider sx={{marginRight: '1.2rem', marginLeft: '1.2rem' , borderBottomWidth: 5, marginTop: 2, marginBottom: 1, backgroundColor: alpha('#90caf9', 0.5) }} />
+                    <section className="flex-col shadow-md w-full bg-slate-100 py-5 rounded-md px-3 sm:mx-2 sm:px-5 md:grid md:mx-2 md:shadow-xl">
 
-                            <Grid container direction="row" sx={{ flexGrow: 1}} >
-                                <Box sx={{ paddingLeft: '1.2rem' }}>
-                                    <section className="font-bold text-blue-600/80 sm:text-lg md:text-xl">Total Amount : </section>
-                                </Box>
-                                <Box sx={{ marginRight: '0px', marginLeft: 'auto', paddingRight: '1.2rem' }}>
-                                    <section className="font-bold text-blue-600/80 sm:text-lg md:text-xl">{paymentCurrency} {userData?.userOrder.orderTotalAmount}</section>
-                                </Box>
-                            </Grid>
-                        </Box>
+                        <h1 ref={pushRef}className={`pt-3 pb-6 mt-12 text-2xl text-center`} >Address & Peronsal Information</h1>
+                        {userData?.userInfo && userData?.userAddress && 
+                        <UserOrderInfoForm 
+                            errorClass={`${findInvalidOrErrorInput(enteredAddress, errors.userAddress) && 'border-red-300'}`}
+                            userAddressModalHandler={userAddressModalHandler} 
+                            enteredInput={enteredInput}
+                            user={userData.userInfo} 
+                            address={userData.userAddress} 
+                        />}
+
+                        <h1 ref={pushRef} className={`pt-3 pb-6 mt-8 text-2xl text-center`} >Choose Payment Method</h1>
+                        <UserSelectPaymentMethodForm
+                            errorClass={`${!enteredInput.paymentMethodId && 'border-red-300'}`}
+                            symbol={enteredInput.paymentMethodId}
+                            paymentMethodModalHandler={paymentMethodModalHandler}
+                            selectedType={enteredInput.paymentMethodName}
+                        />
+
+                        {enteredInput.paymentMethodId && <section className='grid flex-col md:justify-items-center'>
+                            <section className={`border-4 rounded-lg py-4 mt-4 sm:w-full md:w-3/5 hover:bg-slate-200 ${enteredInputIsInvalid.iban ? 'border-red-300' : 'border-slate-300' }`}>
+                                <h2 ref={pushRef} className={`text-center ${enteredInputIsInvalid.iban && 'text-rose-600'}`}>please enter your IBAN/ bank account number </h2><br />
+                                <span className='flex justify-center'>
+                                    <label>
+                                        <input id='iban' type="text" onChange={(e) => ctxValue.updateUserInput('iban',e)} onBlur={(e) => validateAndSetStatus( e, setInvalidTypeStatus)} />
+                                    </label>
+                                </span>
+                            </section>
+                        </section>}
+
+                        <h1 className={`pt-3 pb-6 mt-8 text-2xl text-center`}>Order</h1>
+                        { userData?.userOrder.lines != undefined && <SelectedOrderForPaymentInterface latestOrder={userData?.userOrder.lines}/> }
+                        
+                        <PaymentLineSection paymentCurrency={paymentCurrency} userData={userData}/>
+                        
                         <Form onSubmit={(e) => payOrderHandler(e)} className='flex mt-16 mb-20 justify-center' >
                             <input type="hidden" id="paymentMethod" value={enteredInput.paymentMethodName}/>
-
                             <button
-                                // disabled={lockedSubmitButton}
                                 className={`ring-red-500 bg-rose-500 transition-all duration-300 text-slate-100 h-16 px-8 w-full rounded-b-full 
-                                    rounded-t-full text-2xl border-0 ring-2 shadow-xl md:w-1/2 hover:text-yellow-200 hover:bg-rose-900/75 hover:shadow-2xl`}
-                                // className={` ${ !lockedSubmitButton ? 'ring-red-500 bg-rose-500' : 'bg-gray-300'}
-                                //    ${!lockedSubmitButton && 'transition-all duration-300 hover:text-yellow-200 hover:bg-rose-900/75 hover:shadow-2xl'} 
-                                //     text-slate-100 h-16 px-8 w-full rounded-b-full rounded-t-full text-2xl border-0 ring-2 shadow-xl md:w-1/2`}
+                                rounded-t-full text-2xl border-0 ring-2 shadow-xl md:w-1/2 hover:text-yellow-200 hover:bg-rose-900/75 hover:shadow-2xl`}
                             >
-                                {/* Order and Pay amount {enteredInput?.paymentMethodName ? 'with ' + enteredInput.paymentMethodName : ''} {paymentCurrency} {userData?.userOrder.lastOrder[1]?.productDetails.subscriptionDetails.subscriptionAmount} {userData?.userOrder.orderTotalAmount} */}
-                                Order and Pay amount {enteredInput?.paymentMethodName ? 'with ' + enteredInput.paymentMethodName : ''} {paymentCurrency} {userData?.userOrder.orderTotalAmount}
+                                {
+                                    !findInvalidOrErrorInput(enteredInputIsInvalid, errors.userAddress) 
+                                    ? 'Pay with ' + enteredInput.paymentMethodName + ' ' + paymentCurrency + ' ' + userData?.userOrder.orderTotalAmount 
+                                    : 'cannot proceed payment with invalid fields '
+                                }
                             </button>
                         </Form>
+
                     </section>
-                    
-                </section>
             </OrderContext.Provider>
         </>
     )

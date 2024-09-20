@@ -1,5 +1,5 @@
-import {  prepRequestFields } from "./auth"
-
+import {  prepRequestFields } from './auth'
+import { funcValidateIBAN } from '../../components/ui/input/ValidateIBAN'
 
 export function ApiFetchPostOptions(defineRequest = {url : '', method : 'POST'}, data, headerOptions = null) {
     return {
@@ -58,13 +58,22 @@ export function reconstructPostInput(data, pw)
         return requiredPostRequestFields
 }
 
+export function findInvalidOrErrorInput(invalidInputList, errorResponse){
+    // console.log({findKey:invalidInputList })
+    if(findInvalidInput(invalidInputList)) return true
+
+    if(Object.keys(errorResponse).length !== 0) return true
+
+    return false
+}
+
 export function findInvalidInput(obj){
 
     for (const key in obj)
     {
         const value = obj[key]
 
-        const avoid_keys = ["paymentMethodName","paymentMethodId", "country", "countryId", "location", "state_id", "state", "unitNumber"]
+        const avoid_keys = ["paymentMethodName", "country", "countryId", "location", "state_id", "state", "unitNumber"]
 
         if(avoid_keys.includes(key)) continue
 
@@ -77,45 +86,63 @@ export function findInvalidInput(obj){
     return false
 }
 
-export function findAndUpdateInvalidList(obj, setLockedSubmitButton, setEnteredInputIsInvalid)
+
+export function findAndUpdateInvalidList(obj, setEnteredInputIsInvalid)
 {
     let foundInvalid = false
+    let keyName
+    let value
+
+    console.log({enteredObj:obj})
 
     for (const key in obj)
     {
-        let value = obj[key]
+        value = obj[key]
+        keyName = key
 
-        const trimIfString = value instanceof String ? value.trim() : value
+        const trimIfString = typeof value === 'string' ? value.trim() : value
 
         // 'city_list_nr' && state_list_nr
-        const avoid_keys = ["city_id", "region", "state_id", "state","city_id","unitNumber"]
+        const avoid_keys = ["city_id", "region", "state_id", "state", "city_id", "unitNumber"]
         if(avoid_keys.includes(key)) continue
+
+        if(key === 'addressLine'){
+            console.log({theFuck: trimIfString})
+        }
         
-        if(Number.isInteger(trimIfString))
-        {
+        if(key === 'iban'){
+            const iban = funcValidateIBAN(value)
+            foundInvalid = !iban.valid ? true : false
+            setEnteredInputIsInvalid((prevValue) => ({
+                ...prevValue,
+                [key] : foundInvalid
+            }))
+        } else if(Number.isInteger(trimIfString)) {
             setEnteredInputIsInvalid((prevValue) => ({
                 ...prevValue,
                 [key] : false
             }))
-        } else if (trimIfString instanceof String) {
-            setEnteredInputIsInvalid((prevValue) => ({
-                ...prevValue,
-                [key] : false
-            }))
-        } else if (!value) {
-            setLockedSubmitButton(true)
+        } else if (!trimIfString) {
+            if(key === 'addressLine'){
+                console.log({theFuck: trimIfString})
+            }
             setEnteredInputIsInvalid((prevValue) => ({
                 ...prevValue,
                 [key] : true
             }))
             
             foundInvalid = true
+        } else if (trimIfString.length > 0) {
+            setEnteredInputIsInvalid((prevValue) => ({
+                ...prevValue,
+                [key] : false
+            }))
         }
     }
-    
-    // setLockedSubmitButton(false)
 
-    return foundInvalid
+    console.log({bool: foundInvalid, invalidKey: keyName, value: value})
+
+    return {bool: foundInvalid, invalidKey: keyName, value: value}
 }
 
 export function getErrorFromPostRequest(obj, setLockedSubmitButton, setEnteredInputIsInvalid)
@@ -160,7 +187,7 @@ export function setInputInvalidTrueWhenEnteredInputEmpty(enteredInput, setEntere
                 continue
             }
             // identifier = enteredInput[key]
-            if(enteredInput[key] == '')
+            if(enteredInput[key] === '')
                 {
                     if(!invalidInput){
                         invalidInput = true
