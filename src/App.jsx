@@ -20,11 +20,13 @@ import OrderPage from './pages/OrderPage.jsx'
 import PaymentPage from './pages/client/PaymentPage.jsx'
 import { PaymentLoader } from './components/loader/PaymentLoader.jsx'
 import PaymentErrorBoundary from './components/class/errorHandler/PaymentErrorBoundary.jsx'
+import UserProfilePage from './pages/client/UserProfilePage.jsx'
 
 import {tokenLoader} from './js/util/auth.js'
 import ContactPage from './pages/ContactPage.jsx'
 import ErrorPage from './pages/ErrorPage.jsx'
 // import UsersPage from './pages/admin/UsersPage.jsx'
+import LoginDashboardLoader from './components/loader/LoginDashboardLoader';
 
 function App() {
 
@@ -48,8 +50,8 @@ function App() {
         { path: '/logout', action: logoutAction },
         { path: '/calendar', element: <CalendarPage />},
         { path: '/subscribe', element: <OrderPage />},
-        { path: '/payment', element: <PaymentPage />, loader:  PaymentLoader},
-        { path: '/dashboard/*', element: <DashboardPage />},
+        { path: '/payment', element: <PaymentPage />, loader: PaymentLoader},
+        { path: '/dashboard/*', element: <DashboardPage />}, //,  loader: UserLoader
         { path: '/contact', element: <ContactPage />},
       ]  
     }

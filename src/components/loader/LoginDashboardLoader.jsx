@@ -2,6 +2,9 @@ import { useState } from 'react'
 import { Form, redirect } from 'react-router-dom'
 import { useLogin } from 'react-admin'
 import { setAuthToken } from '../../js/util/auth.js'
+import { setLocalStorageItem } from '../../js/util/getUtil.js'
+import { jwtDecode } from "jwt-decode"
+
 
 const LoginDashboardLoader = () => {
     const [email, setEmail] = useState('')
@@ -16,9 +19,12 @@ const LoginDashboardLoader = () => {
         .then((response) => {
             return response.json()
         }).then((response) => {
-            setAuthToken(response.token)
+            const token = response.token
+            const getTokenData = jwtDecode(token)
+            setAuthToken(token)
+            setLocalStorageItem('email', getTokenData.username)
             redirect('/dashboard')
-            console.log({ fullReponse: response, authToken: response.token })
+            console.log({ fullResponse: response, authToken: response.token })
         })
         .catch((error) => {
 

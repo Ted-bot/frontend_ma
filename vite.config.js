@@ -4,6 +4,9 @@ import svgr from "vite-plugin-svgr"
 
 export default defineConfig({
   server: {
+    fs: {
+      cachedChecks: false
+    },
     cors: {
       methods: ["GET", "POST", "PUT", "PATCH", "OPTIONS", "DELETE"],
       preflightContinue: false
