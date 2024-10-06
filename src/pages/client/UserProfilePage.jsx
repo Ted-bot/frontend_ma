@@ -1,23 +1,11 @@
-import { useState, useEffect, useCallback } from 'react'
-
-import { useLoaderData, Form, useNavigate } from 'react-router-dom'
-import { Card, CardContent, CardHeader } from "@mui/material"
-import CssBaseline from '@mui/material/CssBaseline'
-import { ApiFetch } from '../../js/util/postUtil.js'
-import { AdminGuesser,
-  hydraDataProvider,
-  hydraSchemaAnalyzer,
-  ResourceGuesser,
-  fetchHydra,
-} from '@api-platform/admin'
+import { useState, useEffect } from 'react'
 import { useGetIdentity, useAuthProvider } from 'react-admin'
 
-
-import {ApiFetchGetOptions, getLocalStorageItem} from "../../js/util/getUtil.js"
+import {getLocalStorageItem} from "../../js/util/getUtil.js"
 import { dataProvider } from '../../dataProvider/main/DataProvider.jsx'
-// import { authProvider } from '../../dataProvider/main/AuthProvider.jsx'
 
-import { getAuthToken } from '../../js/util/auth.js'
+import { Card, CardContent, CardHeader } from "@mui/material"
+import CssBaseline from '@mui/material/CssBaseline'
 import Box from '@mui/material/Box'
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
@@ -37,13 +25,13 @@ const UserProfilePage = () => {
   const email = getLocalStorageItem('email')
   
   useEffect(() => {
-    dataProvider.getOneSubscription('users', email).then((response) => setData('subscription',response))
+    dataProvider.getOneSubscription('user', email).then((response) => setData('subscription',response))
     // setData('user',data)
   },[])
 
   // console.log({test: identity.identity, subscription: identity})
   // console.log({DataSet: userData})
-  console.log({AuthUser: userData, error: error, isPending: isPending,checkUSerName: userData.firstName})
+  console.log({AuthUser: userData, error: error, isPending: isPending, tokens_owned: userData.subscription?.tokens_owned})
   return (
     <Card>
       <CardHeader sx={{ mx: 2 }} title={`${data?.firstName} Dashboard`} />
@@ -53,10 +41,10 @@ const UserProfilePage = () => {
       </CardContent>
       <CardContent className='text-center'>
         {
-          userData?.subscription && <p className="text-red-500 text-3xl italic py-3 ">
+          userData?.subscription?.start && <p className="text-red-500 text-3xl italic py-3 ">
             Your Subscription valid<br />
-            From: {userData.subscription.dateStart} <br />
-            Untill: {userData.subscription.dateEnd}
+            From: {userData.subscription.start} <br />
+            Untill: {userData.subscription.end}
           </p>
         }
       </CardContent>
@@ -91,7 +79,7 @@ const UserProfilePage = () => {
                 alignContent="center"
               >
                 <h1 className='text-center text-md md:text-xl lg:text-2xl lg:py-10'>
-                  0
+                  {userData.subscription?.sessions_followed ?? 0}
                 </h1>
               </Box>
               <Divider variant="middle" component="div" />
@@ -126,7 +114,7 @@ const UserProfilePage = () => {
                 alignContent="center"
               >
                 <h1 className='text-center text-md md:text-xl lg:text-2xl lg:py-10'>
-                  100
+                {userData?.subscription?.tokens_owned ?? 0}
                 </h1>
               </Box>    
               <Divider variant="middle" component="div"  />
@@ -155,9 +143,9 @@ const UserProfilePage = () => {
                 alignContent="center"
               >
                 <h1 className='text-center text-md md:text-xl lg:text-lg lg:py-10'>                  
-                  Wo 12 June
+                  {userData?.subscription?.next_session?.next_training_day ?? userData?.subscription}
                   <br />
-                  18:00
+                  {userData?.subscription?.next_session?.start ?? ''}
                 </h1>
               </Box>
               <Divider variant="middle" component="div"  />

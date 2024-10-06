@@ -9,10 +9,10 @@ import { ApiFetchGetOptions} from '../../js/util/getUtil'
 import { parseHydraDocumentation } from "@api-platform/api-doc-parser"
 
 const getAuthHeaders = () => {
-    // {'X-Authorization': 'Bearer ' + token}
+    // {'X-Authorization': token}
     const token = getAuthToken()
     const headers = new Headers()
-    headers.append("X-Authorization", "Bearer " + token)
+    headers.append("X-Authorization", token)
 
     // console.log({'src/dataProvider/main/DataProvder': headers.get("X-Authorization")})
   
@@ -61,9 +61,9 @@ export const dataProvider = ({
         apiDocumentationParser: apiDocumentationParser
     }),
     getOneSubscription: async (resource, params) => {
-        const GetUrl = `/api/${resource}/${params}/subscriptions/paid`
+        const GetUrl = `/api/${resource}/${params}/dashboard`
         const token = getAuthToken()
-        const requestOptions = ApiFetchGetOptions(GetUrl, {'X-Authorization': 'Bearer ' + token})
+        const requestOptions = ApiFetchGetOptions(GetUrl, {'X-Authorization': token})
         const request = ApiFetch(requestOptions)
         
         try {      

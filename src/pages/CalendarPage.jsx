@@ -23,14 +23,13 @@ export default function CalendarPage(){
     const token = getAuthToken()
     const dialog = useRef()
     
-
     useEffect(() => {
         getPlannedEvents()
     }, [])
 
     const getPlannedEvents = useCallback( 
         async () => {
-            const getOptions = ApiFetchGetOptions('/api/trainingsessions',{'X-Authorization': 'Bearer ' + token})
+            const getOptions = ApiFetchGetOptions('/api/trainingsessions',{'X-Authorization': token})
             const getResults = await ApiFetch(getOptions)
             const response = await getResults.json()
             
@@ -56,7 +55,7 @@ export default function CalendarPage(){
     const handleSubmit = useCallback(
         async (event, id) => { 
         event.preventDefault()
-        const ApiOptions = ApiFetchPostOptions({url: '/api/subscribe/events', method:'POST'}, {event_id: id},{'X-Authorization': 'Bearer ' + token})
+        const ApiOptions = ApiFetchPostOptions({url: '/api/subscribe/events', method:'POST'}, {event_id: id},{'X-Authorization': token})
         
         console.log({eventChosen : id})
 
@@ -64,18 +63,20 @@ export default function CalendarPage(){
             const request = await ApiFetch(ApiOptions)
             const response = await request.json()
 
-            if(!response.ok)
+            if(!request.ok)
             { //if(response.status >= 400 && response.status <= 600)
                 // const errorJson = await response.json()
                 throw new PostError('Api: Subscribe to Calendar error', response)
             }
 
-            if(response?.success){
-                return setResponseRequest(() => (response.success))
+            console.log({testEventResponse: response})
+
+            if(request.success){
+                return setResponseRequest(response)
             }
 
-            if(response?.error){
-                return setResponseRequest(() => (response.error))
+            if(request.error){
+                return setResponseRequest(response)
             }
         } catch (error){
             console.log({SubscribeEventError: error})
@@ -108,34 +109,37 @@ export default function CalendarPage(){
             const extractEndTimeMin = extractEventTimeEnd.getMinutes()
             const endTimeEvent = extractEndTimeHours + ':' + extractEndTimeMin
             
-            setShowInModal((prevValues) => {
-                return {
+            setShowInModal(() => ({
                     id: event.id,
                     title: event.title,
                     description: event.description,
                     day: extractDay,
                     start: startTimeEvent,
                     end: endTimeEvent
-                }
-            })
+                })
+            )
         }
     )
-        
+
+    const standardSyle = 'p-4 mb-8'
+
+    console.log({responseSelectEvent:responseRequest })
+
     return(
         <>
-        <CalendarModal ref={dialog} handleSubmit={(e) => handleSubmit(e)} {...showInModal} />
+        <CalendarModal ref={dialog} handleSubmit={handleSubmit} {...showInModal} />
         <MainContentWrap name={wrapName}>
-            <>
+            <div className='flex-col'>
                 {responseRequest != null && 
-                    <section className={Object.keys(responseRequest)[0] =! 'error' ? 'red-100 border border-red-400 text-red-700' : 'green-100 border border-green-400 text-green-700'}>
-                        {responseRequest}
+                    <section className={responseRequest.message ? `bg-red-300 border border-red-400 text-red-700 ${standardSyle}` :`bg-green-300 border border-green-400 text-green-700 ${standardSyle}`}>
+                        {responseRequest.message}
                     </section>
                 }
                 <CalendarInterface 
                     getPlannedEvents={plannedEvents}
                     clickHandle={handleSelectEvent} 
                 />
-            </>    
+            </div>    
         </MainContentWrap>
     </>
     )

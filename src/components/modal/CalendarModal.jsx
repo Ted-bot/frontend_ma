@@ -19,7 +19,9 @@ import './CalendarModal.css'
         }
     })
 
-    
+    console.log({viewEventId: id})
+
+
     const typeEvent = (title)  => {
         switch(title){
             case 'training':
