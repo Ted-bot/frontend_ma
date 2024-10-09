@@ -1,92 +1,80 @@
-import {useState, useEffect, useCallback, useMemo, useRef} from 'react'
+import {useState, useEffect, useCallback, useMemo, useRef, createContext, useContext} from 'react'
 import MainContentWrap from '../components/wraps/client/MainContentWrap' 
 import CalendarInterface from '../components/interface/CalendarInterface.jsx'
 
 import { ApiFetchPostOptions, ApiFetch } from '../js/util/postUtil.js'
-import {ApiFetchGetOptions} from "../js/util/getUtil.js"
+import {ApiFetchGetOptions, getLocalStorageItem} from "../js/util/getUtil.js"
 import {getAuthToken} from "../js/util/auth.js"
-
-import { PostError } from '../js/error/PostError'
-
 import CalendarModal from '../components/modal/CalendarModal.jsx'
+import { useErrorBoundary } from "react-error-boundary"
+import { useLoaderData, Form, useNavigate } from 'react-router-dom'
+import { useUserCalendar } from '../hooks/query/usePublisedEvents.jsx'
+import { useQueryClient, useMutation } from 'react-query'
+
+import { HttpError } from 'react-admin'
 
 export default function CalendarPage(){
-    
+    const {blackDragonEvents, status } = useUserCalendar()
+    const queryClient = useQueryClient()
+    // const loaderData = useLoaderData()
     const wrapName = 'Calendar'
-    const [plannedEvents, setPlannedEvents] = useState([])
+    const token = getAuthToken()
+    const dialog = useRef()
+    const {showBoundary} = useErrorBoundary()
+    const dummyPlannedEvent = { 
+        id: 1,
+        title: 'title',
+        start: 0,
+        end: 0,
+        resource : 1
+      }
+    const [plannedEvents, setPlannedEvents] = useState([dummyPlannedEvent])
+    const [userSelectedEvents, setUserSelectedEvents] = useState([dummyPlannedEvent])
     const [responseRequest, setResponseRequest] = useState(null)
     const [showInModal, setShowInModal] = useState({
         title: '',
         startDateTime: '',
         endTime: '',
     })
-    const token = getAuthToken()
-    const dialog = useRef()
+
     
+    // console.log({newData: blackDragonEvents, status: status})
+
     useEffect(() => {
-        getPlannedEvents()
-    }, [])
+        blackDragonEvents?.events && setPlannedEvents(blackDragonEvents?.events)
+        blackDragonEvents?.userSelectedEvents && setUserSelectedEvents(blackDragonEvents?.userSelectedEvents)
+    }, [blackDragonEvents])//responseRequest?.message
 
-    const getPlannedEvents = useCallback( 
-        async () => {
-            const getOptions = ApiFetchGetOptions('/api/trainingsessions',{'X-Authorization': token})
-            const getResults = await ApiFetch(getOptions)
-            const response = await getResults.json()
-            
-            if(!getResults.ok)
-            {
-                throw new PostError('Api Login error', response)  
-            }
-
-            const events = response['hydra:member'].map((response) => ({
-                id: response.id,
-                title: response.title,
-                start: new Date(response.startDate),
-                end: new Date(response.endDate),
-                resource: response.description,
-            }))
-
-            console.log({loadingEvents : events})
-
-            setPlannedEvents(events)
-        },[]
-    )
-
-    const handleSubmit = useCallback(
-        async (event, id) => { 
-        event.preventDefault()
-        const ApiOptions = ApiFetchPostOptions({url: '/api/subscribe/events', method:'POST'}, {event_id: id},{'X-Authorization': token})
+    
+    // const handleSubmit = useCallback(
+    //     async (event, id) => { 
+    //     event.preventDefault()
+    //     const ApiOptions = ApiFetchPostOptions({url: '/api/subscribe/events', method:'POST'}, {event_id: id},{'X-Authorization': token})
         
-        console.log({eventChosen : id})
+    //     // console.log({eventChosen : id})
 
-        try{
-            const request = await ApiFetch(ApiOptions)
-            const response = await request.json()
+    //     try{
+    //         const request = await ApiFetch(ApiOptions)
+    //         const response = await request.json()
 
-            if(!request.ok)
-            { //if(response.status >= 400 && response.status <= 600)
-                // const errorJson = await response.json()
-                throw new PostError('Api: Subscribe to Calendar error', response)
-            }
+    //         if(!request.ok) throw new HttpError( "Something went wrong subscribing you to an event :( " , response.status)
 
-            console.log({testEventResponse: response})
+    //             console.log({WhatKrijgIkTerug: response})
+    //         if(response?.message) return setResponseRequest(response) 
+            
+            
+    //         // if(request.error) return setResponseRequest(response) 
 
-            if(request.success){
-                return setResponseRequest(response)
-            }
+    //     } catch (error){
+    //         console.log({SubscribeEventError: error})
+    //         showBoundary(error)
+    //     }
+    // }, [token])
 
-            if(request.error){
-                return setResponseRequest(response)
-            }
-        } catch (error){
-            console.log({SubscribeEventError: error})
-        }
-    }, [token]
-)
+
 
     const handleSelectEvent = useMemo(() => 
-        (event) =>  { //unnessecary async removed
-            // console.log({eventSelected: event})
+        (event) =>  { 
             const options = { month: 'short', day: 'numeric' }
             const selectedDate = new Date(event.start).toLocaleDateString('en-us', options)
             
@@ -121,26 +109,35 @@ export default function CalendarPage(){
         }
     )
 
-    const standardSyle = 'p-4 mb-8'
+    const standardSyle = 'p-4 mb-8 rounded-md text-center'
 
-    console.log({responseSelectEvent:responseRequest })
+    console.log({responseSelectEvent:userSelectedEvents })
+    const propsInsert = {
+        getPlannedEvents: plannedEvents, 
+        clickHandle: handleSelectEvent
+    }
 
+    console.log({plannedEvents: plannedEvents})
+    console.log({SeeResponseMessage: responseRequest})
     return(
         <>
-        <CalendarModal ref={dialog} handleSubmit={handleSubmit} {...showInModal} />
-        <MainContentWrap name={wrapName}>
-            <div className='flex-col'>
-                {responseRequest != null && 
-                    <section className={responseRequest.message ? `bg-red-300 border border-red-400 text-red-700 ${standardSyle}` :`bg-green-300 border border-green-400 text-green-700 ${standardSyle}`}>
-                        {responseRequest.message}
-                    </section>
-                }
-                <CalendarInterface 
-                    getPlannedEvents={plannedEvents}
-                    clickHandle={handleSelectEvent} 
-                />
-            </div>    
-        </MainContentWrap>
-    </>
+            <CalendarModal ref={dialog} setResponseRequest={setResponseRequest}  {...showInModal} />
+            {/* <CalendarModal ref={dialog} handleSubmit={subscribeToEvent} {...showInModal} /> */}
+            {/* <CalendarModal ref={dialog} handleSubmit={async (event) => (subscribeToEvent({event}))} {...showInModal} /> */}
+            <MainContentWrap name={wrapName}>
+                <div className='flex-col'>
+                    {responseRequest?.message != null && 
+                        <section className={responseRequest.status >= 399 ? `bg-red-300 border border-red-400 text-red-700 ${standardSyle}` :`bg-green-300 border border-green-400 text-green-700 ${standardSyle}`}>
+                            {responseRequest.message}
+                        </section>
+                    }
+                    <CalendarInterface
+                        getPlannedEvents={plannedEvents}
+                        userSelectedEvents={userSelectedEvents}
+                        clickHandle={handleSelectEvent} 
+                        />
+                </div>    
+            </MainContentWrap>
+        </>
     )
  }

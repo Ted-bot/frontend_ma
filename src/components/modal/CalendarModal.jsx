@@ -1,14 +1,25 @@
-import { forwardRef, useImperativeHandle, useRef } from 'react'
+import { forwardRef, useImperativeHandle, useRef, useState, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import Box from '@mui/material/Box'
 // import Stack from '@mui/material/Stack'
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
 import './CalendarModal.css'
+// import { getLocalStorageItem } from '../../js/util/getUtil'
+// import { ApiFetchPostOptions, ApiFetch} from '../../js/util/postUtil'
+// import { getAuthToken } from '../../js/util/auth'
+// import { useAddToUserCalendar } from '../../hooks/query/usePublisedEvents'
 
- const CalendarModal = forwardRef(function CalendarModal({ id, day, title,description, start, end, handleSubmit}, ref){
-    const dialog = useRef()
+import { useQueryClient, useMutation } from 'react-query'
+import { ActionUserSelectedEventButton } from '../ui/button/ActionUserSelectedEventButton';
+
+ const CalendarModal = forwardRef(function CalendarModal({ id, day, title,description, start, end, setResponseRequest}, ref){
     let setTypeEvent
+    const dialog = useRef()
+    const queryClient = useQueryClient()
+
+    // const token = getAuthToken()
+    // const [responseRequest, setResponseRequest] = useState(null)
 
     useImperativeHandle(ref, () => {
 
@@ -19,8 +30,27 @@ import './CalendarModal.css'
         }
     })
 
-    console.log({viewEventId: id})
-
+    // const {addToUserCalendar} = useAddToUserCalendar()
+    // const token = getAuthToken()
+    
+    
+    // const email = getLocalStorageItem('email')
+    
+    
+    // const {mutateAsync: subscribeToEvent} = useMutation({
+    //     mutationFn: (id) => {        
+    //        fetch(`/api/subscribe/${email}/event/${id}`,{
+    //             method:'POST',
+    //             headers: {
+    //                 "Content-Type":"application/json",
+    //                 'X-Authorization': token
+    //             },
+    //             body: JSON.stringify({event_id:id})}
+    //         )
+    //     },
+    //     reset: false,
+    //     queryClient: queryClient
+    // })
 
     const typeEvent = (title)  => {
         switch(title){
@@ -37,6 +67,8 @@ import './CalendarModal.css'
 
         return setTypeEvent
     }
+
+    // console.log({showSubscribeEventResponse: responseRequest})
 
     return createPortal(
         <dialog ref={dialog} className="result-modal">
@@ -114,16 +146,16 @@ import './CalendarModal.css'
                         <Divider variant="middle" component="div"  />
                     </Grid>
                 </Box>
-            
-                <section className="flex flex-inline justify-center mt-8">
-                    <form onSubmit={(e) => handleSubmit(e, id)}>
+                <ActionUserSelectedEventButton id={id} setResponse={setResponseRequest}/>
+                {/* <section className="flex flex-inline justify-center mt-8">
+                    <form onSubmit={() => subscribeToEvent(id) }>
                         <button 
                             className="text-slate-100 h-16 w-42 px-8 rounded-b-full text-2xl rounded-t-full border-0 ring-2 shadow-xl ring-red-500 bg-red-500 bg-gradient-to-r from-red-500 to-yellow-500 transition-all duration-300 hover:from-orange-400 hover:text-yellow-200 hover:to-red-400 hover:ring-red-400 hover:shadow-2xl"
                         >
                             Sign Up
                         </button>
                     </form>
-                </section>
+                </section> */}
             </section>
         </dialog>,
         document.getElementById("modal")
