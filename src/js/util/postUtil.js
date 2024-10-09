@@ -107,7 +107,7 @@ export function findAndUpdateInvalidList(obj, setEnteredInputIsInvalid)
         if(avoid_keys.includes(key)) continue
 
         if(key === 'addressLine'){
-            console.log({theFuck: trimIfString})
+            console.log({theAddressLine: trimIfString})
         }
         
         if(key === 'iban'){
@@ -124,15 +124,17 @@ export function findAndUpdateInvalidList(obj, setEnteredInputIsInvalid)
             }))
         } else if (!trimIfString) {
             if(key === 'addressLine'){
-                console.log({theFuck: trimIfString})
+                console.log({theFuck: trimIfString, key})
             }
+            console.log({theFuck: trimIfString, key})
             setEnteredInputIsInvalid((prevValue) => ({
                 ...prevValue,
                 [key] : true
             }))
             
             foundInvalid = true
-        } else if (trimIfString.length > 0) {
+            break
+        } else if (trimIfString.length === 0) {
             setEnteredInputIsInvalid((prevValue) => ({
                 ...prevValue,
                 [key] : false
@@ -181,11 +183,11 @@ export function setInputInvalidTrueWhenEnteredInputEmpty(enteredInput, setEntere
     let invalidInput = false
     for (const key in enteredInput)
         {            
-            if(key == 'city_id'){
-                console.log({setInvalidTrue_key: key, value: enteredInput[key]})
-                //  ||  key == 'state_id' || key == 'city_list_nr' || key == 'state_list_nr' || key == 'state'
-                continue
-            }
+            // if(key == 'city_id'){
+            //     console.log({setInvalidTrue_key: key, value: enteredInput[key]})
+            //     //  ||  key == 'state_id' || key == 'city_list_nr' || key == 'state_list_nr' || key == 'state'
+            //     continue
+            // }
             // identifier = enteredInput[key]
             if(enteredInput[key] === '')
                 {

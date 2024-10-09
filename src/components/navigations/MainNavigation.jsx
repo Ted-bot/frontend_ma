@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { NavLink, Form, useRouteLoaderData } from 'react-router-dom'
 import {useLogout } from 'react-admin'
 import { MenuItem } from '@mui/material'
@@ -15,23 +15,21 @@ function MainNavigation() {
         // setOpenAvatarDropdown(false)
     }
 
-    // const logout = useLogout()
-    // const handleClick = () => logout()
-    
-    // const toggleAvatarDropdown = () => {
-    //     setOpenAvatarDropdown(!openAvatarDropdown);
-    // };
-
-    const [colorChange, setColorchange] = useState(false);
+    const [colorChange, setColorChange] = useState(false);
 
     const changeNavbarColor = () => {
         if (window.scrollY >= 80) {
-            setColorchange(true);
+            setColorChange(true);
         } else {
-            setColorchange(false);
+            setColorChange(false);
         }
-    };
-    window.addEventListener("scroll", changeNavbarColor);
+    }
+    
+    useEffect(() => {
+        changeNavbarColor()
+        window.addEventListener("scroll", changeNavbarColor);
+    }, [colorChange])
+    
 
     const navList = () => {
         return (

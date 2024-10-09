@@ -1,7 +1,10 @@
 import { useState } from 'react'
 import { Form, redirect } from 'react-router-dom'
 import { useLogin } from 'react-admin'
-import { setAuthToken } from '../../js/util/auth.js'
+import { setAuthToken, deleteAuthToken } from '../../js/util/auth.js'
+import { setLocalStorageItem, deleteLocalStorageItem } from '../../js/util/getUtil.js'
+
+
 
 const LoginDashboardLoader = () => {
     const [email, setEmail] = useState('')
@@ -15,10 +18,9 @@ const LoginDashboardLoader = () => {
         login({ email, password })
         .then((response) => {
             return response.json()
-        }).then((response) => {
-            setAuthToken(response.token)
+        }).then((response) => {            
             redirect('/dashboard')
-            console.log({ fullReponse: response, authToken: response.token })
+            console.log({ fullResponse: response, authToken: response.token })
         })
         .catch((error) => {
 

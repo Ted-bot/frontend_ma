@@ -15,7 +15,7 @@ export async function PaymentLoader()
     })
 
     const token = getAuthToken()
-    const ApiOptions = ApiFetchGetOptions('/api/v1/order/payment',{'X-Authorization': 'Bearer ' + token})
+    const ApiOptions = ApiFetchGetOptions('/api/v1/order/payment',{'X-Authorization': token})
     const response = await ApiFetch(ApiOptions)
     const getResults = await response.json()       
 

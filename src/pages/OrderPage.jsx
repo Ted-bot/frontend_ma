@@ -43,7 +43,7 @@ export default function OrderPage(){
     const requestAvailableProducts = useCallback(
        async () => {
         const GetUrl = '/api/products?page=1&duration=month'
-        // const requestOptions = ApiFetchGetOptions(GetUrl, {'X-Authorization': 'Bearer ' + token})
+        // const requestOptions = ApiFetchGetOptions(GetUrl, {'X-Authorization': token})
         const requestOptions = ApiFetchGetOptions(GetUrl)
         const request = ApiFetch(requestOptions)
     

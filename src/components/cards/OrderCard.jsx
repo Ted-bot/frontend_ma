@@ -22,7 +22,7 @@ export default function OrderCard(props){
     const postRequest = async (data) => {
         try {
             const options = { url: '/api/v1/order/create', method: 'POST'}
-            const ApiOptions = ApiFetchPostOptions(options,data, {'X-Authorization': 'Bearer ' + token})            
+            const ApiOptions = ApiFetchPostOptions(options,data, {'X-Authorization': token})            
             const response = await ApiFetch(ApiOptions)
             const getResults = await response.json()
         

@@ -277,9 +277,10 @@ export default function SignUpForm() {
         
         const pw = event.target.password.value
         const requestData = reconstructPostInput(enteredInput, pw)
-        const checkInputUser = findAndUpdateInvalidList(enteredInput, setLockedSubmitButton, setEnteredInputIsInvalid) 
-        
-        if(!checkInputUser){
+        const checkInputUser = findAndUpdateInvalidList(enteredInput, setEnteredInputIsInvalid) 
+
+        if(!checkInputUser.bool){
+            console.log("yes Subscriptbe")
             postRequest(requestData)
 
         } else {

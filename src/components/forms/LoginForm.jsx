@@ -8,6 +8,8 @@ export default function LoginForm() {
     const typeEmail = 'email'
     const typePassword = 'password'
     
+    const login = useLogin()
+    const notify = useNotify()
     // const navigate = useNavigate()
 
     const [errors, setErrors] = useState('')
@@ -63,45 +65,6 @@ export default function LoginForm() {
         return createListItems
     } 
 
-    
-
-    // const postRequest = async (data) => {
-    //     try {
-            
-    //         const apiOptions = {url: '/api/v1/login', method: 'POST'}
-    //         const prepareQuery = ApiFetchOptions(apiOptions,data)
-            
-    //         console.log({prepareQuery: prepareQuery})
-
-    //         const res = await ApiFetch(prepareQuery)
-
-    //         if(!res.ok) //if(response.status >= 400 && response.status <= 600)
-    //         {
-    //             // const errorJson = await res.json()
-    //             const getResultError = await res.json()
-    //             console.log({errorPost: getResultError})
-    //             throw new PostError('Api Login error', getResultError)
-    //         } 
-            
-    //         console.log({total_response:res})
-    //         localStorage.setItem('auth', res)
-    //         navigate('/dashboard', {replace: true})
-
-    //     } catch (error) {
-
-    //         if(error.response != undefined ){
-    //             if(error.response.errors != undefined){
-    //                 setErrors(error.response.errors)
-    //             }
-    //         } else {
-    //             console.log(error)
-    //         }
-                        
-    //     }
-    // }
-
-    const login = useLogin()
-    const notify = useNotify()
 
     // function handleSubmit(event, enteredInput, enteredInputIsInvalid) {
     function handleSubmit(event, enteredInput, enteredInputIsInvalid) {

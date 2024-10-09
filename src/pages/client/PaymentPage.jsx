@@ -6,7 +6,7 @@ import {
     findAndUpdateInvalidList,
     findInvalidInput,
     findInvalidOrErrorInput
-} from "../../js/util/postUtil"
+} from "../../js/util/postUtil.js"
 
 import {
     getLocalStorageItem, 
@@ -337,7 +337,7 @@ const PaymentPage = () => {
             amount: amount,
             order_id: orderNumber.toString(),
             redirectUrl: 'http://localhost:5173/dashboard', // set user dashbpoard {id}
-            webhookUrl: 'https://e111-95-96-151-55.ngrok-free.app',
+            webhookUrl: 'https://15e2-95-96-151-55.ngrok-free.app',
             billingAddress: billingAddress,
             shippingAddress: billingAddress,
             metadata: { order_id : orderNumber.toString()},
@@ -353,7 +353,7 @@ const PaymentPage = () => {
         }
 
         const paymentOption = { url: '/api/v1/payment', method: 'POST'}
-        const ApiPayOptions = ApiFetchPostOptions(paymentOption, confirmUserOrder, {'X-Authorization': 'Bearer ' + token})
+        const ApiPayOptions = ApiFetchPostOptions(paymentOption, confirmUserOrder, {'X-Authorization': token})
 
         try {
             const payResponse = await ApiFetch(ApiPayOptions)
@@ -392,7 +392,7 @@ const PaymentPage = () => {
         userAddressInfo = { ...userAddressInfo, ['reactCityNr']: ctxValue.currentUserCity.toString()}
         
         const options = { url: '/api/v1/order/address', method: 'POST'}
-        const ApiUserAddressOptions = ApiFetchPostOptions(options, userAddressInfo, {'X-Authorization': 'Bearer ' + token})            
+        const ApiUserAddressOptions = ApiFetchPostOptions(options, userAddressInfo, {'X-Authorization': token})            
         
         try {
             const response = await ApiFetch(ApiUserAddressOptions)
