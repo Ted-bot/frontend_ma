@@ -13,13 +13,9 @@ import './CalendarModal.css'
 import { useQueryClient, useMutation } from 'react-query'
 import { ActionUserSelectedEventButton } from '../ui/button/ActionUserSelectedEventButton';
 
- const CalendarModal = forwardRef(function CalendarModal({ id, day, title,description, start, end, setResponseRequest}, ref){
+ const CalendarModal = forwardRef(function CalendarModal({ id, day, title,description, start, end, setResponseRequest, allReadySelected}, ref){
     let setTypeEvent
     const dialog = useRef()
-    const queryClient = useQueryClient()
-
-    // const token = getAuthToken()
-    // const [responseRequest, setResponseRequest] = useState(null)
 
     useImperativeHandle(ref, () => {
 
@@ -30,27 +26,8 @@ import { ActionUserSelectedEventButton } from '../ui/button/ActionUserSelectedEv
         }
     })
 
-    // const {addToUserCalendar} = useAddToUserCalendar()
-    // const token = getAuthToken()
-    
-    
-    // const email = getLocalStorageItem('email')
-    
-    
-    // const {mutateAsync: subscribeToEvent} = useMutation({
-    //     mutationFn: (id) => {        
-    //        fetch(`/api/subscribe/${email}/event/${id}`,{
-    //             method:'POST',
-    //             headers: {
-    //                 "Content-Type":"application/json",
-    //                 'X-Authorization': token
-    //             },
-    //             body: JSON.stringify({event_id:id})}
-    //         )
-    //     },
-    //     reset: false,
-    //     queryClient: queryClient
-    // })
+    const buttonTextSubscribe = 'Sign up'
+    const buttonTextUnsubscribe = 'cancell'
 
     const typeEvent = (title)  => {
         switch(title){
@@ -68,8 +45,6 @@ import { ActionUserSelectedEventButton } from '../ui/button/ActionUserSelectedEv
         return setTypeEvent
     }
 
-    // console.log({showSubscribeEventResponse: responseRequest})
-
     return createPortal(
         <dialog ref={dialog} className="result-modal">
             <section>
@@ -84,39 +59,24 @@ import { ActionUserSelectedEventButton } from '../ui/button/ActionUserSelectedEv
 
             <section>
                 <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)' }}>
-                    <Grid 
-                        container 
-                        direction="column"
-                        sx={{ flexGrow: 1}}
-                    >
-                        <Box
-                            width={{ xs:'8rem', sm:'8rem', md:'7rem', lg:'7rem'}}
-                            // paddingTop={{ xs:'1rem' }}                            
-                        >
+                    <Grid container direction="column" sx={{ flexGrow: 1}} >
+                        <Box width={{ xs:'8rem', sm:'8rem', md:'7rem', lg:'7rem'}}>
                             <h1 className='text-center text-md text-orange-200 sm:text-xl lg:py-10'>
                                 Day Event :
                             </h1>
                         </Box>
-                        <Box 
-                            width={{ xs:'8rem', sm:'8rem', md:'7rem', lg:'7rem'}}                            
-                        >
+                        <Box width={{ xs:'8rem', sm:'8rem', md:'7rem', lg:'7rem'}} >
                             <h1 className='text-center text-md text-orange-200 sm:text-xl lg:py-10'>
                                 start time :
                             </h1>
                         </Box>
-                        <Box 
-                            width={{ xs:'8rem', sm:'8rem', md:'7rem', lg:'7rem'}}                            
-                        >
+                        <Box width={{ xs:'8rem', sm:'8rem', md:'7rem', lg:'7rem'}} >
                             <h1 className='text-center text-md text-orange-200 sm:text-xl lg:py-10'>
                                 end time :
                             </h1>
                         </Box>
                     </Grid>
-                    <Grid 
-                        container
-                        direction="column"
-                        sx={{ flexGrow: 1 }}
-                    >
+                    <Grid container direction="column" sx={{ flexGrow: 1 }}>
                         <Box 
                             width={{ xs:'8rem', sm:'8rem', md:'7rem', lg:'7rem'}}  
                             alignContent="center"
@@ -146,16 +106,11 @@ import { ActionUserSelectedEventButton } from '../ui/button/ActionUserSelectedEv
                         <Divider variant="middle" component="div"  />
                     </Grid>
                 </Box>
-                <ActionUserSelectedEventButton id={id} setResponse={setResponseRequest}/>
-                {/* <section className="flex flex-inline justify-center mt-8">
-                    <form onSubmit={() => subscribeToEvent(id) }>
-                        <button 
-                            className="text-slate-100 h-16 w-42 px-8 rounded-b-full text-2xl rounded-t-full border-0 ring-2 shadow-xl ring-red-500 bg-red-500 bg-gradient-to-r from-red-500 to-yellow-500 transition-all duration-300 hover:from-orange-400 hover:text-yellow-200 hover:to-red-400 hover:ring-red-400 hover:shadow-2xl"
-                        >
-                            Sign Up
-                        </button>
-                    </form>
-                </section> */}
+                {
+                    allReadySelected
+                    ? <ActionUserSelectedEventButton id={id} buttonText={buttonTextUnsubscribe} setResponse={setResponseRequest} select={0}/>
+                    : <ActionUserSelectedEventButton id={id} buttonText={buttonTextSubscribe} setResponse={setResponseRequest} select={1}/>
+                }
             </section>
         </dialog>,
         document.getElementById("modal")
