@@ -86,15 +86,13 @@ export function findInvalidInput(obj){
     return false
 }
 
-
 export function findAndUpdateInvalidList(obj, setEnteredInputIsInvalid)
 {
     let foundInvalid = false
     let keyName
     let value
 
-    console.log({enteredObj:obj})
-
+    // console.log({enteredObj:obj})
     for (const key in obj)
     {
         value = obj[key]
@@ -105,10 +103,6 @@ export function findAndUpdateInvalidList(obj, setEnteredInputIsInvalid)
         // 'city_list_nr' && state_list_nr
         const avoid_keys = ["city_id", "region", "state_id", "state", "city_id", "unitNumber"]
         if(avoid_keys.includes(key)) continue
-
-        if(key === 'addressLine'){
-            console.log({theAddressLine: trimIfString})
-        }
         
         if(key === 'iban'){
             const iban = funcValidateIBAN(value)
@@ -123,10 +117,6 @@ export function findAndUpdateInvalidList(obj, setEnteredInputIsInvalid)
                 [key] : false
             }))
         } else if (!trimIfString) {
-            if(key === 'addressLine'){
-                console.log({theFuck: trimIfString, key})
-            }
-            console.log({theFuck: trimIfString, key})
             setEnteredInputIsInvalid((prevValue) => ({
                 ...prevValue,
                 [key] : true
@@ -142,8 +132,7 @@ export function findAndUpdateInvalidList(obj, setEnteredInputIsInvalid)
         }
     }
 
-    console.log({bool: foundInvalid, invalidKey: keyName, value: value})
-
+    // console.log({bool: foundInvalid, invalidKey: keyName, value: value})
     return {bool: foundInvalid, invalidKey: keyName, value: value}
 }
 
@@ -183,12 +172,6 @@ export function setInputInvalidTrueWhenEnteredInputEmpty(enteredInput, setEntere
     let invalidInput = false
     for (const key in enteredInput)
         {            
-            // if(key == 'city_id'){
-            //     console.log({setInvalidTrue_key: key, value: enteredInput[key]})
-            //     //  ||  key == 'state_id' || key == 'city_list_nr' || key == 'state_list_nr' || key == 'state'
-            //     continue
-            // }
-            // identifier = enteredInput[key]
             if(enteredInput[key] === '')
                 {
                     if(!invalidInput){
@@ -201,10 +184,6 @@ export function setInputInvalidTrueWhenEnteredInputEmpty(enteredInput, setEntere
                     }))
                 }
             }
-            
-    console.log({foundInvalidInput: invalidInput})
-    
-    // return invalidInput
 }
 
 

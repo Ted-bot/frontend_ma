@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useGetIdentity, useAuthProvider } from 'react-admin'
+import { Title, useAuthState, useGetIdentity } from 'react-admin'
 
 import {getLocalStorageItem} from "../../js/util/getUtil.js"
 import { dataProvider } from '../../dataProvider/main/DataProvider.jsx'
@@ -10,8 +10,13 @@ import Box from '@mui/material/Box'
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
 
+
 const UserProfilePage = () => {  
+  const { isPending: authPending, authenticated } = useAuthState()
   const {data, isPending, error} = useGetIdentity()
+  if(authPending) return <section>...loading</section>
+
+  // if(authenticated) return <section>...user Authenticated</section>
   const itemLocalstorage = 'user'
   const [errors, setErrors] = useState('')
   const [userData, setUserData] = useState({user: {}})
@@ -32,8 +37,11 @@ const UserProfilePage = () => {
   // console.log({test: identity.identity, subscription: identity})
   // console.log({DataSet: userData})
   console.log({AuthUser: userData, error: error, isPending: isPending, tokens_owned: userData.subscription?.tokens_owned})
+  
+
   return (
     <Card>
+      <Title title="Dashboard" />
       <CardHeader sx={{ mx: 2 }} title={`${data?.firstName} Dashboard`} />
       
       <CardContent>
@@ -52,11 +60,7 @@ const UserProfilePage = () => {
       <CssBaseline />
       <CardContent>
         <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)' }}>
-            <Grid 
-              container 
-              direction="column"
-              sx={{ flexGrow: 1}}
-              >
+            <Grid container direction="column" sx={{ flexGrow: 1}} >
               <Box 
                   display='block'
                   my={2}
@@ -85,11 +89,7 @@ const UserProfilePage = () => {
               <Divider variant="middle" component="div" />
             </Grid>
             
-            <Grid 
-              container
-              direction="column"
-              sx={{ flexGrow: 1 }}
-            >
+            <Grid container direction="column" sx={{ flexGrow: 1 }} >
               <Box 
                 display='block'
                 my={2}
@@ -120,11 +120,7 @@ const UserProfilePage = () => {
               <Divider variant="middle" component="div"  />
             </Grid>
 
-            <Grid 
-              container
-              direction="column"
-              sx={{ flexGrow: 1 }}
-            >
+            <Grid container direction="column" sx={{ flexGrow: 1 }} >
               <Box
                 display='block'
                 my={2}

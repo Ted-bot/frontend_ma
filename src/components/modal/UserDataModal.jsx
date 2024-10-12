@@ -17,8 +17,7 @@ const UserDataModal = forwardRef(function UserDataModal({ handleKeyDown,errors, 
     const typeLocation = 'location'
     const typeText = 'text'
     const typeFirstAndLastName = 'firstAndLastName'
-    const typeMixed = 'mixed'
-    
+    const typeMixed = 'mixed'    
     
     useImperativeHandle(ref, () => {
     

@@ -49,15 +49,19 @@ export default function LabelNameInput({
                     </section>
                     {
                         (type != 'tel' && type != 'location') ? 
+                            <section>
+
                             <input
-                                className={`${checkBox === 1 ? 'h-8 w-8 lg:h-12 lg:w-12 accent-orange-300' : 'w-full appearance-none'} 
+                                className={`${checkBox === 1 ? 'h-8 w-8 lg:h-8 lg:w-12 accent-orange-300' : 'w-full appearance-none'} 
                                 ${error && 'border-red-500'} 
                                 block bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`} 
                                 id={id}
                                 name={name} 
                                 type={type}
                                 {...props}
-                            />
+                                />
+                                {invalid && type == 'checkbox' &&  <p className="text-red-500 text-xs italic"> Select gender</p>}
+                            </section>
                         : type === 'tel' ?
                             <PhoneInput
                                 id={id}
@@ -103,7 +107,6 @@ export default function LabelNameInput({
                 {invalid && type == 'password' &&  <p className="text-red-500 text-xs italic">Please fill in a {lowerCaseName} </p>}
                 {invalid && type == 'location' &&  <p className="text-red-500 text-xs italic">Please fill in a {lowerCaseName} </p>}
                 {invalid && type == 'text' &&  <p className="text-red-500 text-xs italic">Please fill in your {lowerCaseName} </p>}
-                {invalid && type == 'checkbox' &&  <p className="text-red-500 text-xs italic">Please fill gender</p>}
                 {invalid && type == 'date' &&  <p className="text-red-500 text-xs italic">Sorry, only between the age of 7 and 60 years can sign in!</p>}
                 {invalid && type == 'tel' &&  <p className="text-red-500 text-xs italic">Please fill in your {lowerCaseName}</p>}
                 {(error != undefined && error != '') && <section className="text-red-500 text-xs italic">{error}</section>}

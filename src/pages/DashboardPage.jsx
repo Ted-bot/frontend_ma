@@ -3,7 +3,7 @@ import { AdminGuesser,
     hydraSchemaAnalyzer,
     ResourceGuesser,
 } from '@api-platform/admin'
-import { Layout, CustomRoutes} from 'react-admin'
+import { Layout, CustomRoutes, useAuthenticated} from 'react-admin'
 import { Route } from 'react-router-dom'
 // import { createTheme } from '@mui/material/styles'
 
@@ -16,15 +16,14 @@ import LoginDashboardLoader from '../loader/LoginDashboardLoader.jsx'
 import UserProfilePage from './client/UserProfilePage'
 import { dataProvider } from '../dataProvider/main/DataProvider.jsx'
 import { authProvider } from '../dataProvider/main/AuthProvider.jsx'
+import { ProfileSettingsInterface } from '../components/interface/UserDashboardProfileInterface'
 
 export default function DashboardPage() {
+    useAuthenticated()
     
     const schemaAnalyzer = hydraSchemaAnalyzer()
-    const itemLocalstorage = 'user'
 
-    const MyLogin = () => (
-            <LoginDashboardLoader />
-    )
+    const MyLogin = () => (<LoginDashboardLoader />)
 
     const MyLayout = props => <Layout {...props} menu={MyMenu} />
 
@@ -39,8 +38,8 @@ export default function DashboardPage() {
                 loginPage={MyLogin}
                 authProvider={authProvider}
             >
-                <CustomRoutes noLayout >
-                    <Route path="/register" element={<SignUpForm />} />
+                <CustomRoutes>
+                    <Route path="/Settings" element={<ProfileSettingsInterface />} />
                 </CustomRoutes>
                 <ResourceGuesser name={"users"} create={UserCreate} />
                 <ResourceGuesser name={"classes"} />

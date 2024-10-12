@@ -20,7 +20,8 @@ import {tokenLoader} from './js/util/auth.js'
 import ContactPage from './pages/ContactPage.jsx'
 import ErrorPage from './pages/ErrorPage.jsx'
 import { ReactQueryClientProvider } from './dataProvider/main/ReactQueryClientProvider.jsx'
-
+import { useUserFormContext, UserFormContextProvider } from './store/user-form-context.jsx'
+import { SignUpLoader } from './loader/SignUpLoader.jsx'
 
 function App() {
 
@@ -33,7 +34,7 @@ function App() {
       loader: tokenLoader,
       children: [
         { path: '/', element: <HomePage /> },
-        { path: '/sign-up', element: <SignUpPage /> },
+        { path: '/sign-up', element: <SignUpPage />, loader: SignUpLoader },
         { path: '/login', element: <LoginPage /> },
         { path: '/logout', action: logoutAction },
         { path: '/calendar', element: <CalendarPage />, loader: CalendarLoader},
@@ -47,7 +48,11 @@ function App() {
 
   return (
     <ReactQueryClientProvider>
-      <RouterProvider router={router} ></RouterProvider>
+        <UserFormContextProvider>
+      
+          <RouterProvider router={router} ></RouterProvider>
+      
+        </UserFormContextProvider>
     </ReactQueryClientProvider>
     // <QueryClientProvider client={queryClient}>
       
