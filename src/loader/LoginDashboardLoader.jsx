@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { Form, redirect } from 'react-router-dom'
 import { useLogin } from 'react-admin'
-import { setAuthToken, deleteAuthToken } from '../../js/util/auth.js'
-import { setLocalStorageItem, deleteLocalStorageItem } from '../../js/util/getUtil.js'
+import { setAuthToken, deleteAuthToken } from '../js/util/auth.js'
+import { setLocalStorageItem, deleteLocalStorageItem } from '../js/util/getUtil.js'
 
 
 

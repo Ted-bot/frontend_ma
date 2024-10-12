@@ -1,9 +1,6 @@
-import { useCallback } from "react"
-import { json, redirect } from "react-router-dom"
-
-import { ApiFetch } from "../../js/util/postUtil.js"
-import {ApiFetchGetOptions, deleteLocalStorageItem  } from "../../js/util/getUtil.js"
-import { getAuthToken} from "../../js/util/auth.js"
+import { ApiFetch } from "../js/util/postUtil.js"
+import {ApiFetchGetOptions, deleteLocalStorageItem  } from "../js/util/getUtil.js"
+import { getAuthToken } from "../js/util/auth.js"
 
 export async function PaymentLoader()
 {

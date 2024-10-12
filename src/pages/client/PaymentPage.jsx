@@ -587,9 +587,6 @@ const PaymentPage = () => {
                         enteredInput={enteredInput} 
                         formSubmit={userAddressHandler} 
                         handleKeyDown={handleKeyDown}
-                        // user={userData?.userInfo} 
-                        // address={userData?.userAddress}
-                        // addressStorageName={addressStorageName}
                         enteredInputIsInvalid={enteredInputIsInvalid}
                         errors={errors.userAddress}
                     />

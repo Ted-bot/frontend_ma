@@ -31,9 +31,16 @@ export const authProvider = {
         
         return Promise.resolve(authenticateClient)
     },
-    logout: () => {
+    logout: async () => {
+        const authenticateClie= ApiFetchGetOptions(`/api/logout`,{ 'X-Authorization': token})
+        const request = await ApiFetch(prepareQueryObj)
         deleteAuthToken()
         deleteLocalStorageItem('email')
+        if(!authenticateClient){
+            console.error('Error while Loggin out!')
+            // alert('already logged out!')
+            redirect('/')
+        }
         redirect('/')
         return Promise.resolve()
     },
