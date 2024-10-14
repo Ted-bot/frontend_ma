@@ -9,17 +9,19 @@ import CssBaseline from '@mui/material/CssBaseline'
 import Box from '@mui/material/Box'
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
+import inMemoryJwt from '../../js/util/inMemoryJwt.js'
 
 
 const UserProfilePage = () => {  
-  const { isPending: authPending, authenticated } = useAuthState()
+  const { isPending: authPending, authenticated: userAuthenticated } = useAuthState()
   const {data, isPending, error} = useGetIdentity()
   if(authPending) return <section>...loading</section>
 
-  // if(authenticated) return <section>...user Authenticated</section>
+  // if(userAuthenticated) return <section>...user Authenticated</section>
   const itemLocalstorage = 'user'
   const [errors, setErrors] = useState('')
   const [userData, setUserData] = useState({user: {}})
+  const email = getLocalStorageItem('email')
 
   function setData(identifier, data){
     setUserData((prevValues) => ({
@@ -27,18 +29,14 @@ const UserProfilePage = () => {
         [identifier]: data
     }))
   }
-  const email = getLocalStorageItem('email')
-  
+
   useEffect(() => {
-    dataProvider.getOneSubscription('user', email).then((response) => setData('subscription',response))
-    // setData('user',data)
+    if(inMemoryJwt.getValidSubscription()){
+      dataProvider.getOneSubscription('user', email).then((response) => setData('subscription',response))
+    }
   },[])
 
-  // console.log({test: identity.identity, subscription: identity})
-  // console.log({DataSet: userData})
-  console.log({AuthUser: userData, error: error, isPending: isPending, tokens_owned: userData.subscription?.tokens_owned})
-  
-
+  if(userAuthenticated){
   return (
     <Card>
       <Title title="Dashboard" />
@@ -83,7 +81,7 @@ const UserProfilePage = () => {
                 alignContent="center"
               >
                 <h1 className='text-center text-md md:text-xl lg:text-2xl lg:py-10'>
-                  {userData.subscription?.sessions_followed ?? 0}
+                  {userData?.subscription?.sessions_followed ?? 0}
                 </h1>
               </Box>
               <Divider variant="middle" component="div" />
@@ -167,6 +165,7 @@ const UserProfilePage = () => {
       </CardContent>
   </Card>
     )
+  }
   }
 
   export default UserProfilePage

@@ -1,16 +1,14 @@
 import { useQuery } from "react-query"
-import { useCallback } from "react"
-import { getAuthToken } from "../../js/util/auth"
 import { getLocalStorageItem, ApiFetchGetOptions } from "../../js/util/getUtil"
-import { ApiFetch, ApiFetchPostOptions } from "../../js/util/postUtil"
+import { ApiFetch } from "../../js/util/postUtil"
 import { HttpError } from "react-admin"
+import inMemoryJwt from "../../js/util/inMemoryJwt.js"
 
-export const email = getLocalStorageItem('email')
-export const token = getAuthToken()
+// export const email = getLocalStorageItem('email')
 
 const fetchUserCalendar = async () => {
     const email = getLocalStorageItem('email')
-    const token = getAuthToken()
+    const token = inMemoryJwt.getToken()
     const ApiOptions = ApiFetchGetOptions(`/api/subscribe/${email}/events`,{'X-Authorization': token})
     
     const request = await ApiFetch(ApiOptions)
@@ -62,7 +60,7 @@ export const useUserCalendar = () => {
 
 // const handleSubmit = async (id) => { 
 //     const email = getLocalStorageItem('email')
-//     const token = getAuthToken()
+//     const token = inMemoryJwt.getToken()
 
 //     const ApiOptions = ApiFetchPostOptions({url: '/api/subscribe/events', method:'POST'}, {event_id: id},{'X-Authorization': token})
     

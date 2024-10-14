@@ -1,11 +1,14 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, forwardRef } from 'react'
 import { NavLink, Form, useRouteLoaderData } from 'react-router-dom'
 import {useLogout } from 'react-admin'
 import { MenuItem } from '@mui/material'
-// import classes from './MainNavigation.module.css'
+import inMemoryJwt from '../../js/util/inMemoryJwt.js'
+import ExitIcon from '@mui/icons-material/PowerSettingsNew'
 
 function MainNavigation() {
-    const token = useRouteLoaderData('root')
+    const token = inMemoryJwt.getToken()
+    const logout = useLogout()
+    const handleClick = () => logout()
 
     const [openNav, setOpenNav] = useState(false);
     // const [openAvatarDropdown, setOpenAvatarDropdown] = useState(false);
@@ -66,24 +69,7 @@ function MainNavigation() {
                 >
                     contact
                 </NavLink>
-                {token &&
-                    // <MenuItem
-                    //     className={({ isActive, isPending }) =>
-                    //         isPending ? "pending" : isActive ? "text-cyan-200 underline decoration-solid underline-offset-8 decoration-2 decoration-cyan-200" : ""
-                    //     }
-                    //     onClick={handleClick}
-                    //     // ref={ref}
-                    //     // It's important to pass the props to allow Material UI to manage the keyboard navigation
-                    //     // {...props}
-                    // >
-                    //     logout
-                    // </MenuItem>
-                    <Form action="/logout" method="post">
-                        <button>
-                            logout
-                        </button>
-                    </Form>
-                }
+                {token &&  <MyLogoutButton /> }
                 {!token &&
                     <>
                         <NavLink
@@ -155,11 +141,11 @@ function MainNavigation() {
                     <nav className="hidden md:flex space-x-4 text-cyan-400">
                         {navList()}
                     </nav>
-                    <section
+                    {/* <section
                         className={`${openNav ? '' : 'hidden'} mt-4 bg-gradient-to-r from-violet-500 to-opacity-90 flex flex-col gap-4 p-6  rounded text-cyan-400`}
                     >
                         {navList()}
-                    </section>
+                    </section> */}
                     {/* <section onClick={toggleAvatarDropdown} className="relative transition-all duration-500 w-24">
                         <span className="cursor-pointer font-fondamento text-cyan-100">Wing Chun Amsterdam</span>
                         <section className={`absolute ${openAvatarDropdown ? 'block' : 'hidden'} bg-gradient-to-r from-emerald-700/75 to-cyan-500/50 rounded shadow-md mt-2 space-y-2 hover:bg-blue-900/75`}>
@@ -188,5 +174,20 @@ function MainNavigation() {
         </>
     )
 }
+
+const MyLogoutButton = forwardRef((props, ref) => {
+    const logout = useLogout();
+    const handleClick = () => logout();
+    return (
+        <MenuItem
+            onClick={handleClick}
+            ref={ref}
+            // It's important to pass the props to allow Material UI to manage the keyboard navigation
+            {...props}
+        >
+            <ExitIcon /> Logout
+        </MenuItem>
+    );
+});
 
 export default MainNavigation

@@ -2,19 +2,17 @@ import {useState, useEffect, useMemo, useRef } from 'react'
 import MainContentWrap from '../components/wraps/client/MainContentWrap' 
 import CalendarInterface from '../components/interface/CalendarInterface.jsx'
 
-import {getAuthToken} from "../js/util/auth.js"
 import CalendarModal from '../components/modal/CalendarModal.jsx'
-import { useErrorBoundary } from "react-error-boundary"
 import { useUserCalendar } from '../hooks/query/usePublisedEvents.jsx'
 import { useQueryClient } from 'react-query'
+import inMemoryJwt from '../js/util/inMemoryJwt.js'
 
 export default function CalendarPage(){
     const {blackDragonEvents, status } = useUserCalendar()
     const queryClient = useQueryClient()
     const wrapName = 'Calendar'
-    const token = getAuthToken()
+    const token = inMemoryJwt.getToken()
     const dialog = useRef()
-    const {showBoundary} = useErrorBoundary()
     const dummyPlannedEvent = { 
         id: 1,
         title: 'title',

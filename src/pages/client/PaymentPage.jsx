@@ -15,7 +15,8 @@ import {
     getUserInfoObjOrStorageData,
 } from "../../js/util/getUtil.js"
 
-import { getAuthToken, countryid, inputPaymentValidList } from '../../js/util/auth.js'
+import { countryid, inputPaymentValidList } from '../../js/util/auth.js'
+import inMemoryJwt from '../../js/util/inMemoryJwt.js'
 
 import { useLoaderData, Form, useNavigate } from 'react-router-dom'
 
@@ -64,7 +65,7 @@ const PaymentPage = () => {
     refPaymentSection.current = [...Array(refPaymentSection.current.length).keys()].map((index) => refPaymentSection.current[index] ?? createRef())
     const pushRef = (index) => refPaymentSection.current.push(index)
 
-    const token = getAuthToken()
+    const token = inMemoryJwt.getToken()
     const [currencyType, setCurrencyType] = useState('EUR')
     const [userData, setUserData] = useState({
         userInfo: {},
