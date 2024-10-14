@@ -2,52 +2,56 @@ import {
     fetchHydra,
     hydraDataProvider,
 } from '@api-platform/admin'
-import { fetchUtils } from 'react-admin';
-import { getAuthToken, deleteAuthToken } from '../../js/util/auth'
+import { fetchUtils } from 'react-admin'
 import { ApiFetch } from '../../js/util/postUtil'
 import { ApiFetchGetOptions} from '../../js/util/getUtil'
 import { parseHydraDocumentation } from "@api-platform/api-doc-parser"
+import inMemoryJwt from '../../js/util/inMemoryJwt.js'
+import { HttpError } from 'react-admin';
 
 const getAuthHeaders = () => {
-    // {'X-Authorization': token}
-    const token = getAuthToken()
+    const token = inMemoryJwt.getToken()
     const headers = new Headers()
-    headers.append("X-Authorization", token)
-
-    // console.log({'src/dataProvider/main/DataProvder': headers.get("X-Authorization")})
-  
+    if(token){ 
+        headers.set("X-Authorization", token)
+    } else {
+        inMemoryJwt.setRefreshTokenEndpoint('/api/token/refresh') // http://localhost:80
+        inMemoryJwt.getRefreshedToken().then((gotFreshToken) => {
+            if(gotFreshToken) headers.set('Authorization', `${inMemoryJwt.getToken()}`)
+        })
+    }
+    
     return headers;
 };
 
 const getHydraWithHeaders = (url, options = {}) =>
-{
-    console.log({urlSet: url})
-    return fetchHydra(url, {
-        ...options,
-        headers: options.headers ?? getAuthHeaders,
-      })
-}
+    {
+        console.log({urlSet: url})
+        return fetchHydra(url, {
+            ...options,
+            headers: inMemoryJwt.getToken() ? getAuthHeaders() : options.headers,
+        })
+    }
+    
 
 const apiDocumentationParser = async () => {
     try {
         // setRedirectToLogin(false)
     
         return await parseHydraDocumentation("/api", {
-            headers: getAuthHeaders,
+            headers: getAuthHeaders(),
         })
     } catch (result) {
-        const { api, response, status } = result;
-        if (status !== 401 || !response) {
+        const { api, request, status } = result;
+        if (status !== 401 || !request) {
         throw result;
         }
     
-        deleteAuthToken;
-    
-        // setRedirectToLogin(true)
+        inMemoryJwt.ereaseToken()
     
         return {
             api,
-            response,
+            request,
             status,
         }
     }
@@ -62,26 +66,18 @@ export const dataProvider = ({
     }),
     getOneSubscription: async (resource, params) => {
         const GetUrl = `/api/${resource}/${params}/dashboard`
-        const token = getAuthToken()
+        const token = inMemoryJwt.getToken()
         const requestOptions = ApiFetchGetOptions(GetUrl, {'X-Authorization': token})
-        const request = ApiFetch(requestOptions)
         
         try {      
-            const response = await request
-            const getResults = await response.json()
-      
-            console.log({reponse_api_dashboard: getResults})
-      
-            if(!response.ok && response.status === 401){ // 401
-              throw {response: { message: getResults.message, code: response.status }}
-            }
-      
-            return getResults
+            const request = await ApiFetch(requestOptions)
+            const response = await request.json()      
+            if(!request.ok) throw new HttpError()
+            //   throw new HttpError(response.message, response.status)      
+            return response
           
           } catch (error) {
-      
-            // ? handle user doesnt has subscription yet
-            console.log({ error_request_userdata: error })
+            // console.log({ no_valid_auth_or_subscription: error })
         }  
     }
 })

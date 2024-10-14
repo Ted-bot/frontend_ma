@@ -3,12 +3,12 @@ import { json, redirect } from "react-router-dom"
 import { HttpError } from "react-admin"
 import { ApiFetch } from "../js/util/postUtil.js"
 import {ApiFetchGetOptions, deleteLocalStorageItem , getLocalStorageItem } from "../js/util/getUtil.js"
-import { getAuthToken} from "../js/util/auth.js"
+import inMemoryJwt from "../js/util/inMemoryJwt.js"
 
 export async function CalendarLoader()
 {
     const email = getLocalStorageItem('email')
-    const token = getAuthToken()
+    const token = inMemoryJwt.getToken()
     const ApiOptions = ApiFetchGetOptions(`/api/subscribe/${email}/events`,{'X-Authorization': token})
     
     const request = await ApiFetch(ApiOptions)

@@ -51,9 +51,9 @@ export const ProfileSettingsInterface = () => {
             <Card>
                 <Title title="Settings" />
                 <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-                    <Tabs onChange={handleChange}>
+                    <Tabs value={value} onChange={handleChange}>
                         <Tab label="Profile" className="hover:bg-gray-500" {...a11yProps(0)}/>
-                        <Tab label="Password" className="hover:bg-gray-500"  {...a11yProps(0)}/>
+                        <Tab label="Password" className="hover:bg-gray-500" {...a11yProps(0)}/>
                         <Tab label="Billing" className="hover:bg-gray-500" {...a11yProps(0)}/>
                         <Tab label="Notifications" className="hover:bg-gray-500" {...a11yProps(0)}/>
                     </Tabs>

@@ -1,39 +1,24 @@
 import { useState } from 'react'
 import { Form, redirect } from 'react-router-dom'
 import { useLogin } from 'react-admin'
-import { setAuthToken, deleteAuthToken } from '../js/util/auth.js'
-import { setLocalStorageItem, deleteLocalStorageItem } from '../js/util/getUtil.js'
-
-
 
 const LoginDashboardLoader = () => {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
-    const [errors, setErrors] = useState('')
+    const [errors, setErrors] = useState(false)
     const login = useLogin()
 
     const handleSubmit = e => {
         e.preventDefault()
         
         login({ email, password })
+        .then((response) => (response.json()))
         .then((response) => {
-            return response.json()
-        }).then((response) => {            
             redirect('/dashboard')
-            console.log({ fullResponse: response, authToken: response.token })
         })
         .catch((error) => {
-
-            console.log({ possible_401_status:error})
-            // "code":401,"message":"JWT Token not found"
-            if(error.response != undefined ){
-                error.response.code != undefined && setErrors(error.response.message)
-            }      
-            
-            if(error.response != undefined ){
-                error.response.errors != undefined && setErrors(error.response.errors)
-            }      
-            redirect('/dashboard/login')      
+            console.log({ error_login: error})
+            if(error?.message) setErrors(error.message) 
         })
     }
 
@@ -42,7 +27,7 @@ const LoginDashboardLoader = () => {
                 <section  className={`w-full py-24 bg-orange-300 rounded-md md:w-1/2 lg:justify-center px-3 mb-6 md:mb-0`}>
                     
                 <section className='flex justify-center'>
-                    {errors && <p className="text-red-500 text-xs italic py-3">{errors} </p>}
+                    {errors && <p className="text-red-500 text-xl italic py-3">Invalid credentials</p>}
                 </section>
                     <Form onSubmit={handleSubmit} >
                         <input

@@ -1,6 +1,6 @@
 import { ApiFetch } from "../js/util/postUtil.js"
 import {ApiFetchGetOptions, deleteLocalStorageItem  } from "../js/util/getUtil.js"
-import { getAuthToken } from "../js/util/auth.js"
+import inMemoryJwt from "../js/util/inMemoryJwt.js"
 
 export async function PaymentLoader()
 {
@@ -11,7 +11,7 @@ export async function PaymentLoader()
         // console.log({deleteSuccessExample_Lines: localStorage.getItem(`${key}`), key})
     })
 
-    const token = getAuthToken()
+    const token = inMemoryJwt.getToken()
     const ApiOptions = ApiFetchGetOptions('/api/v1/order/payment',{'X-Authorization': token})
     const response = await ApiFetch(ApiOptions)
     const getResults = await response.json()       

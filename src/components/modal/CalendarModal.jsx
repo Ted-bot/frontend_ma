@@ -7,7 +7,6 @@ import Grid from '@mui/material/Grid'
 import './CalendarModal.css'
 // import { getLocalStorageItem } from '../../js/util/getUtil'
 // import { ApiFetchPostOptions, ApiFetch} from '../../js/util/postUtil'
-// import { getAuthToken } from '../../js/util/auth'
 // import { useAddToUserCalendar } from '../../hooks/query/usePublisedEvents'
 
 import { useQueryClient, useMutation } from 'react-query'

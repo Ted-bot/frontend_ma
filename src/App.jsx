@@ -9,7 +9,6 @@ import HomePage from './pages/HomePage.jsx'
 import SignUpPage from './pages/SignUpPage.jsx'
 import LoginPage from './pages/LoginPage.jsx'
 import DashboardPage from './pages/DashboardPage.jsx'
-import {logoutAction} from './action/ActionLogout.jsx'
 import CalendarPage from './pages/CalendarPage.jsx'
 import OrderPage from './pages/OrderPage.jsx'
 import PaymentPage from './pages/client/PaymentPage.jsx'
@@ -35,8 +34,7 @@ function App() {
       children: [
         { path: '/', element: <HomePage /> },
         { path: '/sign-up', element: <SignUpPage />, loader: SignUpLoader },
-        { path: '/login', element: <LoginPage /> },
-        { path: '/logout', action: logoutAction },
+        { path: '/work', element: <LoginPage /> },
         { path: '/calendar', element: <CalendarPage />, loader: CalendarLoader},
         { path: '/subscribe', element: <OrderPage />},
         { path: '/payment', element: <PaymentPage />},

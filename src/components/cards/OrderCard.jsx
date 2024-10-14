@@ -5,7 +5,7 @@ import TextWithLineBreaks from "../ui/text/TextWithLineBreaks"
 import { ApiFetch,
     ApiFetchPostOptions,
 } from '../../js/util/postUtil.js'
-import { deleteAuthToken, getAuthToken } from '../../js/util/auth.js'
+import inMemoryJwt from '../../js/util/inMemoryJwt.js'
 
 import Box from '@mui/material/Box'
 
@@ -15,7 +15,7 @@ import classes from "./OrderCard.module.css"
 // export default function OrderCard({id,name, description,category, duration, durationLength, price, directOrPeriodic }){
 export default function OrderCard(props){
 
-    const token = getAuthToken()
+    const token = inMemoryJwt.getToken()
     const navigate = useNavigate()
     // const id = props['@id']
 
@@ -23,18 +23,18 @@ export default function OrderCard(props){
         try {
             const options = { url: '/api/v1/order/create', method: 'POST'}
             const ApiOptions = ApiFetchPostOptions(options,data, {'X-Authorization': token})            
-            const response = await ApiFetch(ApiOptions)
-            const getResults = await response.json()
+            const request = await ApiFetch(ApiOptions)
+            const response = await request.json()
         
-            if(!response.ok)
+            if(!request.ok)
             { //if(response.status >= 400 && response.status <= 600)
                 throw {message:'Api select order error', code: response.status}
             }
 
-            const redirectTo = getResults.redirect
+            const redirectTo = response.redirect
 
-            console.log({redirectTo})
-            navigate(getResults.redirect, {replace: true})
+            // console.log({redirectTo})
+            navigate(redirectTo, {replace: true})
 
         } catch (error) {
 
@@ -67,7 +67,7 @@ export default function OrderCard(props){
                     })
                 } else {
                     if(error.code === 401){
-                        deleteAuthToken()
+                        inMemoryJwt.ereaseToken()
                         navigate("/sign-up", {replace: true}) 
                     }
                 }
