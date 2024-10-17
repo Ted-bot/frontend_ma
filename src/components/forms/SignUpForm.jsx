@@ -32,7 +32,7 @@ const typeLocation = 'location'
 // ps reset pw:TNrh5vrZ4N201n2
 // ps reset pw:GivjJD4guFwQhzv
 
-export default function SignUpForm({stateList, nameStorageItem, userStoredFormData}) {
+export default function SignUpForm({stateList, storageNameNewUser, userStoredFormData}) {
 
     const navigate = useNavigate()
     const navigation = useNavigation()
@@ -42,7 +42,7 @@ export default function SignUpForm({stateList, nameStorageItem, userStoredFormDa
     let isSubmitting = navigation.state === 'submitting'
     
     const [genderStatusRequired, setGenderStatusRequired] = useState(true)
-    const [enteredInput, setEnteredInput] = useState(getNewUserObjOrStorageData(nameStorageItem))
+    const [enteredInput, setEnteredInput] = useState(getNewUserObjOrStorageData(storageNameNewUser))
     const [enteredInputIsInvalid, setEnteredInputIsInvalid] = useState(inputValidList)
     const [cityList, setCityList] = useState([])
     const [firstRequest, setFirstRequest] = useState(true)
@@ -53,7 +53,7 @@ export default function SignUpForm({stateList, nameStorageItem, userStoredFormDa
             setEnteredInput(userStoredFormData)
             setFirstRequest(false)
         }
-        setLocalStorageItem(nameStorageItem,enteredInput)
+        setLocalStorageItem(storageNameNewUser,enteredInput)
     }, [enteredInput])
     
 
@@ -125,7 +125,7 @@ export default function SignUpForm({stateList, nameStorageItem, userStoredFormDa
             if(!request.ok) throw new HttpError('Something went wrong', 500, response.errors) 
 
             setErrors(inputValidList)            
-            deleteLocalStorageItem(nameStorageItem)
+            deleteLocalStorageItem(storageNameNewUser)
             navigate('/dashboard', {replace: true})
             
         } catch (error) {

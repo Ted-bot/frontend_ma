@@ -5,14 +5,14 @@ import { Form } from 'react-router-dom'
 
 import Divider from '@mui/material/Divider'
 import { alpha } from "@mui/material"
-import {OrderContext} from '../../store/shop-order-context'
+import {OrderContext} from '../../store/shop-order-context.js'
 import UserOrderInfoInterface from '../interface/UserOrderInfoInterface'
 
 import './CalendarModal.css'
 
 const UserDataModal = forwardRef(function UserDataModal({ handleKeyDown,errors, enteredInput, enteredInputIsInvalid, formSubmit}, ref){
     
-    const {updateUserInput, onBlur} = useContext(OrderContext)
+    // const {updateUserInput, onBlur} = useContext(OrderContext)
     const dialog = useRef()
     const typeLocation = 'location'
     const typeText = 'text'
@@ -134,7 +134,6 @@ const UserDataModal = forwardRef(function UserDataModal({ handleKeyDown,errors, 
             },
         ],
     }
-
 
     return createPortal(
         <dialog ref={dialog} className="result-modal w-full md:w-3/4 lg:w-[32rem]">

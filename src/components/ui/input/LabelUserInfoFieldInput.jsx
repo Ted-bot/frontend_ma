@@ -1,5 +1,5 @@
 import { useRef, useState, useContext } from 'react'
-import {OrderContext} from '../../../store/shop-order-context'
+import {OrderContext} from '../../../store/shop-order-context.js'
 import NativeSelect from '@mui/material/NativeSelect'
 import PhoneInput from 'react-phone-number-input/input'
 

@@ -1,23 +1,20 @@
 import React from 'react'
-import { Link, Form, Navigate, useNavigate } from 'react-router-dom'
-import TextWithLineBreaks from "../ui/text/TextWithLineBreaks"
+import { useNavigate } from 'react-router-dom'
+// import TextWithLineBreaks from "../ui/text/TextWithLineBreaks"
 
-import { ApiFetch,
-    ApiFetchPostOptions,
-} from '../../js/util/postUtil.js'
+import { ApiFetch, ApiFetchPostOptions} from '../../js/util/postUtil.js'
 import inMemoryJwt from '../../js/util/inMemoryJwt.js'
 
 import Box from '@mui/material/Box'
-
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faArrowRightLong } from "@fortawesome/free-solid-svg-icons"
+
 import classes from "./OrderCard.module.css"
-// export default function OrderCard({id,name, description,category, duration, durationLength, price, directOrPeriodic }){
+
 export default function OrderCard(props){
 
     const token = inMemoryJwt.getToken()
     const navigate = useNavigate()
-    // const id = props['@id']
 
     const postRequest = async (data) => {
         try {
@@ -33,7 +30,6 @@ export default function OrderCard(props){
 
             const redirectTo = response.redirect
 
-            // console.log({redirectTo})
             navigate(redirectTo, {replace: true})
 
         } catch (error) {

@@ -6,13 +6,13 @@ import SignUpForm from "../components/forms/SignUpForm.jsx"
 export default function SignUpPage() {
 
     const data = useLoaderData()
-    const {stateList, nameStorageItem, userStoredFormData} = data
-    // console.log({stateList, nameStorageItem, userStoredFormData})
+    const {stateList, storageNameNewUser, userStoredFormData} = data
+    // console.log({stateList, storageNameNewUser, userStoredFormData})
 
     return (
         <>
             <FormWrap>
-                <SignUpForm stateList={stateList} nameStorageItem={nameStorageItem} userStoredFormData={userStoredFormData}/>
+                <SignUpForm stateList={stateList} storageNameNewUser={storageNameNewUser} userStoredFormData={userStoredFormData}/>
             </FormWrap>
         </>
     )

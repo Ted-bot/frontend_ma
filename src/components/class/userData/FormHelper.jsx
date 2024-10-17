@@ -1,10 +1,7 @@
-import React from "react"
-import { useErrorBoundary } from "react-error-boundary"
+import { GetState } from "react-country-state-city/dist/cjs"
+import { countryid } from "../../../js/util/auth"
 
-// export const sendToErrorBoundray = (data) => {
-//     const {showBoundary} = useErrorBoundary()
-//     return showBoundary(data)
-// }
+export const getStates = async () => {return await GetState(countryid)}
 
 export const checkForInvalidInputUser = (enteredInputIsInvalid) => {
     for (const [key, value] of Object.entries(enteredInputIsInvalid)){

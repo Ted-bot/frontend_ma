@@ -17,6 +17,7 @@ import UserProfilePage from './client/UserProfilePage'
 import { dataProvider } from '../dataProvider/main/DataProvider.jsx'
 import { authProvider } from '../dataProvider/main/AuthProvider.jsx'
 import { ProfileSettingsInterface } from '../components/interface/UserDashboardProfileInterface'
+import { SignUpLoader } from '../loader/SignUpLoader.jsx'
 
 export default function DashboardPage() {
     useAuthenticated()
@@ -39,7 +40,7 @@ export default function DashboardPage() {
                 authProvider={authProvider}
             >
                 <CustomRoutes>
-                    <Route path="/Settings" element={<ProfileSettingsInterface />} />
+                    <Route path="/Settings" element={<ProfileSettingsInterface />} loader={SignUpLoader} />
                 </CustomRoutes>
                 <ResourceGuesser name={"users"} create={UserCreate} />
                 <ResourceGuesser name={"classes"} />

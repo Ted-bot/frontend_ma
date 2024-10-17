@@ -1,15 +1,15 @@
-const inMemoryJWTManager = () => {
+const inMemoryJwtManager = () => {
     let logoutEventName = 'ra-logout'
     let refreshEndpoint = '/api/token/refresh'
-    let inMemoryJWT = null
+    let inMemoryJwt = null
     let refreshTimeOutId
     let isRefreshing = null
-    let inMemoryJWTRefresh = null
+    let inMemoryJwtRefresh = null
     let inMemoryCheckValidSubscription = false
 
     window.addEventListener('storage', (event) => {
         if (event.key === logoutEventName) {
-            inMemoryJWT = null
+            inMemoryJwt = null
         }
     })
 
@@ -55,12 +55,13 @@ const inMemoryJWTManager = () => {
 
         const bodyJson = JSON.stringify({refreshToken: tokenCookie})
 
-        const request = new Request(refreshEndpoint, {
+        const request = new Request({
+            // url: refreshEndpoint,
             method: 'POST',
             headers: new Headers({ 'Content-Type': 'application/json' }),
             body: bodyJson,
         })
-        isRefreshing = fetch(request)
+        isRefreshing = fetch(refreshEndpoint, request)
             .then((response) => {
                 if (response.status !== 200) {
                     ereaseToken()
@@ -84,7 +85,7 @@ const inMemoryJWTManager = () => {
             return isRefreshing
     }
 
-    const getToken = () => inMemoryJWT
+    const getToken = () => inMemoryJwt
     
     const getValidSubscription = () => inMemoryCheckValidSubscription
 
@@ -94,12 +95,12 @@ const inMemoryJWTManager = () => {
     }
 
     const setToken = (token) => {
-        inMemoryJWT = token
+        inMemoryJwt = token
         return true
     }
 
     const setRefreshToken = (token) => {
-        inMemoryJWTRefresh = token
+        inMemoryJwtRefresh = token
         const minutes = 10
         const expireDate = new Date()
         expireDate.setTime(expireDate.getTime()+(minutes*60*1000))
@@ -108,7 +109,7 @@ const inMemoryJWTManager = () => {
     }
 
     const ereaseToken = () => {
-        inMemoryJWT = null
+        inMemoryJwt = null
         const cookies = document.cookie.split(";");
 
         for (var i = 0; i < cookies.length; i++) {
@@ -143,4 +144,4 @@ const inMemoryJWTManager = () => {
     }
 }
 
-export default inMemoryJWTManager()
+export default inMemoryJwtManager()

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { 
     Card,
@@ -8,7 +8,11 @@ import {
     TextField,
  } from "@mui/material"
  import { useAuthenticated, Title } from "react-admin"
-
+ import { ProfileTabInterface } from './settings/ProfileTabInterface'
+// import { getStates, inputBlurHandle } from '../class/userData/FormHelper.jsx'
+import { GetState } from 'react-country-state-city/dist/cjs'
+import { countryid } from '../../js/util/auth'
+import { getStates } from '../class/userData/FormHelper'
 function CustomTabPanel(props) {
     const { children, value, index, ...other } = props
 
@@ -42,10 +46,17 @@ export const ProfileSettingsInterface = () => {
     useAuthenticated()
 
     const [value, setValue] = useState(0)
-
     const handleChange = (event, newValue) => {
         setValue(newValue)
-      }
+    }
+    const [stateList, setStateList] = useState()
+    
+    // const getAvailableStates = () => getStates()
+    // useEffect(() => {
+    //     getStates().then(response => setStateList(response))
+    //     }, [])
+
+    
     return (
         <>
             <Card>
@@ -60,7 +71,7 @@ export const ProfileSettingsInterface = () => {
                 </Box>
             </Card>
             <CustomTabPanel value={value} index={0}>
-                Item One
+                <ProfileTabInterface />
             </CustomTabPanel>
             <CustomTabPanel value={value} index={1}>
                 Item Two

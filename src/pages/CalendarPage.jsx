@@ -9,7 +9,7 @@ import inMemoryJwt from '../js/util/inMemoryJwt.js'
 
 export default function CalendarPage(){
     const {blackDragonEvents, status } = useUserCalendar()
-    const queryClient = useQueryClient()
+    // const queryClient = useQueryClient()
     const wrapName = 'Calendar'
     const token = inMemoryJwt.getToken()
     const dialog = useRef()

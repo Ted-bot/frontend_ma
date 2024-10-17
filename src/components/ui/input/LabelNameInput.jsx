@@ -2,6 +2,9 @@ import PhoneInput from 'react-phone-number-input/input'
 import NativeSelect from '@mui/material/NativeSelect'
 import { camelCaseToLoWithSpace } from '../../../js/util/postUtil'
 
+import { useEffect } from 'react'
+import LocationInput from './LocationInput'
+
 /* eslint-disable react/prop-types */
 // eslint-disable-next-line no-unused-vars
 export default function LabelNameInput({ 
@@ -18,27 +21,13 @@ export default function LabelNameInput({
     onChangeCity,
     ...props 
 }) {
-
-    let checkBox = 0
-    let optionStateList = []
-    let optionCitiesList = []
+    let checkBox = 0    
     const lowerCaseName = camelCaseToLoWithSpace(name)
 
     if(type === 'checkbox'){
         checkBox = 1
     }
 
-    if(type === 'location'){
-        optionStateList = stateList.map((state) => ({
-            label: state.name,
-            value: state.id
-        }))
-        
-        optionCitiesList = cityList.map((city) => ({
-            label: city.name,
-            value: city.id
-        }))
-    }
 
     return (
         <>
@@ -74,32 +63,14 @@ export default function LabelNameInput({
                         :
                         <>
                             <section className='flex w-full justify-evenly'>
-                                <NativeSelect
-                                    className={`${error && 'border-red-500 border '}w-full block text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`}
-                                    id={stateId}
-                                    onChange={(e) => onChangeState(e)}
-                                    placeholder='select state ...' 
-                                    value={stateId }                                    
-                                >
-                                    {
-                                        optionStateList instanceof Array && 
-                                        optionStateList.length > 0 && 
-                                        optionStateList.map((value, index) => (<option key={index} value={value.value}>{value.label}</option>))
-                                    }
-                                </NativeSelect>
-                                <NativeSelect
-                                    className={`${error && 'border-red-500 border '}w-full block text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`}
+                                <LocationInput 
                                     id={id}
-                                    onChange={(e) => onChangeCity(e)}
-                                    placeholder='select city ...'
-                                    value={cityId}
-                                >
-                                    {
-                                        optionCitiesList instanceof Array && 
-                                        optionCitiesList.length > 0 && 
-                                        optionCitiesList.map((value, index) => (<option key={index} value={value.value}>{value.label}</option>))
-                                    }
-                                </NativeSelect>
+                                    stateId={stateId} 
+                                    cityId={cityId} 
+                                    errorMessage={error} 
+                                    onChangeCity={onChangeCity} 
+                                    onChangeState={onChangeState}
+                                />
                             </ section> 
                         </>
                     }

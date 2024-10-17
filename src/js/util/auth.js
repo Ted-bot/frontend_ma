@@ -4,6 +4,27 @@ export function getAuthToken(){
     // return token
 }
 
+export const storageNameNewUser = 'new_user'
+export const storageNameModifyUser = 'new_user'
+
+export const initialUserState = {
+    first_name: '',
+    last_name: '',
+    email: '',
+    password: '',
+    location: '',
+    phone_number: '',
+    region: '',
+    data_of_birth: '',
+    gender: '',
+    conversion: '',
+    cityId: null,
+    city_list: [],
+    state_id: null,
+    state_list: [],
+    // status: 'idle', // | 'loading' | 'succeeded' | 'failed'
+    // error: null
+}
 
 export function setAuthToken(data){
     if(getAuthToken() != null){

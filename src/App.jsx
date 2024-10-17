@@ -21,6 +21,8 @@ import ErrorPage from './pages/ErrorPage.jsx'
 import { ReactQueryClientProvider } from './dataProvider/main/ReactQueryClientProvider.jsx'
 import { useUserFormContext, UserFormContextProvider } from './store/user-form-context.jsx'
 import { SignUpLoader } from './loader/SignUpLoader.jsx'
+import { Provider } from 'react-redux'
+import { store } from './store/index.js'
 
 function App() {
 
@@ -45,6 +47,9 @@ function App() {
   ])
 
   return (
+
+<Provider store={store}>
+
     <ReactQueryClientProvider>
         <UserFormContextProvider>
       
@@ -52,9 +57,7 @@ function App() {
       
         </UserFormContextProvider>
     </ReactQueryClientProvider>
-    // <QueryClientProvider client={queryClient}>
-      
-    // </QueryClientProvider>
+    </Provider>
   )
 }
 

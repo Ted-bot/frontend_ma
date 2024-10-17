@@ -1,4 +1,8 @@
 import { useState, useEffect, useCallback, useRef, createRef } from 'react'
+import inMemoryJwt from '../../js/util/inMemoryJwt.js'
+import { OrderContext } from '../../store/shop-order-context.js'
+import { GetState, GetCity } from "react-country-state-city"
+
 import { 
     ApiFetchPostOptions,
     ApiFetch,
@@ -15,8 +19,8 @@ import {
     getUserInfoObjOrStorageData,
 } from "../../js/util/getUtil.js"
 
+import UserSelectPaymentMethodForm from '../../components/forms/client/UserSelectPaymentMethodForm'
 import { countryid, inputPaymentValidList } from '../../js/util/auth.js'
-import inMemoryJwt from '../../js/util/inMemoryJwt.js'
 
 import { useLoaderData, Form, useNavigate } from 'react-router-dom'
 
@@ -25,15 +29,10 @@ import UserChoosePaymentModal from '../../components/modal/UserChoosePaymentModa
 import UserOrderInfoForm from "../../components/forms/client/UserOrderInfoForm"
 import SelectedOrderForPaymentInterface from '../../components/interface/SelectedOrderForPaymentInterface'
 import PaymentLineSection from '../../components/section/PaymentLineSection'
-
-// import PaymentErrorBoundary from '../../components/class/errorHandler/PaymentErrorBoundary.jsx'
-
 import { validateAndSetStatus } from '../../components/ui/input/ValidateIBAN.jsx'
+import { handleKeyDown } from '../../js/keyBoardUtil.js'
+import { paymentInputBlurHandle } from '../../components/class/userData/PaymentFormHelper.jsx'
 
-import { GetState, GetCity } from "react-country-state-city"
-import UserSelectPaymentMethodForm from '../../components/forms/client/UserSelectPaymentMethodForm'
-
-import { OrderContext } from '../../store/shop-order-context'
 
 const PaymentPage = () => {
 
@@ -102,10 +101,10 @@ const PaymentPage = () => {
     , [countryid])
     
     const getCity = useCallback(
-        () => GetCity(countryid, Number(userData.userAddress.reactStateNr)).then((result) => {
+        () => GetCity(countryid, Number(userData?.userAddress.reactStateNr)).then((result) => {
             setCityList(result)
         }) 
-    ,[countryid, userData.userAddress.reactStateNr])
+    ,[countryid, userData?.userAddress.reactStateNr])
 
     function updateEnteredInputState(identifier, value){
         setEnteredInput((prevValues) => {
@@ -123,32 +122,32 @@ const PaymentPage = () => {
 
         setEnteredInput((prevValue) => ({
             ...prevValue,
-            ['city_id']: Number(userData.userAddress.reactCityNr)
+            ['city_id']: Number(userData?.userAddress.reactCityNr)
         }))
         
         setEnteredInput((prevValue) => ({
             ...prevValue,
-            ['state_id']: Number(userData.userAddress.reactStateNr)
+            ['state_id']: Number(userData?.userAddress.reactStateNr)
         }))
         
-        Object.keys(userData.userInfo).forEach(key => {
-            const value = userData.userInfo[key]
+        Object.keys(userData?.userInfo).forEach(key => {
+            const value = userData?.userInfo[key]
             setEnteredInput((prevValue) => ({
                 ...prevValue,
                 [key]: value
             }))
         })
         
-        Object.keys(userData.userAddress).forEach(key => {
-            const value = userData.userAddress[key]
+        Object.keys(userData?.userAddress).forEach(key => {
+            const value = userData?.userAddress[key]
             setEnteredInput((prevValue) => ({
                 ...prevValue,
                 [key]: value
             }))
         })
         
-        if(data.address){
-            const { id, firstAndLastName, email, unitNumber, reactStateNr, reactCityNr, ...deconstructLoadedUserData} = data.address 
+        if(data?.address){
+            const { id, firstAndLastName, email, unitNumber, reactStateNr, reactCityNr, ...deconstructLoadedUserData} = data?.address 
             
             for (const [key, value] of Object.entries(deconstructLoadedUserData)) {
                 
@@ -168,7 +167,7 @@ const PaymentPage = () => {
                 }
             }
         }
-    }, [userData.userAddress.reactStateNr])
+    }, [userData?.userAddress.reactStateNr])
 
     useEffect(() => {
         setLocalStorageItem(addressStorageName,enteredInput)
@@ -248,33 +247,33 @@ const PaymentPage = () => {
         async () => {
             const response = data
             
-            if(!response.lines){
+            if(!response?.lines){
                 console.log({ apiResponseError : response})
-                throw {error: 'Not Found!'}
+                // throw {error: 'Not Found!'}
             }
 
-            const jsonToObj = response.lines
+            const jsonToObj = response?.lines
 
             setStorageUserSelectedSubscription(jsonToObj)
 
-            updateUserData('userInfo', {...response.user})
-            updateUserData('userAddress', {...response.address})
+            updateUserData('userInfo', {...response?.user})
+            updateUserData('userAddress', {...response?.address})
             updateUserData('userOrder', 
                 {
-                    // orderId: response.orderId,
-                    currency: response.currency,
-                    lines: response.lines,
-                    orderTaxPrice: response.orderTaxPrice,
-                    orderTotalAmount: response.amount.value,
-                    orderTotalProductPrice: response.orderTotalProductPrice,
+                    // orderId: response?.orderId,
+                    currency: response?.currency,
+                    lines: response?.lines,
+                    orderTaxPrice: response?.orderTaxPrice,
+                    orderTotalAmount: response?.amount.value,
+                    orderTotalProductPrice: response?.orderTotalProductPrice,
                 })
 
-            setLocalStorageItem('amount',response.amount)
-            setLocalStorageItem('locale',response.locale)
-            setLocalStorageItem('description',response.description)
-            setLocalStorageItem('order_number',response.orderId)
-            setLocalStorageItem(response.curreny.name,response.curreny.symbol)                  
-            setLocalStorageItem('lines', response.lines)                   
+            setLocalStorageItem('amount',response?.amount)
+            setLocalStorageItem('locale',response?.locale)
+            setLocalStorageItem('description',response?.description)
+            setLocalStorageItem('order_number',response?.orderId)
+            setLocalStorageItem(response?.curreny.name,response?.curreny.symbol)                  
+            setLocalStorageItem('lines', response?.lines)                   
     }, [data])
 
     const userAddressModalHandler = useCallback(
@@ -287,9 +286,7 @@ const PaymentPage = () => {
         (event) => {
             dialogUserPaymentMethod.current.open()
         }
-    )
-
-    
+    )  
 
     const payOrderHandler = async (event) => {
         event.preventDefault()
@@ -358,11 +355,11 @@ const PaymentPage = () => {
 
         try {
             const payResponse = await ApiFetch(ApiPayOptions)
-            const getPayResults = await payResponse.json()
+            const getPayResults = await payResponse?.json()
         
-            if(!payResponse.ok)
-            {   //if(response.status >= 400 && response.status <= 600)
-                // const errorJson = await response.json()
+            if(!payResponse?.ok)
+            {   //if(response?.status >= 400 && response?.status <= 600)
+                // const errorJson = await response?.json()
                 throw {message: 'Api error send order address error!', errors: getPayResults}
             }
 
@@ -397,11 +394,11 @@ const PaymentPage = () => {
         
         try {
             const response = await ApiFetch(ApiUserAddressOptions)
-            const getResults = await response.json()
+            const getResults = await response?.json()
             
-            if(!response.ok)
-            {   //if(response.status >= 400 && response.status <= 600)
-                // const errorJson = await response.json()
+            if(!response?.ok)
+            {   //if(response?.status >= 400 && response?.status <= 600)
+                // const errorJson = await response?.json()
                 throw {message: 'Api error send order address error!', errors: getResults.errors}                
             }
 
@@ -515,51 +512,7 @@ const PaymentPage = () => {
     }
 
     function inputBlurHandle(identifier, event, type) {
-
-        if(identifier === 'unitNumber') return
-        
-        if(type === 'text')
-            {
-                setEnteredInputIsInvalid((prevValues) => ({
-                    ...prevValues,
-                    [identifier] : regexSearchText.test(event.target.value) ? false : true
-                }))
-                return
-            }  
-            
-        if(type === typeFirstAndLastName)
-            {
-                setEnteredInputIsInvalid((prevValues) => ({
-                    ...prevValues,
-                    // [identifier] : regexSearchFirstAndLastName.test(event.target.value) ? false : true
-                    [identifier] : event.target.value !== "" ? false : true
-                }))
-                return
-            }  
-
-        if(type === 'number')
-            {
-                console.log({regex: event.target.value})
-                setEnteredInputIsInvalid((prevValues) => ({
-                    ...prevValues,
-                    [identifier] : regexSearchInt.test(event.target.value) ? false : true
-                }))
-                return
-            }  
-            
-        if(type === 'location')
-            {
-            console.log({locationEvent:event})
-            setEnteredInputIsInvalid((prevValues) => ({
-                ...prevValues,
-                [identifier] : (event.target.value == '') ? true : false
-            })) 
-        }
-
-        setEnteredInputIsInvalid((prevValues) => ({
-            ...prevValues,
-            [identifier] : (!event.target.value) ? true : false
-        }))            
+        return paymentInputBlurHandle(identifier, event, type, setEnteredInputIsInvalid)                  
     }
 
     const ctxValue = {
@@ -571,81 +524,73 @@ const PaymentPage = () => {
         onBlur: inputBlurHandle,
     }
 
-    const handleKeyDown = (identifier,event) => {
-        if(event.key !== "Backspace") return
-        const eniProperty = enteredInput[identifier]
-        const backspaceInput = eniProperty.substring(0, eniProperty.length - 1)
-        // console.log({keyPressed: event.key, identifier, eniProperty, checkLength: eniProperty.length, backspaceInput})
-        if(eniProperty.length > 0) updateUserData( identifier, backspaceInput)
-    }
-
     console.log({enteredInputIsInvalid, enteredInput})
     return (
         <>     
-            <OrderContext.Provider value={ctxValue}>
-                    <UserDataModal 
-                        ref={dialogUserAddress} 
-                        enteredInput={enteredInput} 
-                        formSubmit={userAddressHandler} 
-                        handleKeyDown={handleKeyDown}
-                        enteredInputIsInvalid={enteredInputIsInvalid}
-                        errors={errors.userAddress}
+            {/* <OrderContext.Provider value={ctxValue}> */}
+                <UserDataModal 
+                    ref={dialogUserAddress} 
+                    enteredInput={enteredInput} 
+                    formSubmit={userAddressHandler} 
+                    handleKeyDown={handleKeyDown}
+                    enteredInputIsInvalid={enteredInputIsInvalid}
+                    errors={errors.userAddress}
+                />
+
+                <UserChoosePaymentModal ref={dialogUserPaymentMethod} paymentMethodOptions={paymentMethodOptions} />
+
+                <section className="flex-col shadow-md w-full bg-slate-100 py-5 rounded-md px-3 sm:mx-2 sm:px-5 md:grid md:mx-2 md:shadow-xl">
+
+                    <h1 ref={pushRef}className={`pt-3 pb-6 mt-12 text-2xl text-center`} >Address & Peronsal Information</h1>
+                    {userData?.userInfo && userData?.userAddress && 
+                    <UserOrderInfoForm 
+                        errorClass={`${findInvalidOrErrorInput(enteredAddress, errors.userAddress) && 'border-red-300'}`}
+                        userAddressModalHandler={userAddressModalHandler} 
+                        enteredInput={enteredInput}
+                        user={userData?.userInfo} 
+                        address={userData?.userAddress} 
+                    />}
+
+                    <h1 ref={pushRef} className={`pt-3 pb-6 mt-8 text-2xl text-center`} >Choose Payment Method</h1>
+                    <UserSelectPaymentMethodForm
+                        errorClass={`${!enteredInput.paymentMethodId && 'border-red-300'}`}
+                        symbol={enteredInput.paymentMethodId}
+                        paymentMethodModalHandler={paymentMethodModalHandler}
+                        selectedType={enteredInput.paymentMethodName}
                     />
 
-                    <UserChoosePaymentModal ref={dialogUserPaymentMethod} paymentMethodOptions={paymentMethodOptions} />
+                    {enteredInput.paymentMethodId && <section className='grid flex-col md:justify-items-center'>
+                        <section className={`border-4 rounded-lg py-4 mt-4 sm:w-full md:w-3/5 hover:bg-slate-200 ${enteredInputIsInvalid.iban ? 'border-red-300' : 'border-slate-300' }`}>
+                            <h2 ref={pushRef} className={`text-center ${enteredInputIsInvalid.iban && 'text-rose-600'}`}>please enter your IBAN/ bank account number </h2><br />
+                            <span className='flex justify-center'>
+                                <label>
+                                    <input id='iban' type="text" onChange={(e) => ctxValue.updateUserInput('iban',e)} onBlur={(e) => validateAndSetStatus( e, setInvalidTypeStatus)} />
+                                </label>
+                            </span>
+                        </section>
+                    </section>}
 
-                    <section className="flex-col shadow-md w-full bg-slate-100 py-5 rounded-md px-3 sm:mx-2 sm:px-5 md:grid md:mx-2 md:shadow-xl">
+                    <h1 className={`pt-3 pb-6 mt-8 text-2xl text-center`}>Order</h1>
+                    { userData?.userOrder.lines != undefined && <SelectedOrderForPaymentInterface latestOrder={userData?.userOrder.lines}/> }
+                    
+                    <PaymentLineSection paymentCurrency={paymentCurrency} userData={userData}/>
+                    
+                    <Form onSubmit={(e) => payOrderHandler(e)} className='flex mt-16 mb-20 justify-center' >
+                        <input type="hidden" id="paymentMethod" value={enteredInput.paymentMethodName}/>
+                        <button
+                            className={`ring-red-500 bg-rose-500 transition-all duration-300 text-slate-100 h-16 px-8 w-full rounded-b-full 
+                            rounded-t-full text-2xl border-0 ring-2 shadow-xl md:w-1/2 hover:text-yellow-200 hover:bg-rose-900/75 hover:shadow-2xl`}
+                        >
+                            {
+                                !findInvalidOrErrorInput(enteredInputIsInvalid, errors.userAddress) 
+                                ? 'Pay with ' + enteredInput.paymentMethodName + ' ' + paymentCurrency + ' ' + userData?.userOrder.orderTotalAmount 
+                                : 'cannot proceed payment with invalid fields '
+                            }
+                        </button>
+                    </Form>
 
-                        <h1 ref={pushRef}className={`pt-3 pb-6 mt-12 text-2xl text-center`} >Address & Peronsal Information</h1>
-                        {userData?.userInfo && userData?.userAddress && 
-                        <UserOrderInfoForm 
-                            errorClass={`${findInvalidOrErrorInput(enteredAddress, errors.userAddress) && 'border-red-300'}`}
-                            userAddressModalHandler={userAddressModalHandler} 
-                            enteredInput={enteredInput}
-                            user={userData.userInfo} 
-                            address={userData.userAddress} 
-                        />}
-
-                        <h1 ref={pushRef} className={`pt-3 pb-6 mt-8 text-2xl text-center`} >Choose Payment Method</h1>
-                        <UserSelectPaymentMethodForm
-                            errorClass={`${!enteredInput.paymentMethodId && 'border-red-300'}`}
-                            symbol={enteredInput.paymentMethodId}
-                            paymentMethodModalHandler={paymentMethodModalHandler}
-                            selectedType={enteredInput.paymentMethodName}
-                        />
-
-                        {enteredInput.paymentMethodId && <section className='grid flex-col md:justify-items-center'>
-                            <section className={`border-4 rounded-lg py-4 mt-4 sm:w-full md:w-3/5 hover:bg-slate-200 ${enteredInputIsInvalid.iban ? 'border-red-300' : 'border-slate-300' }`}>
-                                <h2 ref={pushRef} className={`text-center ${enteredInputIsInvalid.iban && 'text-rose-600'}`}>please enter your IBAN/ bank account number </h2><br />
-                                <span className='flex justify-center'>
-                                    <label>
-                                        <input id='iban' type="text" onChange={(e) => ctxValue.updateUserInput('iban',e)} onBlur={(e) => validateAndSetStatus( e, setInvalidTypeStatus)} />
-                                    </label>
-                                </span>
-                            </section>
-                        </section>}
-
-                        <h1 className={`pt-3 pb-6 mt-8 text-2xl text-center`}>Order</h1>
-                        { userData?.userOrder.lines != undefined && <SelectedOrderForPaymentInterface latestOrder={userData?.userOrder.lines}/> }
-                        
-                        <PaymentLineSection paymentCurrency={paymentCurrency} userData={userData}/>
-                        
-                        <Form onSubmit={(e) => payOrderHandler(e)} className='flex mt-16 mb-20 justify-center' >
-                            <input type="hidden" id="paymentMethod" value={enteredInput.paymentMethodName}/>
-                            <button
-                                className={`ring-red-500 bg-rose-500 transition-all duration-300 text-slate-100 h-16 px-8 w-full rounded-b-full 
-                                rounded-t-full text-2xl border-0 ring-2 shadow-xl md:w-1/2 hover:text-yellow-200 hover:bg-rose-900/75 hover:shadow-2xl`}
-                            >
-                                {
-                                    !findInvalidOrErrorInput(enteredInputIsInvalid, errors.userAddress) 
-                                    ? 'Pay with ' + enteredInput.paymentMethodName + ' ' + paymentCurrency + ' ' + userData?.userOrder.orderTotalAmount 
-                                    : 'cannot proceed payment with invalid fields '
-                                }
-                            </button>
-                        </Form>
-
-                    </section>
-            </OrderContext.Provider>
+                </section>
+            {/* </OrderContext.Provider> */}
         </>
     )
 }
