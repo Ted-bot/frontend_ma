@@ -82,7 +82,7 @@ const inMemoryJwtManager = () => {
                 if (token) {
                     setRefreshToken(refreshToken)
                     setToken(token)
-                    return true
+                    return token
                 }
                 ereaseToken()
                 return false

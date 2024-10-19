@@ -15,12 +15,9 @@ const getAuthHeaders = () => {
     if(token){ 
         headers.set("X-Authorization", token)
     } else {
-        // inMemoryJwt.setRefreshTokenEndpoint('/api/token/refresh') // http://localhost:80
-        inMemoryJwt.getRefreshedToken().then((gotFreshToken) => {
-            if(gotFreshToken) headers.set('X-Authorization', `${inMemoryJwt.getToken()}`)
-        })
-    }
-    
+        inMemoryJwt.getRefreshedToken()
+        if(inMemoryJwt.getToken()) headers.set('X-Authorization', `${inMemoryJwt.getToken()}`)
+    }    
     return headers;
 };
 
@@ -36,8 +33,7 @@ const getHydraWithHeaders = (url, options = {}) =>
 
 const apiDocumentationParser = async () => {
     try {
-        // setRedirectToLogin(false)
-    
+        // setRedirectToLogin(false)    
         return await parseHydraDocumentation("/api", {
             headers: getAuthHeaders(),
         })
