@@ -1,9 +1,9 @@
 import {  useEffect, useState } from 'react'
 import { useSelector } from 'react-redux' //connect
 import { NativeSelect } from '@mui/material'
-import { selectStateList } from '../../../store/features/users/userSlice'
+import InputLabel from '@mui/material/InputLabel'
 
-const LocationInput = ({errorMessage: error, id, cityId, stateId, onChangeState, onChangeCity}) => {
+const LocationInput = ({errorMessage: error,  cityId, stateId, onChangeState, onChangeCity}) => { // id,
 
         const stateList = useSelector((state) => state.users.user.state_list)
         const cityList = useSelector((state) => state.users.user.city_list)
@@ -12,9 +12,11 @@ const LocationInput = ({errorMessage: error, id, cityId, stateId, onChangeState,
     return (
         <>
         <h1>Test</h1>
+            <InputLabel id="select_state" sx={{ display: 'none' }}>State</InputLabel>
             <NativeSelect
+                labelid='select_state'
                 className={`${error && 'border-red-500 border '}w-full block text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`}
-                id={stateId}
+                id='region'
                 onChange={(e) => onChangeState(e)}
                 placeholder='select state ...' 
                 value={stateId }                                    
@@ -26,9 +28,12 @@ const LocationInput = ({errorMessage: error, id, cityId, stateId, onChangeState,
                     
                 }
             </NativeSelect>
+
+            <InputLabel id="select_location" sx={{ display: 'none' }}>City</InputLabel>
             <NativeSelect
+                labelid="select_location"
                 className={`${error && 'border-red-500 border '}w-full block text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`}
-                id={id}
+                id='location'
                 onChange={(e) => onChangeCity(e)}
                 placeholder='select city ...'
                 value={cityId}

@@ -40,28 +40,34 @@ const inMemoryJwtManager = () => {
         })
     }
 
-    // The method makes a call to the refresh-token endpoint
-    // If there is a valid cookie, the endpoint will return a fresh jwt.
-    const getRefreshedToken = () => {
+    const checkAvailableRefreshToken = () => {
         const cookies = document.cookie.split(';')
-        let tokenCookie = ''
         for (var i = 0; i < cookies.length; i++) {
             const cookie = cookies[i]
             const searchName = cookie.includes("xxx")
             if(searchName) {
-                tokenCookie = cookie.split("=")[1]
+                const tokenCookie = cookie.split("=")[1]
+                return tokenCookie
             }
+            return false
         }
+    }
+
+    // The method makes a call to the refresh-token endpoint
+    // If there is a valid cookie, the endpoint will return a fresh jwt.
+    const getRefreshedToken = () => {
+        
+        const tokenCookie = checkAvailableRefreshToken()
+
+        if(!tokenCookie) return
 
         const bodyJson = JSON.stringify({refreshToken: tokenCookie})
 
-        const request = new Request({
-            // url: refreshEndpoint,
+        isRefreshing = fetch(refreshEndpoint, {
             method: 'POST',
             headers: new Headers({ 'Content-Type': 'application/json' }),
             body: bodyJson,
         })
-        isRefreshing = fetch(refreshEndpoint, request)
             .then((response) => {
                 if (response.status !== 200) {
                     ereaseToken()
@@ -140,7 +146,8 @@ const inMemoryJwtManager = () => {
         abordRefreshToken,
         waitForTokenRefresh,
         getValidSubscription,
-        setValidSubscription
+        setValidSubscription,
+        checkAvailableRefreshToken
     }
 }
 

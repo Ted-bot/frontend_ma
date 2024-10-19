@@ -7,6 +7,19 @@ import LocationInput from './LocationInput'
 
 /* eslint-disable react/prop-types */
 // eslint-disable-next-line no-unused-vars
+//     id = 0,
+//     name = '', 
+//     type = '', 
+//     error = false,
+//     invalid = false,
+//     cityId = 0,
+//     cityList = [], 
+//     stateId = 0,
+//     stateList = [],
+//     onChange = () => {},
+//     onBlur = () => {},
+//     onChangeState = () => {},
+//     onChangeCity = () => {},
 export default function LabelNameInput({ 
     id,
     name, 
@@ -17,9 +30,10 @@ export default function LabelNameInput({
     cityList, 
     stateId,
     stateList,
+    onChange,
+    onBlur,
     onChangeState,
-    onChangeCity,
-    ...props 
+    onChangeCity
 }) {
     let checkBox = 0    
     const lowerCaseName = camelCaseToLoWithSpace(name)
@@ -27,7 +41,6 @@ export default function LabelNameInput({
     if(type === 'checkbox'){
         checkBox = 1
     }
-
 
     return (
         <>
@@ -47,7 +60,8 @@ export default function LabelNameInput({
                                 id={id}
                                 name={name} 
                                 type={type}
-                                {...props}
+                                onChange={onChange}
+                                onBlur={onBlur}
                                 />
                                 {invalid && type == 'checkbox' &&  <p className="text-red-500 text-xs italic"> Select gender</p>}
                             </section>
@@ -58,13 +72,14 @@ export default function LabelNameInput({
                                 w-full appearance-none block bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight 
                                 focus:outline-none focus:bg-white`}
                                 country="NL"
-                                {...props}
+                                onChange={onChange}
+                                onBlur={onBlur}
                             />
                         :
                         <>
                             <section className='flex w-full justify-evenly'>
                                 <LocationInput 
-                                    id={id}
+                                    // id={id}
                                     stateId={stateId} 
                                     cityId={cityId} 
                                     errorMessage={error} 

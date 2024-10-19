@@ -4,9 +4,7 @@ import LabelNameInput from "../ui/input/LabelNameInput"
 export default function CreateFormInterface({array}) {
 
         return array.map((item) => (
-            <LabelNameInput 
-                name={item.name}
-                type={item.type}
+            <LabelNameInput
                 key={item.id}
                 {...item}
             />

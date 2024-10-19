@@ -15,9 +15,9 @@ const getAuthHeaders = () => {
     if(token){ 
         headers.set("X-Authorization", token)
     } else {
-        inMemoryJwt.setRefreshTokenEndpoint('/api/token/refresh') // http://localhost:80
+        // inMemoryJwt.setRefreshTokenEndpoint('/api/token/refresh') // http://localhost:80
         inMemoryJwt.getRefreshedToken().then((gotFreshToken) => {
-            if(gotFreshToken) headers.set('Authorization', `${inMemoryJwt.getToken()}`)
+            if(gotFreshToken) headers.set('X-Authorization', `${inMemoryJwt.getToken()}`)
         })
     }
     

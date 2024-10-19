@@ -6,13 +6,20 @@ import { storageNameModifyUser, inputValidList } from '../../../js/util/auth.js'
 import { useUserFormContext } from '../../../store/user-form-context.jsx'
 import { getNewUserObjOrStorageData } from '../../../js/util/postUtil.js'
 import CreateFormInterface from '../CreateFormInterface.jsx'
-import { getAvailableLocations, getUserProfile } from '../../../store/features/users/userSlice.jsx' //, 
+import { getAvailableLocations, getUserProfile, userActions, sendUpdatedUser } from '../../../store/features/users/userSlice.jsx' //, 
+import { inputBlurHandle } from '../../class/userData/FormHelper.jsx'
 
-export const ProfileTabInterface = () => {
-    const {state, dispatch} = useUserFormContext()
+export const ProfileTabInterface = () => {    
+    const typeText = 'text'
+    const typePhone = 'tel'
+    const typeLocation = 'location'
+
     const [enteredInput, setEnteredInput] = useState(getNewUserObjOrStorageData(storageNameModifyUser))
     const [errors, setErrors] = useState(inputValidList)
     const [enteredInputIsInvalid, setEnteredInputIsInvalid] = useState(inputValidList)
+    const [buttonPressed, setButtonPressed] = useState(false)
+    
+    const {state, dispatch} = useUserFormContext()
     const reduxDispatch = useDispatch()
     const user = useSelector((state) => state.users.user)
     console.log({userObj: user})
@@ -26,7 +33,6 @@ export const ProfileTabInterface = () => {
     }
 
     useEffect(() => { 
-        // console.log({stateSelected})
         getLocations(stateSelected.id)
         // reduxDispatch(getAvailableLocations(stateSelected.id))
         reduxDispatch(getUserProfile())
@@ -35,10 +41,9 @@ export const ProfileTabInterface = () => {
             email: email,
             phone_number: phone_number
         }
-        setProfileData(profileData)
-        
-       
-    }, [])
+        setProfileData(profileData)       
+        setButtonPressed(true)
+    }, [buttonPressed])
 
     function setProfileData(obj){
         for (const [key, value] of Object.entries(obj)) {
@@ -66,22 +71,31 @@ export const ProfileTabInterface = () => {
         reduxDispatch(getAvailableLocations(stateSelected.value))
     }
 
-    const typeText = 'text'
-    const typePhone = 'tel'
-    const typeLocation = 'location'
     const InterfaceConfiguration = {
         buttonname: 'Save Changes',
         setItems : [
-            { name: 'Email', id: 'email', type: typeText, placeholder: 'email', value: enteredInput?.email, error: errors.email, invalid: enteredInputIsInvalid.email, autoComplete: 'email', required:true, onChange: (e) => handleGeneralUserInput('email', e.target.value), onBlur : (e) => inputBlurHandle('email', e.target.value, setEnteredInputIsInvalid)},
-            { name: 'PhoneNumber', id: 'phone_number', type: typePhone, placeholder: 'phone number', value: enteredInput?.phone_number, error: errors.phone_number, invalid: enteredInputIsInvalid.phone_number, required:true, onChange: (value) => handleGeneralUserInput('phone_number', value), onBlur : (e) => inputBlurHandle('phone_number', e.target.value, setEnteredInputIsInvalid)},
+            { name: 'Email', id: 'email', type: typeText, placeholder: 'email', value: enteredInput?.email, error: errors.email, invalid: enteredInputIsInvalid.email, autoComplete: 'email', onChange: (e) => handleGeneralUserInput('email', e.target.value), onBlur : (e) => inputBlurHandle('email', e.target.value, setEnteredInputIsInvalid)},
+            { name: 'PhoneNumber', id: 'phone_number', type: typePhone, placeholder: 'phone number', value: enteredInput?.phone_number, error: errors.phone_number, invalid: enteredInputIsInvalid.phone_number, onChange: (value) => handleGeneralUserInput('phone_number', value), onBlur : (e) => inputBlurHandle('phone_number', e.target.value, setEnteredInputIsInvalid)},
+            // { name: 'Unit Number', id: 'unit_number',  type: typeText, placeholder: 'unit number', value: enteredInput?.unitNumber, invalid: enteredInputIsInvalid.unitNumber, error: errors?.unit_number, onChange: (e) => handleGeneralUserInput('unitNumber', e), onBlur: (e) => inputBlurHandle('unitNumber', e, typeText)},
+            // { name: 'Street Number', id: 'street_number', type: 'number', placeholder: 'street number', min: 0,  value: enteredInput?.streetNumber, invalid: enteredInputIsInvalid.streetNumber, error: errors?.street_number,  true, onChange: (e) => handleGeneralUserInput('streetNumber', e), onBlur: (e) => inputBlurHandle('streetNumber', e, 'number')},
+            // { name: 'Street Name', id: 'address_line', type: typeText, placeholder: 'address line', value: enteredInput?.addressLine, invalid: enteredInputIsInvalid.addressLine, error: errors?.address_line, true, onChange: (e) => handleGeneralUserInput('addressLine', e), onBlur: (e) => inputBlurHandle('addressLine', e, typeText)},
+            // { name: 'Postal Code', id: 'postal_code', type: typeMixed, placeholder: 'postal code', value: enteredInput?.postalCode, invalid: enteredInputIsInvalid.postalCode, error: errors?.postalCode, true, onChange: (e) => handleGeneralUserInput('postalCode', e), onBlur: (e) => inputBlurHandle('postalCode', e, typeMixed) },
             { name: 'Location', id: 'location', type: typeLocation, value: enteredInput?.city, cityId: enteredInput?.city_id, stateId: enteredInput?.state_id, error: errors?.location, invalid: enteredInputIsInvalid?.city,
-                required:true , onChangeState: (e) => handleStatelUserInput('state', e.target.value), onChangeCity: (e) => handleCitylUserInput('city', e.target.value), onBlur : (e) => inputBlurHandle('city', e.target.value, setEnteredInputIsInvalid)},
+                onChangeState: (e) => handleStatelUserInput('state', e.target.value), onChangeCity: (e) => handleCitylUserInput('city', e.target.value), onBlur : (e) => inputBlurHandle('city', e.target.value, setEnteredInputIsInvalid)},
             ]
     }
-
+    
     console.log({enteredInputProfileTab: enteredInput})
-    const handleSubmit = e => {
-        e.preventDefault()
+
+    const handleSubmit = (e) => {
+        console.log({UpdateUser_Button_Handle: e.target , value: e.target[1].defaultValue})
+        const data = {
+            email: e.target[0].defaultValue,
+            phone_number: e.target[1].defaultValue,
+        }
+        // reduxDispatch(userActions.updateUser(data))
+        reduxDispatch(sendUpdatedUser(data))
+        setButtonPressed(true)
     }
 
     return(

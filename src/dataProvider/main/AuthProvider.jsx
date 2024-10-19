@@ -35,19 +35,20 @@ export const authProvider = {
     },
     logout: async () => {
         deleteLocalStorageItem('email')        
-        const request = new Request('/api/logout', { // http://localhost:80
-            method: 'GET',
-            headers: new Headers({ 
-                'Content-Type': 'application/json',
-                'X-authorization' : inMemoryJwt.getToken() 
-            }),
-            // credentials: 'include',
-        })
+        // const request = new Request('/api/logout', { // http://localhost:80
+        //     method: 'GET',
+        //     headers: new Headers({ 
+        //         'Content-Type': 'application/json',
+        //         'X-authorization' : inMemoryJwt.getToken() 
+        //     }),
+        //     // credentials: 'include',
+        // })
 
         inMemoryJwt.ereaseToken()
 
         // return fetch(request).then(() => '/dashboard/login')
-        return Promise.resolve() // { redirectTo: '/', logoutUser: true }
+        // return '/'
+        return Promise.resolve('/dashboard/login') // 
     },
     checkAuth: () => {
         // inMemoryJwt.getToken() !== null ? Promise.resolve() : Promise.reject({ redirectTo: '/login', logoutUser: true })
@@ -82,7 +83,7 @@ export const authProvider = {
         // return Promise.resolve()
     },
     getPermissions: () => {
-        // return inMemoryJwt.getToken() ?  Promise.resolve() : redirect('/login')
+        // return inMemoryJwt.getToken() ?  Promise.resolve() : Promise.reject()
         return inMemoryJwt.waitForTokenRefresh().then(() => {
             return inMemoryJwt.getToken() ? Promise.resolve() : Promise.reject();
         })

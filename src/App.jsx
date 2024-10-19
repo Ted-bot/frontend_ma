@@ -47,16 +47,14 @@ function App() {
   ])
 
   return (
-
-<Provider store={store}>
-
-    <ReactQueryClientProvider>
-        <UserFormContextProvider>
-      
-          <RouterProvider router={router} ></RouterProvider>
-      
-        </UserFormContextProvider>
-    </ReactQueryClientProvider>
+    <Provider store={store}>
+      <ReactQueryClientProvider>
+          <UserFormContextProvider>
+        
+            <RouterProvider router={router} ></RouterProvider>
+        
+          </UserFormContextProvider>
+      </ReactQueryClientProvider>
     </Provider>
   )
 }

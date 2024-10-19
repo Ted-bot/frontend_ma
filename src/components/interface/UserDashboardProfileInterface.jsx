@@ -65,6 +65,7 @@ export const ProfileSettingsInterface = () => {
                     <Tabs value={value} onChange={handleChange}>
                         <Tab label="Profile" className="hover:bg-gray-500" {...a11yProps(0)}/>
                         <Tab label="Password" className="hover:bg-gray-500" {...a11yProps(0)}/>
+                        <Tab label="Address" className="hover:bg-gray-500" {...a11yProps(0)}/>
                         <Tab label="Billing" className="hover:bg-gray-500" {...a11yProps(0)}/>
                         <Tab label="Notifications" className="hover:bg-gray-500" {...a11yProps(0)}/>
                     </Tabs>
@@ -81,6 +82,9 @@ export const ProfileSettingsInterface = () => {
             </CustomTabPanel>
             <CustomTabPanel value={value} index={3}>
                 Item Four
+            </CustomTabPanel>
+            <CustomTabPanel value={value} index={3}>
+                Item Five
             </CustomTabPanel>
         </>
     )
