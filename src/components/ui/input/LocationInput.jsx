@@ -1,49 +1,61 @@
 import {  useEffect, useState } from 'react'
 import { useSelector } from 'react-redux' //connect
-import { NativeSelect } from '@mui/material'
+import Select from '@mui/material/Select'
+import MenuItem from '@mui/material/MenuItem'
+import FormControl from '@mui/material/FormControl'
+// import { NativeSelect } from '@mui/material'
 import InputLabel from '@mui/material/InputLabel'
 
-const LocationInput = ({errorMessage: error,  cityId, stateId, onChangeState, onChangeCity}) => { // id,
+const LocationInput = ({errorMessage: error, onChangeState, onChangeCity}) => { // id,
 
-        const stateList = useSelector((state) => state.users.user.state_list)
-        const cityList = useSelector((state) => state.users.user.city_list)
-    
+    const stateList = useSelector((state) => state.users.user.state_list)
+    const cityList = useSelector((state) => state.users.user.city_list)    
+    const cityId = useSelector((state) => state.users.user.city_id)    
+    const stateId = useSelector((state) => state.users.user.state_id)    
+
+    console.log({stateId, cityId})
 
     return (
         <>
-        <h1>Test</h1>
-            <InputLabel id="select_state" sx={{ display: 'none' }}>State</InputLabel>
-            <NativeSelect
-                labelid='select_state'
-                className={`${error && 'border-red-500 border '}w-full block text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`}
-                id='region'
-                onChange={(e) => onChangeState(e)}
-                placeholder='select state ...' 
-                value={stateId }                                    
-            >
-                {
-                    stateList instanceof Array && 
-                    stateList.length > 0 && 
-                    stateList.map((value, index) => (<option key={index} value={value.value}>{value.label}</option>))
-                    
-                }
-            </NativeSelect>
+             <FormControl className='w-full'>
+                <InputLabel id="state" >State</InputLabel>
+                <Select
+                    labelid='state'
+                    label='state'
+                    className={`${error && 'border-red-500 border'} w-full block text-gray-700 rounded px-4 mb-3 leading-tight focus:outline-none focus:bg-white`}
+                    id='state'
+                    onChange={(e) => onChangeState(e)}
+                    placeholder='select state ...' 
+                    defaultValue={stateId}                                    
+                >
+                    {
+                        stateList instanceof Array && 
+                        stateList.length > 0 && 
+                        stateList.map((value, index) => (<MenuItem key={index} value={value.value}>{value.label}</MenuItem>))
+                        // stateList.map((value, index) => (<option key={index} value={value.value}>{value.label}</option>))
+                        
+                    }
+                </Select>
+            </FormControl>
 
-            <InputLabel id="select_location" sx={{ display: 'none' }}>City</InputLabel>
-            <NativeSelect
-                labelid="select_location"
-                className={`${error && 'border-red-500 border '}w-full block text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`}
-                id='location'
-                onChange={(e) => onChangeCity(e)}
-                placeholder='select city ...'
-                value={cityId}
-            >
-                {
-                    cityList instanceof Array && 
-                    cityList?.length > 0 && 
-                    cityList?.map((value, index) => (<option key={index} value={value.value}>{value.label}</option>))
-                }
-            </NativeSelect>
+            <FormControl className='w-full'>
+                <InputLabel id="location" >City</InputLabel>
+                <Select
+                    labelid="location"
+                    className={`${error && 'border-red-500 border'} w-full block text-gray-700 rounded px-4 mb-3 leading-tight focus:outline-none focus:bg-white`}
+                    id='location'
+                    onChange={(e) => onChangeCity(e)}
+                    label='location'
+                    defaultValue={cityId}
+                >
+                    {
+                        cityList instanceof Array && 
+                        cityList?.length > 0 && 
+                        cityList?.map((value, index) => (<MenuItem value={value.value}>{value.label}</MenuItem>))
+                        // cityList?.map((value, index) => (<option key={index} value={value.value}>{value.label}</option>))
+                    }
+                </Select>
+            </FormControl>
         </>
     )
 }

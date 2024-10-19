@@ -81,9 +81,10 @@ export default function SignUpForm({stateList, storageNameNewUser, userStoredFor
     }
 
     const handleCitylUserInput = (identifier, value) => {
-        const city = cityList.find((city) => city.id == Number(value))
-        handleGeneralUserInput(identifier, city.name)
-        handleGeneralUserInput('city_id', city.id)
+        const city = cityList.find((city) => city.value === value)
+        // console.log({gotCity: city, value, identifier})
+        handleGeneralUserInput(identifier, city.label)
+        handleGeneralUserInput('city_id', city.value)
     }
     
     const handleStatelUserInput = (identifier, value) => {

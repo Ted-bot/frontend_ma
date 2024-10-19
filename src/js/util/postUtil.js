@@ -1,6 +1,18 @@
 import {  prepRequestFields } from './auth'
 import { funcValidateIBAN } from '../../components/ui/input/ValidateIBAN'
 
+const snakeToCamel = str => str.toLowerCase().replace(/(_\w)/g, m => m.toUpperCase().substr(1))
+
+const changeObjKeysToCamelCaseFields = (obj) => {
+    let convertedKeys = {}
+    for ( const [key, value] of Object.entries(obj)){
+        console.log({ChangeToCamel: key, value})
+        const newKeyName = snakeToCamel(key)
+        convertedKeys = {...convertedKeys, [newKeyName]: value}
+    }
+    return convertedKeys
+}
+
 export function ApiFetchPostOptions(defineRequest = {url : '', method : 'POST'}, data, headerOptions = null) {
     return {
        url: defineRequest.url, 
@@ -261,3 +273,6 @@ export function camelCaseToLoWithSpace(data)
     }
     return newKey
 }
+
+
+export {changeObjKeysToCamelCaseFields, snakeToCamel}

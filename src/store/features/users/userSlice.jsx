@@ -5,9 +5,10 @@ import { createAsyncThunk } from "@reduxjs/toolkit"
 import { GetState, GetCity } from "react-country-state-city/dist/cjs"
 import { countryid } from "../../../js/util/auth"
 import { getLocalStorageItem, deleteLocalStorageItem, setLocalStorageItem } from "../../../js/util/getUtil"
-import { ApiFetch, ApiFetchPostOptions } from "../../../js/util/postUtil"
+import { ApiFetch, ApiFetchPostOptions, changeObjKeysToCamelCaseFields } from "../../../js/util/postUtil"
 import { ApiFetchGetOptions } from "../../../js/util/getUtil"
 import inMemoryJwt from "../../../js/util/inMemoryJwt"
+import Notification from "../../../components/ui/notification/Notification"
 
 const USERS_URL = '/api/users'
 
@@ -43,14 +44,36 @@ export const getUserProfile = createAsyncThunk(
 
 const userSlice = createSlice({
     name: 'users',
-    initialState:{user: {...initialUserState}, status: 'idle', error: null},
+    initialState:{
+        user: {...initialUserState}, 
+        status: 'idle', error: null,
+        ui: {notification: null}
+    },
     reducers: {
-        updateUser(state, action) {
-            const email = action.payload.email
-            const phone_number = action.payload.phone_number
+        showNotification(state, action){
+            if(action.payload === null) {
+                state.ui.notification = null
+                return
+            }
 
-            if(email) state.user.email = email 
-            if(phone_number) state.user.phone_number = phone_number
+            state.ui.notification = {
+                status: action.payload.status,
+                title: action.payload.title,
+                message: action.payload.message
+            }
+        },
+        updateUser(state, action) {
+            console.log({changed_update_user: action.payload})
+            let email = action.payload.email
+            let phone_number = action.payload.phone_number
+
+            let original_number = state.user.phone_number
+            let new_number = action.payload.phone_number
+            let previousNumberOfString = original_number.substring(original_number.length - 8)
+            let currentNumberOfString = new_number.substring(new_number.length - 8)
+
+            if(email != state.user.email) state.user.email = email 
+            if(previousNumberOfString != currentNumberOfString) state.user.phone_number = phone_number
 
             // console.log({updatedState: current(state)})
             // return current(state)
@@ -77,7 +100,6 @@ const userSlice = createSlice({
         builder
             .addCase(getAvailableLocations.fulfilled, (state, action) => { //getAvailableLocations.fullfilled
                 state.status = 'success'
-                console.log({updated_state: action.payload})
                 let stateList = action.payload.getStates
                 let optionStateList = stateList.map((state) => ({
                     label: state.name,
@@ -92,7 +114,6 @@ const userSlice = createSlice({
 
                 state.user.state_list = [...optionStateList]
                 state.user.city_list = [...optionCitiesList]
-                console.log({updated_state: state.user.state_list})
             })
             .addCase(getAvailableLocations.pending, (state, action) => {
                 state.status = 'loading'
@@ -131,18 +152,24 @@ const userSlice = createSlice({
 
 export const sendUpdatedUser = (payload) => {
     return async (dispatch) => {
-        const currentUserEmail = getLocalStorageItem('email')
-        dispatch(userActions.createUser(payload))       
+        dispatch(userActions.showNotification({
+            status: 'pending',
+            title: 'Sending...',
+            message: 'Sending Updated Data'
+        }))
+        const currentUserEmail = getLocalStorageItem('email') 
         
         const updateUser = Object.entries(payload).filter((field) => field[1] !== '')
         const map = new Map(updateUser)
         const createBodyRequest = Object.fromEntries(map)
 
-        console.log({About_to_update: createBodyRequest})
+        const data = changeObjKeysToCamelCaseFields(createBodyRequest)
+
+        console.log({sendUpdateRequest: data})
 
         try {   
             const options = { url: `/api/user_by_email/${currentUserEmail}/email`, method: 'PATCH'}
-            const updateUserData = ApiFetchPostOptions(options, createBodyRequest, {
+            const updateUserData = ApiFetchPostOptions(options, data, {
                 'X-Authorization': inMemoryJwt.getToken(),
                 'Content-Type':'application/merge-patch+json'
             })            
@@ -157,14 +184,24 @@ export const sendUpdatedUser = (payload) => {
             }
 
             if(createBodyRequest?.email){
-                alert(`please logout and login with new email ${createBodyRequest.email}`)
+                alert(`please logout and login with if you changed email ${createBodyRequest.email}`)
             }
             console.log({succes_upload_updatedUser: getResults})
         } catch (error) {
                 console.error({unhandledError_userSlice: error})
+                dispatch(userActions.showNotification({
+                    status: 'Error',
+                    title: 'Error!',
+                    message: 'Updating your data Failed'
+                })) 
         }
 
         dispatch(userActions.updateUser(payload))
+        dispatch(userActions.showNotification({
+            status: 'success',
+            title: 'Success!',
+            message: 'Updated data successfully'
+        })) 
     }
 }
 

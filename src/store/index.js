@@ -4,7 +4,7 @@ import userSlice from "./features/users/userSlice.jsx"
 
 export const store = configureStore({
     reducer: {
-        users: userSlice
+        users: userSlice,
     },
     devTools: process.env.NODE_ENV === 'development',
     trace: true

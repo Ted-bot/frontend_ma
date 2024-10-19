@@ -23,6 +23,8 @@ import { useUserFormContext, UserFormContextProvider } from './store/user-form-c
 import { SignUpLoader } from './loader/SignUpLoader.jsx'
 import { Provider } from 'react-redux'
 import { store } from './store/index.js'
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 
 function App() {
 
@@ -50,9 +52,9 @@ function App() {
     <Provider store={store}>
       <ReactQueryClientProvider>
           <UserFormContextProvider>
-        
-            <RouterProvider router={router} ></RouterProvider>
-        
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <RouterProvider router={router} ></RouterProvider>
+            </LocalizationProvider>        
           </UserFormContextProvider>
       </ReactQueryClientProvider>
     </Provider>
