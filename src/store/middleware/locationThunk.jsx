@@ -1,19 +1,13 @@
-// import { createAsyncThunk } from "@reduxjs/toolkit"
-// import { GetState, GetCity } from "react-country-state-city/dist/cjs"
-// import { countryid } from "../../js/util/auth"
-// 
-// 
-// export const getAvailableLocations = (stateId) => {
-    // createAsyncThunk(
-        // '/api/v1/location', 
-        // (stateId = null) => {
-            // try {
-                // let getCities = []
-                // const getStates = GetState(countryid)
-                // if(id) getCities = GetCity(countryid, stateId)
-                    // return { getStates, getCities}
-            // } catch (err) {
-                // return err.message
-            // }
-        // })
-    // } 
+// import { createListenerMiddleware, addListener } from '@reduxjs/toolkit'
+// import type { RootState, AppDispatch } from '../index.js'
+
+// export const listenerMiddleware = createListenerMiddleware()
+
+// export const startAppListening = listenerMiddleware.startListening.withTypes<
+//   RootState,
+//   AppDispatch
+// >()
+// export type AppStartListening = typeof startAppListening
+
+// export const addAppListener = addListener.withTypes<RootState, AppDispatch>()
+// export type AppAddListener = typeof addAppListener
