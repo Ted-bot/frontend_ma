@@ -3,8 +3,30 @@ import { getLocalStorageItem, ApiFetchGetOptions } from "../../js/util/getUtil"
 import { ApiFetch } from "../../js/util/postUtil"
 import { HttpError } from "react-admin"
 import inMemoryJwt from "../../js/util/inMemoryJwt.js"
+import { dataProvider } from "../../dataProvider/main/DataProvider.jsx"
 
-// export const email = getLocalStorageItem('email')
+export const updateUserIdentity = async (resource, params, payload) => {
+    dataProvider.updateUserIdentity(resource, params, payload)
+}
+
+export const user = () => {
+    const {dragonUser} = useUserIdentifier()
+    return dragonUser
+}
+
+export const getUserIdentity = async () => {
+    const identifier = getLocalStorageItem('email')
+        const token = inMemoryJwt.getToken()
+        const prepareQueryObj = ApiFetchGetOptions(`/api/user_by_email/${identifier}/email`,{ 'X-Authorization': token})
+        const authenticateClient = await ApiFetch(prepareQueryObj)
+        const getResults = await authenticateClient.json()
+        
+        // console.log({GEtIdentity: getResults})
+        // console.log({getSubscriptions: getResults.subscriptions.length !== 0 })
+        const validSubscription = getResults?.subscriptions?.length !== 0
+        inMemoryJwt.setValidSubscription(validSubscription)
+        const username = getResults["firstName"] + ' ' + getResults["lastName"]
+}
 
 const fetchUserCalendar = async () => {
     const email = getLocalStorageItem('email')
@@ -56,6 +78,19 @@ export const useUserCalendar = () => {
     // const { data: userCalendar, status } = useQuery({queryKey:['userCalendar'], queryFn: fetchUserCalendar, refetchInterval: 6000})
 
     return {blackDragonEvents: userCalendar, status: status}
+}
+
+export const useUserIdentifier = () => {
+    const { data: userIdentity, status } = useQuery({
+        queryFn: getUserIdentity,
+        queryKey: ["userIdentifier"], 
+        refetchOnWindowFocus: false,        
+        // refetchInterval: 60000,
+        // retry: 5,
+})
+    // const { data: userCalendar, status } = useQuery({queryKey:['userCalendar'], queryFn: fetchUserCalendar, refetchInterval: 6000})
+
+    return {dragonUser: userIdentity, status: status}
 }
 
 // const handleSubmit = async (id) => { 

@@ -15,9 +15,11 @@ import {
 import { GetState } from 'react-country-state-city/dist/cjs'
 import { countryid } from '../../js/util/auth'
 import { getStates } from '../class/userData/FormHelper'
-import Notification from '../ui/notification/Notification'
+// import Notification from '../ui/notification/Notification'
 import { useSelector, useDispatch } from 'react-redux'
-import { userActions } from '../../store/features/users/userSlice'
+// import { uiActions } from '../../store/features/ui/notificationSlice.jsx'
+// import { apiSliceWithUsers, useGetUserQuery, selectUsersResult } from '../../store/features/users/userSlice.jsx'
+// import { store } from '../../store/index.js'
 
 let isInitail = true
 
@@ -52,22 +54,30 @@ function a11yProps(index) {
 
 export const ProfileSettingsInterface = () => {
     useAuthenticated()
-    const reduxDispatch = useDispatch()
+    // const reduxDispatch = useDispatch()
 
     const [value, setValue] = useState(0)
     const handleChange = (event, newValue) => {
         setValue(newValue)
     }
 
-    const notification = useSelector((state) => state.users.ui.notification)
+    // const test = useGetUserQuery()
+    // const dispatching = async () => await useGetUserQuery()
+    // dispatching()
 
+    // const notification = useSelector((state) => state.ui.notification)
+
+    // const test = useSelector(selectUsersResult)
+    
     useEffect(() => {
-        if(notification){
-            setTimeout(()=> {
-                reduxDispatch(userActions.showNotification(null))
-            }, 7000)
-        }
-    }, [notification])
+        // console.log({userREsults: test})
+        // console.log({singleUserREsults: selectUsersResult})
+        // if(notification){
+        //     setTimeout(()=> {
+        //         reduxDispatch(uiActions.showNotification(null))
+        //     }, 4000)
+        // }
+    }, []) //notification
     
     
     return (
@@ -85,23 +95,19 @@ export const ProfileSettingsInterface = () => {
                 </Box>
             </Card>
             <CustomTabPanel value={value} index={0}>
-                {notification && <Notification status={notification.status} title={notification.title} message={notification.message} />}
+                {/* {notification && <Notification status={notification.status} title={notification.title} message={notification.message} />} */}
                 <ProfileTabInterface />
             </CustomTabPanel>
             <CustomTabPanel value={value} index={1}>
-                {notification && <Notification status={notification.status} title={notification.title} message={notification.message} />}
                 <PasswordTabInterface />
             </CustomTabPanel>
             <CustomTabPanel value={value} index={2}>
-                {notification && <Notification status={notification.status} title={notification.title} message={notification.message} />}
                 <AddressTabInterface />
             </CustomTabPanel>
             <CustomTabPanel value={value} index={3}>
-                {notification && <Notification status={notification.status} title={notification.title} message={notification.message} />}
                 Item Four
             </CustomTabPanel>
             <CustomTabPanel value={value} index={4}>
-                {notification && <Notification status={notification.status} title={notification.title} message={notification.message} />}
                 Item Five
             </CustomTabPanel>
         </>

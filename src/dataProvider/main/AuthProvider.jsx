@@ -6,9 +6,19 @@ import { ApiFetchGetOptions, getLocalStorageItem, setLocalStorageItem, deleteLoc
 import { PostError } from '../../js/error/PostError.js'
 import inMemoryJwt from '../../js/util/inMemoryJwt.js'
 import { HttpError } from 'react-admin'
+import { dataProvider } from './DataProvider.jsx'
+import { useUserIdentifier, user } from '../../hooks/query/usePublisedEvents.jsx'
+// import { userLoggedIn } from '../../store/features/auth/authSlice.jsx'
+// import { useDispatch } from 'react-redux'
+// import { AppDispatch } from '../../store/index.js'
+// import { selectUsersResult } from '../../store/features/users/userSlice.jsx'
+// const dispatch = AppDispatch
+
 
 export const authProvider = {
     login: async ({ email, password }) => {
+        
+        // const dispatch = useDispatch()
         const apiOptions = {url: '/api/login_check', method: 'POST'} // , withCredentials: true
         const prepareQueryObj = ApiFetchPostOptions(apiOptions,{ username: email, password })
         const authenticateClient = await ApiFetch(prepareQueryObj)
@@ -20,14 +30,19 @@ export const authProvider = {
                 // throw new HttpError('Api Login error', authenticateClient.status, response)  
                 return Promise.reject() //response
             }
+
         console.log({headerLoginJWT:authenticateClient.headers.getSetCookie(), headers:authenticateClient.headers,response: response})
         const token = response.token
         const refreshToken = response.refreshToken
         const getTokenData = jwtDecode(token)
         console.log({crack_token: getTokenData})
+
+        // AppDispatch(userLoggedIn({payload: getTokenData.username }))
+
         inMemoryJwt.setToken(token)
         inMemoryJwt.setRefreshToken(refreshToken)
         setLocalStorageItem('email', getTokenData.username)        
+        setLocalStorageItem('userId', getTokenData.id)        
                     
         // return Promise.resolve({redirectTo: '/dashboard',})
         return Promise.resolve(authenticateClient)
@@ -46,9 +61,8 @@ export const authProvider = {
 
         inMemoryJwt.ereaseToken()
 
-        // return fetch(request).then(() => '/dashboard/login')
-        // return '/'
-        return Promise.resolve('/dashboard/login') // 
+        return '/'
+        // return Promise.resolve('/dashboard/login') // 
     },
     checkAuth: () => {
         // inMemoryJwt.getToken() !== null ? Promise.resolve() : Promise.reject({ redirectTo: '/login', logoutUser: true })
@@ -68,6 +82,7 @@ export const authProvider = {
         // return Promise.resolve({redirectTo: '/dashboard', logoutUser: false })
     },
     getIdentity: async () => {
+        //  const dragonUser = user()
         const identifier = getLocalStorageItem('email')
         const token = inMemoryJwt.getToken()
         const prepareQueryObj = ApiFetchGetOptions(`/api/user_by_email/${identifier}/email`,{ 'X-Authorization': token})

@@ -3,7 +3,7 @@ import {
     hydraDataProvider,
 } from '@api-platform/admin'
 import { fetchUtils } from 'react-admin'
-import { ApiFetch } from '../../js/util/postUtil'
+import { ApiFetch, ApiFetchPostOptions } from '../../js/util/postUtil'
 import { ApiFetchGetOptions} from '../../js/util/getUtil'
 import { parseHydraDocumentation } from "@api-platform/api-doc-parser"
 import inMemoryJwt from '../../js/util/inMemoryJwt.js'
@@ -75,5 +75,28 @@ export const dataProvider = ({
           } catch (error) {
             // console.log({ no_valid_auth_or_subscription: error })
         }  
+    },
+    updateUserIdentity: async (resource, params, payload) => {
+        const GetUrl = `/api/${resource}/${params}/email`
+        const token = inMemoryJwt.getToken()
+        const requestOptions = ApiFetchPostOptions({url: GetUrl, method:'PATCH'}, payload,{
+            'X-Authorization': token, 
+            'Content-Type': 'application/merge-patch+json'
+        })
+
+        
+        // try {      
+            const request = await ApiFetch(requestOptions)
+            const response = await request.json()               
+            
+            if(!request.ok){
+                throw new HttpError('messageError')
+            }
+            //   throw new HttpError(response.message, response.status)      
+            return response
+          
+        //   } catch (error) {
+            // console.log({ no_valid_auth_or_subscription: error })
+        // }  
     }
 })

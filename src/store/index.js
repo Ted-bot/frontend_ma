@@ -1,11 +1,16 @@
 import { configureStore, applyMiddleware } from "@reduxjs/toolkit"
 // import { getAvailableLocations } from "./middleware/locationThunk"
-import userSlice from "./features/users/userSlice.jsx"
+// import userSlice from "./features/users/userSlice.jsx"
 import { apiSlice } from "./features/api/apiSlice.jsx"
+import locationReducer from "./features/location/locationSlice.jsx"
+import notificationReducer from "./features/ui/notificationSlice.jsx"
+import authReducer from './features/auth/authSlice.jsx'
 
 export const store = configureStore({
     reducer: {
-        users: userSlice,
+        auth: authReducer,
+    // ui: notificationReducer
+        // location: locationReducer,
         [apiSlice.reducerPath]: apiSlice.reducer
     },
     middleware: getDefaultMiddleware =>
@@ -26,4 +31,4 @@ export const store = configureStore({
 // export const AppThunk = {RootState, unknown, Action}
 
 
-// store.dispatch(getAvailableLocations)
+export const AppDispatch = store.dispatch

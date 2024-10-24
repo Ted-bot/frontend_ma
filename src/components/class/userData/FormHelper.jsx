@@ -73,12 +73,12 @@ export function inputBlurHandle(identifier, event, setEnteredInputIsInvalid) {
 
 
 export function errorHandlerPostRequest(error, showErrors){
-    
     const ifArrayErrors = error?.body
     if(Array.isArray(ifArrayErrors) && (ifArrayErrors.length > 1))
     {
-        console.log('{cameIn: 1}')
+        console.log('{cameIn: 1}', ifArrayErrors)
         ifArrayErrors.map((error) => {
+            // console.log({ShowSingleErrorProp: error.property,ShowSingleErrorMessage :error.message})
             showErrors(error.property,error.message)
         })
         return true
@@ -92,7 +92,7 @@ export function errorHandlerPostRequest(error, showErrors){
         return true
         
     } else if (ifArrayErrors?.property instanceof Array) {
-        console.log('{cameIn: 3}')
+        console.log('{cameIn: 3}', ifArrayErrors)
         const arrayProperty = ifArrayErrors.property[0]
         const messageError = ifArrayErrors.message                
         showErrors(arrayProperty,messageError)
@@ -100,7 +100,7 @@ export function errorHandlerPostRequest(error, showErrors){
         
     } else {           
         if(ifArrayErrors?.property){
-            console.log('{cameIn: 4}')
+            console.log('{cameIn: 4}', ifArrayErrors)
             const arrayProperty = ifArrayErrors.property
             const messageError = ifArrayErrors.message
             showErrors(arrayProperty,messageError)

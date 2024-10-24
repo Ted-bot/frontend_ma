@@ -188,3 +188,9 @@ section .spAllRefBtns:hover .spFaIcon {
   display: none;
   width: 2rem;
 }
+
+
+.hiddenText {
+  visibility: hidden;
+  display: none;
+}

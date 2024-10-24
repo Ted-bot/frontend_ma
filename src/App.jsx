@@ -21,8 +21,8 @@ import ErrorPage from './pages/ErrorPage.jsx'
 import { ReactQueryClientProvider } from './dataProvider/main/ReactQueryClientProvider.jsx'
 import { useUserFormContext, UserFormContextProvider } from './store/user-form-context.jsx'
 import { SignUpLoader } from './loader/SignUpLoader.jsx'
-import { Provider } from 'react-redux'
-import { store } from './store/index.js'
+// import { Provider } from 'react-redux'
+// import { store } from './store/index.js'
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 
@@ -49,7 +49,7 @@ function App() {
   ])
 
   return (
-    <Provider store={store}>
+    // <Provider store={store}>
       <ReactQueryClientProvider>
           <UserFormContextProvider>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -57,7 +57,7 @@ function App() {
             </LocalizationProvider>        
           </UserFormContextProvider>
       </ReactQueryClientProvider>
-    </Provider>
+    // </Provider>
   )
 }
 

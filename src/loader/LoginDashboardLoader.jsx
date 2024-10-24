@@ -14,6 +14,7 @@ const LoginDashboardLoader = () => {
         login({ email, password })
         .then((response) => (response))
         .then((response) => {
+            // console.log({loginData: response})
                 redirect('/dashboard')
             })
         .catch((error) => {

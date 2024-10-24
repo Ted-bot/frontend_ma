@@ -19,8 +19,14 @@ import { authProvider } from '../dataProvider/main/AuthProvider.jsx'
 import { ProfileSettingsInterface } from '../components/interface/UserDashboardProfileInterface'
 import { SignUpLoader } from '../loader/SignUpLoader.jsx'
 
+
 export default function DashboardPage() {
     useAuthenticated()
+
+    // const user = () => {
+    //     const {dragonUser} = useUserIdentifier()
+    //     return dragonUser
+    // }
     
     const schemaAnalyzer = hydraSchemaAnalyzer()
 

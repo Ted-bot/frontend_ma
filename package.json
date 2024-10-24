@@ -21,6 +21,7 @@
     "@mui/material": "^5.15.18",
     "@mui/x-date-pickers": "^7.21.0",
     "@reduxjs/toolkit": "^2.3.0",
+    "@tanstack/react-query-devtools": "^4.36.1",
     "dayjs": "^1.11.13",
     "dotenv": "^16.4.5",
     "framer-motion": "^6.5.1",

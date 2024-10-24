@@ -9,22 +9,14 @@ import { ApiFetch, ApiFetchPostOptions, changeObjKeysToCamelCaseFields } from ".
 import { ApiFetchGetOptions } from "../../../js/util/getUtil"
 import inMemoryJwt from "../../../js/util/inMemoryJwt"
 import Notification from "../../../components/ui/notification/Notification"
+import { apiSlice } from "../api/apiSlice"
+import { createSelector, createEntityAdapter } from "@reduxjs/toolkit"
+import { selectCurrentUsername } from "../auth/authSlice"
+// import { authProvider } from "../../../dataProvider/main/AuthProvider"
+import { useGetIdentity } from "react-admin"
+import {store} from '../../index.js'
 
 const USERS_URL = '/api/users'
-
-export const getAvailableLocations = createAsyncThunk(
-        '/api/getLocation', 
-        async (id) => {
-            try {
-                let getCities = []
-                const getStates = await GetState(countryid) // countryid
-                if(id) getCities = await GetCity(countryid, id)
-                    return { getStates, getCities}
-            } catch (err) {
-                console.log({'userSlice.js: - nr.19 - getLocation': err})
-                return err.message
-            }
-        })
 
 export const getUserProfile = createAsyncThunk(
     '/api/getUserProfile', 
@@ -41,61 +33,71 @@ export const getUserProfile = createAsyncThunk(
             return err.message
         }
     })
+    
+    export const sendUpdateNotification = (payload) => {
+        return async (dispatch) => {
+            dispatch(userActions.showNotification({
+                status: payload.status,
+                title: payload.title,
+                message: payload.message
+            }))         
+        }
+    }
 
 const userSlice = createSlice({
     name: 'users',
     initialState:{
         user: {...initialUserState}, 
         status: 'idle', error: null,
-        ui: {notification: null}
+        // ui: {notification: null}
     },
-    reducers: {
-        showNotification(state, action){
-            if(action.payload === null) {
-                state.ui.notification = null
-                return
-            }
+    // reducers: {
+        // showNotification(state, action){
+        //     if(action.payload === null) {
+        //         state.ui.notification = null
+        //         return
+        //     }
 
-            state.ui.notification = {
-                status: action.payload.status,
-                title: action.payload.title,
-                message: action.payload.message
-            }
-        },
-        updateUser(state, action) {
-            console.log({changed_update_user: action.payload})
-            let email = action.payload.email
-            let phone_number = action.payload.phone_number
+        //     state.ui.notification = {
+        //         status: action.payload.status,
+        //         title: action.payload.title,
+        //         message: action.payload.message
+        //     }
+        // },
+        // updateUser(state, action) {
+        //     console.log({changed_update_user: action.payload})
+        //     let email = action.payload.email
+        //     let phone_number = action.payload.phone_number
 
-            let original_number = state.user.phone_number
-            let new_number = action.payload.phone_number
-            let previousNumberOfString = original_number.substring(original_number.length - 8)
-            let currentNumberOfString = new_number.substring(new_number.length - 8)
+        //     let original_number = state.user.phone_number
+        //     let new_number = action.payload.phone_number
+        //     let previousNumberOfString = original_number.substring(original_number.length - 8)
+        //     let currentNumberOfString = new_number.substring(new_number.length - 8)
 
-            if(email != state.user.email) state.user.email = email 
-            if(previousNumberOfString != currentNumberOfString) state.user.phone_number = phone_number
+        //     if(email != state.user.email) state.user.email = email 
+        //     if(previousNumberOfString != currentNumberOfString) state.user.phone_number = phone_number
 
-            // console.log({updatedState: current(state)})
-            // return current(state)
-        },
-        createUser(state, action){
-            console.log({state, action})
-            state.user.first_name = action.payload.first_name
-            state.user.last_name = action.payload.last_name
-            state.user.gender = action.payload.gender
-            state.user.date_of_birth = action.payload.state_id
-            state.user.email = action.payload.email
-            state.user.state_id = action.payload.state_id
-            state.user.location = action.payload.location
-            state.user.city_id = action.payload.city_id
-            state.user.phone_number = action.payload.phone_number
-            state.user.location = action.payload.location
-            state.user.conversion = action.payload.conversion
-        },
+        //     // console.log({updatedState: current(state)})
+        //     // return current(state)
+        // },
+        // createUser(state, action){
+        //     console.log({state, action})
+        //     state.user.first_name = action.payload.first_name
+        //     state.user.last_name = action.payload.last_name
+        //     state.user.gender = action.payload.gender
+        //     state.user.date_of_birth = action.payload.state_id
+        //     state.user.email = action.payload.email
+        //     state.user.state_id = action.payload.state_id
+        //     state.user.location = action.payload.location
+        //     state.user.city_id = action.payload.city_id
+        //     state.user.phone_number = action.payload.phone_number
+        //     state.user.location = action.payload.location
+        //     state.user.conversion = action.payload.conversion
+        // },
         // updateProfile(state, action){
         //     console.log({state, action})
         // },
-    },
+    // },
     extraReducers: builder => {
         builder
             .addCase(getAvailableLocations.fulfilled, (state, action) => { //getAvailableLocations.fullfilled
@@ -144,72 +146,86 @@ const userSlice = createSlice({
                 state.error = action.error
             })
     },
-    selectors: {
-        selectStateList: (state) => state.user.state_list
-    }
+    // selectors: {
+    //     selectStateList: (state) => state.user.state_list
+    // }
     }
 )
 
-export const sendUpdatedUser = (payload) => {
-    return async (dispatch) => {
-        dispatch(userActions.showNotification({
-            status: 'pending',
-            title: 'Sending...',
-            message: 'Sending Updated Data'
-        }))
-        const currentUserEmail = getLocalStorageItem('email') 
-        
-        const updateUser = Object.entries(payload).filter((field) => field[1] !== '')
-        const map = new Map(updateUser)
-        const createBodyRequest = Object.fromEntries(map)
+const usersAdapter = createEntityAdapter()
+const initialState = usersAdapter.getInitialState({
+    status: 'idle',
+    error: null
+})
 
-        const data = changeObjKeysToCamelCaseFields(createBodyRequest)
+export const apiSliceWithUsers = apiSlice.injectEndpoints({
+    endpoints: builder => ({
+      getUser: builder.query({
+        // query: () => `/user_by_email`,
+        query: () => `/user_by_email/${getLocalStorageItem('email')}/email`,
+        transformResponse(res) {
+            console.log({checkApdater: res})
+            // Create a normalized state object containing all the user items
+            return usersAdapter.addOne(initialState, res)
+            // return usersAdapter.setAll(initialState, res)
+          }
+      })
+    })
+  })
 
-        console.log({sendUpdateRequest: data})
 
-        try {   
-            const options = { url: `/api/user_by_email/${currentUserEmail}/email`, method: 'PATCH'}
-            const updateUserData = ApiFetchPostOptions(options, data, {
-                'X-Authorization': inMemoryJwt.getToken(),
-                'Content-Type':'application/merge-patch+json'
-            })            
-            
-            const response = await ApiFetch(updateUserData)
-            const getResults = await response.json()
-            
-            if(!response?.ok)
-            {   //if(response?.status >= 400 && response?.status <= 600)
-                // const errorJson = await response?.json()
-                throw {message: 'Api error send update user error!', errors: getResults}                
-            }
+const emptyUsers = []
 
-            if(createBodyRequest?.email){
-                alert(`please logout and login with if you changed email ${createBodyRequest.email}`)
-            }
-            console.log({succes_upload_updatedUser: getResults})
-        } catch (error) {
-                console.error({unhandledError_userSlice: error})
-                dispatch(userActions.showNotification({
-                    status: 'Error',
-                    title: 'Error!',
-                    message: 'Updating your data Failed'
-                })) 
-        }
+// export const {useGetUserQuery} = apiSliceWithUsers
 
-        dispatch(userActions.updateUser(payload))
-        dispatch(userActions.showNotification({
-            status: 'success',
-            title: 'Success!',
-            message: 'Updated data successfully'
-        })) 
+export const selectUsersResult = apiSlice.endpoints.getUser.select()
+
+// const {selectUsers} = usersAdapter.getSelectors((state) => state.user)
+// const selectUsers = createSelector(
+//     [selectUsersResult, (id) => id.data],
+//     (state) => { 
+//         console.log({seeCreateSelector: state.id})
+//         return user.filter(user => user.id === state.id)
+//     }
+// )
+export const selectUsers = createSelector(
+    [selectUsersResult, (state, id) => id],
+    userResult => userResult.data ?? emptyUsers
+)
+
+// export const selectUsers = createSelector(
+//     selectUsersResult,
+//     userResult => userResult ?? emptyUsers
+// )
+
+
+
+ 
+export const { selectAll: selectAllUsers, selectById: selectUserById } =
+  usersAdapter.getSelectors(selectUsers)
+
+  export const apiState = store.getState
+
+  export const selectCurrentUser = () => {
+    // const id = getLocalStorageItem('userId')
+    // const {id } = data
+    // const currentUsername = apiState().auth.username
+    const currentUsername = selectCurrentUsername(apiState().auth)
+    console.log({SearchUser: currentUsername})
+    // const currentUsername = id
+    if (currentUsername) {
+        console.log({GetCurrentUser: id})
+        const test = selectUserById(apiState().api, id)
+      return test
     }
-}
+  }
 
 // Extract the action creators object and the reducer
 const { actions: userActions, reducer } = userSlice
+export const {useGetUserQuery} = apiSliceWithUsers
 
 // Extract and export each action creator by name
-export {userActions}
+// export {userActions, useGetUserQuery}
 
 // Export the reducer, either as a default or named export
 export default reducer

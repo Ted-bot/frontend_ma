@@ -114,7 +114,10 @@ export default function SignUpForm({stateList, storageNameNewUser, userStoredFor
         ]
     }
 
-    function showErrors(identifier, message){ setErrors(() => { return {[identifier] : message} }) }
+    function showErrors(identifier, message){ setErrors(() => { 
+        if(identifier === 'city_id' || identifier === 'state_id') identifier = 'location'
+        return {[identifier] : message} 
+    }) }
 
     const postRequest = async (data) => {        
         try {
@@ -152,7 +155,7 @@ export default function SignUpForm({stateList, storageNameNewUser, userStoredFor
         }
     }    
     // console.log({ enteredInput: enteredInput })
-    // console.log({ enteredInput: errors })
+    console.log({ errorHttpRequest_SignUp: errors })
     return (
         <>'
             <section className="flex flex-col items-center shadow-md bg-slate-100 py-5 rounded-md px-3 sm:mx-4 w-full sm:px-5 sm:w-4/5 md:px-3 md:shadow-xl">

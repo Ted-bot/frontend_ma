@@ -1,18 +1,22 @@
 import { useState, useEffect } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
+// import { useSelector, useDispatch } from 'react-redux'
 import { Form } from 'react-router-dom'
 
 import { storageNameModifyUser, inputValidList } from '../../../js/util/auth.js'
 import { useUserFormContext } from '../../../store/user-form-context.jsx'
 import { getNewUserObjOrStorageData } from '../../../js/util/postUtil.js'
 import CreateFormInterface from '../CreateFormInterface.jsx'
-import { getAvailableLocations, getUserProfile, userActions, sendUpdatedUser } from '../../../store/features/users/userSlice.jsx' //, 
 import { inputBlurHandle } from '../../class/userData/FormHelper.jsx'
+// import { getAvailableLocations } from '../../../store/features/location/locationSlice.jsx' //, 
+// import { useGetLocationsQuery } from '../../../store/features/api/apiSlice.jsx'
+// import { useGetUserRecentAddressQuery } from '../../../store/features/api/apiSlice.jsx'
+// import { selectUsersResult } from '../../../store/features/users/userSlice.jsx'
 
 export const AddressTabInterface = () => {    
     const typeText = 'text'
     const typeMixed = 'mixed'
     const typeLocation = 'location'
+    let stateSelected = {id:2612}
 
     const [enteredInput, setEnteredInput] = useState(getNewUserObjOrStorageData(storageNameModifyUser))
     const [errors, setErrors] = useState(inputValidList)
@@ -21,20 +25,22 @@ export const AddressTabInterface = () => {
     
     const {state, dispatch} = useUserFormContext()
     const reduxDispatch = useDispatch()
-    const user = useSelector((state) => state.users.user)
+    const {data: userRecentAddress} = useGetUserRecentAddressQuery()
+    // const getLocations = async (id) => {
+    //     await useGetLocationsQuery(id)
+    //     // await reduxDispatch(getAvailableLocations(id))
+    // }
+    const user = selectUsersResult()
+    // const {city_list:cityList, state_list: stateList} = getLocations(stateSelected.id) // , state_id: stateId, city_id: cityId
     const {city_list:cityList, state_list: stateList, state_id: stateId, city_id: cityId, phone_number} = user // , state_id: stateId, city_id: cityId
-    let stateSelected = {id:2612}
     
-    console.log({userObj: user})
+    console.log({userObj: user, stateId, cityId})
 
-    const getLocations = async (id) => {
-        await reduxDispatch(getAvailableLocations(id))
-    }
 
     useEffect(() => { 
-        getLocations(stateSelected.id)
-        // reduxDispatch(getAvailableLocations(stateSelected.id))
-        reduxDispatch(getUserProfile())
+        // getLocations(stateSelected.id)
+        reduxDispatch(getAvailableLocations(stateSelected.id))
+        // reduxDispatch(getUserProfile())
         
         setAddressData(user)       
         setButtonPressed(true)
@@ -94,7 +100,7 @@ export const AddressTabInterface = () => {
             if(value.id === 'location' || value.id === 'region' || !value.id) continue
             data = {...data, [value.id]: value.value}
         }
-        reduxDispatch(sendUpdatedUser(data))
+        reduxDispatch(sendUpdateNotification(data))
         setButtonPressed(true)
     }
 

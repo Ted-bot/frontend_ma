@@ -16,13 +16,14 @@ export default function LabelNameInput({
     id,
     name, 
     type, 
-    error,
+    error = false,
     invalid,
     cityId,
     cityList, 
     stateId,
     stateList,
     defaultValue = '',
+    value = '',
     onChange,
     onBlur,
     onChangeState,
@@ -58,7 +59,8 @@ export default function LabelNameInput({
                                 // className={`${checkBox === 1 ? 'h-8 w-8 lg:h-8 lg:w-12 accent-orange-300' : 'w-full appearance-none'}                                 
                                 // block bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`} 
                                 id={id}
-                                defaultValue={defaultValue}
+                                // defaultValue={defaultValue}
+                                value={value}
                                 name={name} 
                                 label={name}
                                 type={type}
