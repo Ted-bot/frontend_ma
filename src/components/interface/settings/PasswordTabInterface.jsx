@@ -34,6 +34,7 @@ export const PasswordTabInterface = () => {
 
     let data = {}
     const handleSubmit = async (e) => {
+        e.preventDefault()
         for (const [key, value] of Object.entries(e.target)){
             if(value.id === 'location' || value.id === 'region' || !value.id) continue
             data = {...data, [value.id]: value.value}
@@ -57,8 +58,8 @@ export const PasswordTabInterface = () => {
     return(
         <>
 
-            <Form onSubmit={handleSubmit} className='flex-col md:justify-item-center' >
-                <section className='flex-col w-full md:w-1/2'>
+            <Form onSubmit={handleSubmit} className='flex-col' >
+                <section className='flex-wrap justify-items-center mt-10'>
                     <TextField
                         className='w-full'
                         error={errors?.password}
@@ -74,11 +75,11 @@ export const PasswordTabInterface = () => {
                         autoComplete='new-password'
                     />
                     <br />
-                    <section className='inline-flex w-full justify-center'>
-                        <button className="w-full py-3 mt-10 bg-[#063970] rounded-md
-                                font-medium text-white uppercase md:w-4/5
-                                focus:outline-none hover:shadow-none hover:bg-[#4a8add]"
-                            >
+                    <section className='flex w-full justify-center  mt-20'>
+                            <button className="w-2/3 lg:w-1/2 py-3 bg-[#063970] rounded-md
+                                    font-medium text-white uppercase md:w-4/5
+                                    focus:outline-none hover:shadow-none hover:bg-[#4a8add]"
+                                >
                                 Update
                         </button>
                     </section>

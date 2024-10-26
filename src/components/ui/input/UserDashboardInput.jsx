@@ -49,8 +49,8 @@ export default function LabelNameInput({
 
     return (
         <>
-            <section className={`${checkBox === 1 ? 'flex md:w-1/4' : 'w-full md:w-1/2'} lg:justify-center px-3 mb-6 md:mb-0`}>
-                <label className={`${checkBox === 1 ? 'flex flex-col md:w-1/4' : 'w-full md:w-1/2'} tracking-wide text-gray-700 text-xs font-bold mb-2`}>
+            <section className={`w-full md:w-[80] lg:justify-center px-3 mb-6 md:mb-0`}>
+                <label className={`w-full tracking-wide text-gray-700 text-xs font-bold mb-2`}>
                     <section className='mt-5'>
                     {
                         (type === 'text' || type === 'password' ) ?  //&& type != 'location'

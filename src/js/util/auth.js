@@ -5,7 +5,7 @@ export function getAuthToken(){
 }
 
 export const storageNameNewUser = 'new_user'
-export const storageNameModifyUser = 'new_user'
+export const storageNameModifyUser = 'update_user'
 
 export const initialUserState = {
     first_name: '',
@@ -65,6 +65,22 @@ const prepRequestFields = {
     phone_number: '',
     conversion: '',
 }
+
+const prepUpdateFields = {
+    first_name: '',
+    last_name: '',
+    email: '',
+    gender: '',
+    city: '',
+    city_id: 77618,
+    // city_list_nr:'',
+    state:'',
+    state_id:2612,
+    // state_list_nr:'',
+    date_of_birth: '',
+    phone_number: '',
+    conversion: '',
+} //state_id: 2612, city_id: 77618
 
 const inputValidList = {
     gender: false,
@@ -131,4 +147,4 @@ const inputPaymentValidList = {
 || 
 */
 
-export {countryid, prepPaymentRequestFields, inputPaymentValidList, prepRequestFields, inputValidList}
+export {countryid, prepPaymentRequestFields, inputPaymentValidList, prepRequestFields, inputValidList, prepUpdateFields}

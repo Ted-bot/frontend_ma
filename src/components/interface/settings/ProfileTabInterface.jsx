@@ -9,6 +9,7 @@ import { dataProvider } from '../../../dataProvider/main/DataProvider.jsx'
 import { TextField } from '@mui/material'
 import { MuiTelInput } from 'mui-tel-input'
 import { useLogout } from 'react-admin'
+import { useErrorBoundary } from "react-error-boundary"
 
 
 export const ProfileTabInterface = () => {
@@ -25,6 +26,7 @@ export const ProfileTabInterface = () => {
     const defaultPhoneNumber = userIdentity?.phoneNumber
     const defaultEmail = userIdentity?.email
     const logout = useLogout()
+    const {showBoundary} = useErrorBoundary()
     
     const onPhoneChanged = (val) => {
         setPhoneNumber(val)
@@ -63,6 +65,7 @@ export const ProfileTabInterface = () => {
     // const [message, setMessage] = useState('')
     
     const handleSubmit = async (e) => {
+        e.preventDefault()
         console.log({WhatToUpdate:e.target})
         for (const [key, value] of Object.entries(e.target)){
             if(value.id === 'location' || value.id === 'region' || !value.id) continue
@@ -101,7 +104,9 @@ export const ProfileTabInterface = () => {
                 logout()
             }
         }).catch((error) => {
-            console.log({Failed_update: error})
+            const errorHandled = errorHandlerPostRequest(error, showErrors)
+            if(!errorHandled) showBoundary(error)   
+            // console.log({Failed_update: error})
             notify(`Failed updating ${message}`, { type: 'error' })
         })
         
@@ -116,13 +121,14 @@ export const ProfileTabInterface = () => {
 
     return(
         <>
-            <Form onSubmit={handleSubmit} className='flex-col md:justify-item-center' >
+            <Form onSubmit={handleSubmit} className='flex-col justify-center' >
                 {isError && <div> Something went wrong {isError.toString()}</div>}
                 {isLoading && <p>Loading...</p>}
                 {userIdentity && <>
-                        <section >
+                    <section className='flex-wrap justify-items-center'>
+                        <section className='w-full md:w-2/3 mt-5'>
                             <TextField
-                                className='w-full md:w-1/2'
+                                className='w-full'
                                 error={errors && errors?.email}
                                 id={'email'}
                                 // defaultValue={userIdentity?.email}
@@ -135,9 +141,9 @@ export const ProfileTabInterface = () => {
                                 variant="outlined"
                             />
                         </section>
-                        <section >
+                        <section className='w-full md:w-2/3'>
                             <MuiTelInput
-                                className='w-full md:w-1/2'
+                                className='w-full lg:w-full'
                                 id={'phone_number'}
                                 label={'PhoneNumber'}
                                 onChange={onPhoneChanged}
@@ -146,17 +152,18 @@ export const ProfileTabInterface = () => {
                                 value={phoneNumber}
                             />
                         </section>
-                    </>
-                }
+                        <section className='flex w-full justify-center'>
+                            <button className="w-2/3 lg:w-1/2 py-3 mt-10 bg-[#063970] rounded-md
+                                    font-medium text-white uppercase md:w-4/5
+                                    focus:outline-none hover:shadow-none hover:bg-[#4a8add]"
+                                >
+                                    Save Changes
+                            </button>
+                        </section>
+                    </section>
+                </>}
 
-                <section className='inline-flex w-full justify-center md:w-1/2'>
-                    <button className="w-full py-3 mt-10 bg-[#063970] rounded-md
-                            font-medium text-white uppercase md:w-4/5
-                            focus:outline-none hover:shadow-none hover:bg-[#4a8add]"
-                        >
-                            Save Changes
-                    </button>
-                </section>
+                
             </Form>
         </>
     )

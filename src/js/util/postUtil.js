@@ -1,4 +1,4 @@
-import {  prepRequestFields } from './auth'
+import {  prepRequestFields, prepUpdateFields } from './auth'
 import { funcValidateIBAN } from '../../components/ui/input/ValidateIBAN'
 
 const snakeToCamel = str => str.toLowerCase().replace(/(_\w)/g, m => m.toUpperCase().substr(1))
@@ -39,6 +39,16 @@ export function getNewUserObjOrStorageData(name){
 
     if(!storedValues){
         return prepRequestFields
+    }
+
+    return JSON.parse(storedValues) 
+}
+
+export function getUpdateUserObjOrStorageData(name){
+    const storedValues = localStorage.getItem(name)
+
+    if(!storedValues){
+        return prepUpdateFields
     }
 
     return JSON.parse(storedValues) 

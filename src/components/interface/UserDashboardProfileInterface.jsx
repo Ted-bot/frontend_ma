@@ -11,15 +11,7 @@ import {
  import { ProfileTabInterface } from './settings/ProfileTabInterface'
  import { PasswordTabInterface } from './settings/PasswordTabInterface'
  import { AddressTabInterface } from './settings/AddressTabInterface'
-// import { getStates, inputBlurHandle } from '../class/userData/FormHelper.jsx'
-import { GetState } from 'react-country-state-city/dist/cjs'
-import { countryid } from '../../js/util/auth'
-import { getStates } from '../class/userData/FormHelper'
-// import Notification from '../ui/notification/Notification'
-import { useSelector, useDispatch } from 'react-redux'
-// import { uiActions } from '../../store/features/ui/notificationSlice.jsx'
-// import { apiSliceWithUsers, useGetUserQuery, selectUsersResult } from '../../store/features/users/userSlice.jsx'
-// import { store } from '../../store/index.js'
+import { BillingTabInterface } from './settings/BillingTabInterface'
 
 let isInitail = true
 
@@ -84,8 +76,12 @@ export const ProfileSettingsInterface = () => {
         <>
             <Card>
                 <Title title="Settings" />
-                <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-                    <Tabs value={value} onChange={handleChange}>
+                <Box sx={{ borderBottom: 1, borderColor: "divider"}}>
+                    <Tabs value={value} onChange={handleChange} 
+                        TabIndicatorProps={{ sx: { display: 'none' } }}
+                        sx={{ '& .MuiTabs-flexContainer': {
+                        flexWrap: 'wrap',
+                    },  }}>
                         <Tab label="Profile" className="hover:bg-gray-500" {...a11yProps(0)}/>
                         <Tab label="Password" className="hover:bg-gray-500" {...a11yProps(0)}/>
                         <Tab label="Address" className="hover:bg-gray-500" {...a11yProps(0)}/>
@@ -105,7 +101,7 @@ export const ProfileSettingsInterface = () => {
                 <AddressTabInterface />
             </CustomTabPanel>
             <CustomTabPanel value={value} index={3}>
-                Item Four
+                <BillingTabInterface />
             </CustomTabPanel>
             <CustomTabPanel value={value} index={4}>
                 Item Five

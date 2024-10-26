@@ -85,6 +85,21 @@ export function inputBlurHandle(identifier, event, setEnteredInputIsInvalid) {
         
 }
 
+export function errorPayloadHandler(error, showErrors){
+    const errObj = JSON.stringify(error.errors)
+    const errors = JSON.parse(errObj)
+    if(errors){
+        for(const [key,value] of Object.entries(errors)){
+            console.log('Error Key',key)
+            console.log('Error Value',value)
+            showErrors([key], value)
+        }
+        return true
+    } else {
+        return false
+    }
+}
+
 
 export function errorHandlerPostRequest(error, showErrors){
     const ifArrayErrors = error?.body

@@ -3,6 +3,8 @@ import { useSelector } from 'react-redux' //connect
 import Select from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
 import FormControl from '@mui/material/FormControl'
+import FormLabel from '@mui/material/FormLabel'
+import FormGroup from '@mui/material/FormGroup'
 // import { NativeSelect } from '@mui/material'
 import InputLabel from '@mui/material/InputLabel'
 import { dataProvider } from '../../../dataProvider/main/DataProvider'
@@ -13,12 +15,16 @@ import { useGetIdentity } from 'react-admin'
 import { LocationState, LocationCity } from '../../../store'
 // import { GetState, GetCity } from 'react-country-state-city/dist/cjs'
 
-const LocationInput = ({errorMessage: error, stateId, cityId}) => { // id,
+const LocationInput = ({errorMessage: error, stateId, cityId, onChange, stateError, cityError}) => { // id,
 
-    const [enteredInput, setEnteredInput] = useState({state_id: 2612, city_id: 77618})
+    const [enteredInput, setEnteredInput] = useState({state_id: '', city_id: ''})
     const [stateList, setStateList] = useState([])
     const [cityList, setCityList] = useState([])
+    // const stateError = error?.state_id
+    // const cityError = error?.city_id
 
+    console.log('got city id', cityId)
+    console.log('got state id', stateId)
     useEffect(() => {
         setState()
         setCities(stateId)
@@ -52,10 +58,16 @@ const LocationInput = ({errorMessage: error, stateId, cityId}) => { // id,
           setCityList(result)
         })
     }
+
+    const selectCityHandler = id => {
+        handleGeneralUserInput('city_id', id)
+        const city = cityList.find((city) => city.id === id )
+        onChange(city?.name)
+    }
     
     return (
         <>
-            <FormControl className='w-full'>
+            <FormControl className='w-full' error={stateError}>
                 <InputLabel id="state" >State</InputLabel>
                 {stateList.length > 0 && <Select
                     labelid='state'
@@ -63,28 +75,31 @@ const LocationInput = ({errorMessage: error, stateId, cityId}) => { // id,
                     className={`${error && 'border-red-500 border'} w-full block text-gray-700 rounded px-4 mb-3 leading-tight focus:outline-none focus:bg-white`}
                     id='state'
                     onChange={(e) => handleGeneralUserInput('state_id', e.target.value)}
-                    value={enteredInput.state_id}             
+                    value={enteredInput?.state_id}             
                 >
                     {
                         stateList.map((value, index) => (<MenuItem key={index} value={value.id}>{value.name}</MenuItem>))                        
                     }
                 </Select>}
-            </FormControl>
+             {(stateError != undefined && stateError != '') && <section className="text-red-500 text-xs text-center italic">select a state</section>}
+             </FormControl>
 
-            <FormControl className='w-full'>
+
+            <FormControl className='w-full' error={cityError}>
                 <InputLabel id="location" >City</InputLabel>
                 <Select
                     labelid="location"
                     label='location'
                     className={`${error && 'border-red-500 border'} w-full block text-gray-700 rounded px-4 mb-3 leading-tight focus:outline-none focus:bg-white`}
                     id='location'
-                    onChange={(e) => handleGeneralUserInput('city_id', e.target.value)}
-                    value={enteredInput.city_id} //libReactCity
+                    onChange={(e) => selectCityHandler(e.target.value)}
+                    value={enteredInput?.city_id} //libReactCity
                 >
                     {
-                        cityList.map((value, index) => (<MenuItem key={index} value={value.id}>{value.name}</MenuItem>))
+                        cityList.map((value, index) => (<MenuItem key={index} name={value.name} value={value.id}>{value.name}</MenuItem>))
                     }
                 </Select>
+            {(cityError != undefined && cityError != '') && <section className="text-red-500 text-xs italic text-center">select a city</section>}
             </FormControl>
         </>
     )

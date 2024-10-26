@@ -102,11 +102,11 @@ export const dataProvider = ({
         // }  
     },
     updateUserAddress: async (resource, params, payload) => {
-        const GetUrl = `/api/${resource}/${params}/email`
+        const GetUrl = `/api/${resource}/${params.email}/id/${params.id}`
         const token = inMemoryJwt.getToken()
-        const requestOptions = ApiFetchPostOptions({url: GetUrl, method:'PATCH'}, payload,{
+        const requestOptions = ApiFetchPostOptions({url: GetUrl, method:'POST'}, payload,{
             'X-Authorization': token, 
-            'Content-Type': 'application/merge-patch+json'
+            'Content-Type': 'application/json'
         })
 
         
@@ -115,7 +115,7 @@ export const dataProvider = ({
             const response = await request.json()               
             
             if(!request.ok){
-                throw new HttpError('messageError')
+                throw response
             }
             //   throw new HttpError(response.message, response.status)      
             return response
@@ -124,15 +124,4 @@ export const dataProvider = ({
             // console.log({ no_valid_auth_or_subscription: error })
         // }  
     },
-    getLocations: async (id) => {
-        try {
-            let getCities = []
-            const getStates = await GetState(countryid) // countryid
-            if(id) getCities = await GetCity(countryid, id)
-                return { getStates, getCities}
-        } catch (err) {
-            console.log({'locationSlice.js: - nr.11 - dataProvider ': err})
-            return err.message
-        }
-    }
 })
