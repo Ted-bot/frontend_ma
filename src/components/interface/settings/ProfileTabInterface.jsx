@@ -128,6 +128,7 @@ export const ProfileTabInterface = () => {
                                 // defaultValue={userIdentity?.email}
                                 value={enteredInput?.email}
                                 name={'email'} 
+                                label='email'
                                 type={'email'}
                                 onChange={(e) => handleGeneralUserInput('email', e.target.value)}
                                 onBlur={(e) => inputBlurHandle('email', e.target.value, setEnteredInputIsInvalid)}
@@ -138,7 +139,7 @@ export const ProfileTabInterface = () => {
                             <MuiTelInput
                                 className='w-full md:w-1/2'
                                 id={'phone_number'}
-                                // label={'PhoneNumber'}
+                                label={'PhoneNumber'}
                                 onChange={onPhoneChanged}
                                 // onChange={(e) => handleGeneralUserInput('phone_number', e.target.value)}
                                 onBlur={(e) => inputBlurHandle('phone_number', e.target.value, setEnteredInputIsInvalid)}

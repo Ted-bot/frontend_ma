@@ -5,33 +5,10 @@ import { HttpError } from "react-admin"
 import inMemoryJwt from "../../js/util/inMemoryJwt.js"
 import { dataProvider } from "../../dataProvider/main/DataProvider.jsx"
 
-export const updateUserIdentity = async (resource, params, payload) => {
-    dataProvider.updateUserIdentity(resource, params, payload)
-}
-
-export const user = () => {
-    const {dragonUser} = useUserIdentifier()
-    return dragonUser
-}
-
-export const getUserIdentity = async () => {
-    const identifier = getLocalStorageItem('email')
-        const token = inMemoryJwt.getToken()
-        const prepareQueryObj = ApiFetchGetOptions(`/api/user_by_email/${identifier}/email`,{ 'X-Authorization': token})
-        const authenticateClient = await ApiFetch(prepareQueryObj)
-        const getResults = await authenticateClient.json()
-        
-        // console.log({GEtIdentity: getResults})
-        // console.log({getSubscriptions: getResults.subscriptions.length !== 0 })
-        const validSubscription = getResults?.subscriptions?.length !== 0
-        inMemoryJwt.setValidSubscription(validSubscription)
-        const username = getResults["firstName"] + ' ' + getResults["lastName"]
-}
-
-const fetchUserCalendar = async () => {
+export const fetchUserCalendar = async () => {
     const email = getLocalStorageItem('email')
-    const token = inMemoryJwt.getToken()
-    const ApiOptions = ApiFetchGetOptions(`/api/subscribe/${email}/events`,{'X-Authorization': token})
+    // const token = inMemoryJwt.getToken()
+    const ApiOptions = ApiFetchGetOptions(`/api/subscribe/${email}/events`,{'X-Authorization': inMemoryJwt.getToken()})
     
     const request = await ApiFetch(ApiOptions)
     const response = await request.json()   
@@ -72,7 +49,7 @@ export const useUserCalendar = () => {
         queryFn: fetchUserCalendar,
         queryKey: ["userCalendar"], 
         refetchOnWindowFocus: false,        
-        refetchInterval: 60000,
+        // refetchInterval: 60000,
         retry: 5,
 })
     // const { data: userCalendar, status } = useQuery({queryKey:['userCalendar'], queryFn: fetchUserCalendar, refetchInterval: 6000})
@@ -92,53 +69,3 @@ export const useUserIdentifier = () => {
 
     return {dragonUser: userIdentity, status: status}
 }
-
-// const handleSubmit = async (id) => { 
-//     const email = getLocalStorageItem('email')
-//     const token = inMemoryJwt.getToken()
-
-//     const ApiOptions = ApiFetchPostOptions({url: '/api/subscribe/events', method:'POST'}, {event_id: id},{'X-Authorization': token})
-    
-//     // console.log({eventChosen : id})
-
-//     // try{
-//         const request = await ApiFetch(ApiOptions)
-//         const response = await request.json()
-
-//         if(!request.ok) throw new HttpError( "Something went wrong subscribing you to an event :( " , response.status)
-
-//             console.log({WhatKrijgIkTerug: response})
-//         if(response?.message) return response
-        
-        
-//         // if(request.error) return setResponseRequest(response) 
-
-//     // } catch (error){
-//     //     console.log({SubscribeEventError: error})
-//     //     // showBoundary(error)
-//     // }
-// }
-// // export const id = {id:0}
-// export const useAddToUserCalendar = (id) => {
-//     const id = id
-//     const { addToUserCalendar, status } = useQuery({
-//         queryKey: ["addToUserCalendar"], 
-//         queryFn: (id) => {        
-//             fetch(`/api/subscribe/${email}/event/${id}`,{
-//                  method:'POST',
-//                  headers: {
-//                      "Content-Type":"application/json",
-//                      'X-Authorization': token
-//                  },
-//                  body: JSON.stringify({event_id:id})}
-//              )
-//          }
-//         // refetch: 6000
-//     })
-
-//     return {addToUserCalendar, status: status}
-// }
-
-
-
-// queryClient.invalidateQueries('userCalendar')

@@ -7,12 +7,7 @@ import { PostError } from '../../js/error/PostError.js'
 import inMemoryJwt from '../../js/util/inMemoryJwt.js'
 import { HttpError } from 'react-admin'
 import { dataProvider } from './DataProvider.jsx'
-import { useUserIdentifier, user } from '../../hooks/query/usePublisedEvents.jsx'
-// import { userLoggedIn } from '../../store/features/auth/authSlice.jsx'
-// import { useDispatch } from 'react-redux'
-// import { AppDispatch } from '../../store/index.js'
-// import { selectUsersResult } from '../../store/features/users/userSlice.jsx'
-// const dispatch = AppDispatch
+import { useUserIdentifier } from '../../hooks/query/usePublisedEvents.jsx'
 
 
 export const authProvider = {
@@ -82,7 +77,6 @@ export const authProvider = {
         // return Promise.resolve({redirectTo: '/dashboard', logoutUser: false })
     },
     getIdentity: async () => {
-        //  const dragonUser = user()
         const identifier = getLocalStorageItem('email')
         const token = inMemoryJwt.getToken()
         const prepareQueryObj = ApiFetchGetOptions(`/api/user_by_email/${identifier}/email`,{ 'X-Authorization': token})

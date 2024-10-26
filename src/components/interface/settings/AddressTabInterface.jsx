@@ -11,40 +11,32 @@ import { inputBlurHandle } from '../../class/userData/FormHelper.jsx'
 // import { useGetLocationsQuery } from '../../../store/features/api/apiSlice.jsx'
 // import { useGetUserRecentAddressQuery } from '../../../store/features/api/apiSlice.jsx'
 // import { selectUsersResult } from '../../../store/features/users/userSlice.jsx'
+import { useGetIdentity } from 'react-admin'
+import { changeObjKeysToCamelCaseFields } from '../../../js/util/postUtil.js'
+import { dataProvider } from '../../../dataProvider/main/DataProvider.jsx'
+import { LocationState, LocationCity } from '../../../store/index'
+
 
 export const AddressTabInterface = () => {    
     const typeText = 'text'
     const typeMixed = 'mixed'
     const typeLocation = 'location'
-    let stateSelected = {id:2612}
+
+    const { isPending: isLoading, error: isError, data: userIdentity = {email: '', phoneNumber: ''}, refetch } = useGetIdentity()
 
     const [enteredInput, setEnteredInput] = useState(getNewUserObjOrStorageData(storageNameModifyUser))
     const [errors, setErrors] = useState(inputValidList)
     const [enteredInputIsInvalid, setEnteredInputIsInvalid] = useState(inputValidList)
-    const [buttonPressed, setButtonPressed] = useState(false)
     
-    const {state, dispatch} = useUserFormContext()
-    const reduxDispatch = useDispatch()
-    const {data: userRecentAddress} = useGetUserRecentAddressQuery()
-    // const getLocations = async (id) => {
-    //     await useGetLocationsQuery(id)
-    //     // await reduxDispatch(getAvailableLocations(id))
-    // }
-    const user = selectUsersResult()
-    // const {city_list:cityList, state_list: stateList} = getLocations(stateSelected.id) // , state_id: stateId, city_id: cityId
-    const {city_list:cityList, state_list: stateList, state_id: stateId, city_id: cityId, phone_number} = user // , state_id: stateId, city_id: cityId
-    
-    console.log({userObj: user, stateId, cityId})
 
-
-    useEffect(() => { 
-        // getLocations(stateSelected.id)
-        reduxDispatch(getAvailableLocations(stateSelected.id))
-        // reduxDispatch(getUserProfile())
-        
-        setAddressData(user)       
-        setButtonPressed(true)
-}, [buttonPressed])
+    useEffect(() => {
+        handleGeneralUserInput('city_id', Number(userIdentity.libReactCity))
+        handleGeneralUserInput('state_id', Number(userIdentity.libReactState))
+        handleGeneralUserInput('unitNumber', userIdentity.userAddress.unitNumber)
+        handleGeneralUserInput('streetNumber', userIdentity.userAddress.streetNumber)
+        handleGeneralUserInput('postalCode', userIdentity.userAddress.postalCode)
+        handleGeneralUserInput('addressLine', userIdentity.userAddress.addressLine)
+    },[])
 
     function setAddressData(obj){
         for (const [key, value] of Object.entries(obj)) {
@@ -62,46 +54,32 @@ export const AddressTabInterface = () => {
             ...prevValues,
             [identifier]: value
         }))
-        const updateUserForm = {[identifier]: value}
-        dispatch({type: 'SET_GENERAL_USER_DATA', payload: updateUserForm})
-    }
-
-    const handleStatelUserInput = (identifier, value) => {
-        stateSelected = stateList.find((state) => state.value == Number(value))      
-        handleGeneralUserInput('state_id', stateSelected.value)        
-        handleGeneralUserInput(identifier, stateSelected.label)
-        reduxDispatch(getAvailableLocations(stateSelected.value))
-    }
-
-    const handleCitylUserInput = (identifier, value) => {
-        const city = cityList.find((city) => city.value === value)
-        // console.log({gotCity: city, value, identifier})
-        handleGeneralUserInput(identifier, city.label)
-        handleGeneralUserInput('city_id', city.value)
+        // const updateUserForm = {[identifier]: value}
+        // dispatch({type: 'SET_GENERAL_USER_DATA', payload: updateUserForm})
     }
 
     const InterfaceConfiguration = {
         buttonname: 'Save Changes',
         setItems : [
-            { name: 'Unit Number', id: 'unit_number',  type: typeText, placeholder: 'unit number', defaultValue: '',value: enteredInput?.unitNumber, invalid: enteredInputIsInvalid.unitNumber, error: errors?.unit_number, onChange: (e) => handleGeneralUserInput('unitNumber', e), onBlur: (e) => inputBlurHandle('unitNumber', e, typeText)},
-            { name: 'Street Number', id: 'street_number', type: typeText, placeholder: 'street number', min: 0, defaultValue: '',value: enteredInput?.streetNumber, invalid: enteredInputIsInvalid.streetNumber, error: errors?.street_number, onChange: (e) => handleGeneralUserInput('streetNumber', e), onBlur: (e) => inputBlurHandle('streetNumber', e, 'number')},
-            { name: 'Street Name', id: 'address_line', type: typeText, placeholder: 'address line', defaultValue: '',value: enteredInput?.addressLine, invalid: enteredInputIsInvalid.addressLine, error: errors?.address_line, onChange: (e) => handleGeneralUserInput('addressLine', e), onBlur: (e) => inputBlurHandle('addressLine', e, typeText)},
-            { name: 'Postal Code', id: 'postal_code', type: typeText, placeholder: 'postal code', defaultValue: '',value: enteredInput?.postalCode, invalid: enteredInputIsInvalid.postalCode, error: errors?.postalCode, onChange: (e) => handleGeneralUserInput('postalCode', e), onBlur: (e) => inputBlurHandle('postalCode', e, typeMixed) },
-            { name: 'Location', id: 'location', type: typeLocation, value: enteredInput?.city, cityId: enteredInput?.city_id, stateId: enteredInput?.state_id, error: errors?.location, invalid: enteredInputIsInvalid?.city,
-                onChangeState: (e) => handleStatelUserInput('state', e.target.value), onChangeCity: (e) => handleCitylUserInput('city', e.target.value), onBlur : (e) => inputBlurHandle('city', e.target.value, setEnteredInputIsInvalid)},
+            { name: 'Unit Number', id: 'unit_number',  type: typeText, placeholder: 'unit number', value: enteredInput?.unitNumber, invalid: enteredInputIsInvalid.unit_number, error: errors?.unit_number, onChange: (e) => handleGeneralUserInput('unitNumber', e), onBlur: (e) => inputBlurHandle('unit_number', e.target.value, setEnteredInputIsInvalid)},
+            { name: 'Street Number', id: 'street_number', type: typeText, placeholder: 'street number', value: enteredInput?.streetNumber, invalid: enteredInputIsInvalid.street_number, error: errors?.street_number, onChange: (e) => handleGeneralUserInput('streetNumber', e.target.value), onBlur: (e) => inputBlurHandle('street_number', e.target.value, setEnteredInputIsInvalid)},
+            { name: 'Street Name', id: 'address_line', type: typeText, placeholder: 'address line', value: enteredInput?.addressLine, invalid: enteredInputIsInvalid.address_line, error: errors?.address_line, onChange: (e) => handleGeneralUserInput('addressLine', e.target.value), onBlur: (e) => inputBlurHandle('address_line', e.target.value, setEnteredInputIsInvalid)},
+            { name: 'Postal Code', id: 'postal_code', type: typeText, placeholder: 'postal code', value: enteredInput?.postalCode, invalid: enteredInputIsInvalid.postal_code, error: errors?.postalCode, onChange: (e) => handleGeneralUserInput('postalCode', e.target.value), onBlur: (e) => inputBlurHandle('postal_code', e.target.value, setEnteredInputIsInvalid) },
+            { name: 'Location', id: 'location', type: typeLocation, error: errors?.location, stateId: enteredInput?.state_id, cityId: enteredInput?.city_id},
             ]
     }
     
-    console.log({enteredInputProfileTab: InterfaceConfiguration.setItems})
+    console.log({enteredInputIsInvalid: enteredInputIsInvalid})
 
     const handleSubmit = (e) => {
         let data = {}
         for (const [key, value] of Object.entries(e.target)){
-            if(value.id === 'location' || value.id === 'region' || !value.id) continue
+            if(value.id === 'undefined' || value.id === 'region' || !value.id) continue
             data = {...data, [value.id]: value.value}
         }
-        reduxDispatch(sendUpdateNotification(data))
-        setButtonPressed(true)
+        const requstBody = changeObjKeysToCamelCaseFields(data)
+        console.log({ready_to_send_request:requstBody})
+        // reduxDispatch(sendUpdateNotification(data))
     }
 
     return(

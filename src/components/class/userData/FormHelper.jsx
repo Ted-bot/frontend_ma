@@ -15,32 +15,35 @@ export const checkForInvalidInputUser = (enteredInputIsInvalid) => {
 export function inputBlurHandle(identifier, event, setEnteredInputIsInvalid) {
     const regexSearch = /^[A-Za-z]+$/
     
-    if(identifier == 'gender')
+    if(identifier === 'gender')
         {
             setEnteredInputIsInvalid((prevValues) => ({
                 ...prevValues,
                 [identifier] : event ? false : true
             }))
+            return
         }        
     
-    if(identifier == 'first_name' || identifier == 'last_name')
+    if(identifier === 'first_name' || identifier == 'last_name')
         {
             console.log({[identifier]: regexSearch.test(event)})
             setEnteredInputIsInvalid((prevValues) => ({
                 ...prevValues,
                 [identifier] : regexSearch.test(event) ? false : true
             }))
+            return
         }
 
-    if(identifier == 'email')
+    if(identifier === 'email')
         {
             setEnteredInputIsInvalid((prevValues) => ({
                 ...prevValues,
                 [identifier] : (!event.includes('@') || event == '' || event === null) ? true : false
             }))
+            return
         }
 
-    if(identifier == 'date_of_birth' )
+    if(identifier === 'date_of_birth' )
         {
             const currentYear = new Date().getFullYear();
             const yearOfBirth = event.split("-")[0]
@@ -52,23 +55,34 @@ export function inputBlurHandle(identifier, event, setEnteredInputIsInvalid) {
                 ...prevValues,
                 [identifier] : (age > 17) || (age < 60) ? false : true
             }))
+            return
         }
         
-    if(identifier == 'password' )
+    if(identifier === 'password' )
         {
             setEnteredInputIsInvalid((prevValues) => ({
                 ...prevValues,
                 [identifier] : (event.length < 6)   ? true : false
             }))
+            return
         }
 
-    if(identifier == 'phone_number' || identifier == 'conversion')
+    if(identifier === 'phone_number' || identifier == 'conversion')
         {
             setEnteredInputIsInvalid((prevValues) => ({
                 ...prevValues,
                 [identifier] : (event == '') ? true : false
             }))
+            return
         }
+
+        if(identifier != 'unit_number'){
+            setEnteredInputIsInvalid((prevValues) => ({
+                ...prevValues,
+                [identifier] : (event === '') ? true : false
+            }))
+        }
+        
 }
 
 

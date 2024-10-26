@@ -66,7 +66,7 @@ export const PasswordTabInterface = () => {
                         // defaultValue={defaultValue}
                         value={enteredInput?.password}
                         name={'password'} 
-                        // label={'password'}
+                        label={'new password'}
                         type={'password'}
                         onChange={(e) => handleGeneralUserInput('password', e.target.value)}
                         onBlur={(e) => inputBlurHandle('password', e.target.value, setEnteredInputIsInvalid)}

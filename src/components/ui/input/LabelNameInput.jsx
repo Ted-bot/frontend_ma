@@ -8,7 +8,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker'
 import NativeSelect from '@mui/material/NativeSelect'
 import { camelCaseToLoWithSpace } from '../../../js/util/postUtil'
 
-import LocationInput from './LocationInput'
+import LocationInput from './LocationInput.jsx'
 
 /* eslint-disable react/prop-types */
 // eslint-disable-next-line no-unused-vars
@@ -42,6 +42,9 @@ export default function LabelNameInput({
     console.log({new_phone_number: val})
     onChange(val)
     setPhoneNumber(val)
+  }
+  if(id === 'street_number'){
+      console.log({Is_Invalid_StreetNumber : invalid})
   }
 
     return (
@@ -114,10 +117,9 @@ export default function LabelNameInput({
                         <>
                             <section className='flex w-full justify-evenly'>
                                 <LocationInput 
-                                    // id={id}
+                                    stateId={stateId}
+                                    cityId={cityId}
                                     errorMessage={error} 
-                                    onChangeCity={onChangeCity} 
-                                    onChangeState={onChangeState}
                                 />
                             </ section> 
                         </>
