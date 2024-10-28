@@ -35,8 +35,8 @@ export const AddressTabInterface = () => {
     
 
     useEffect(() => {
-        // console.log('got city id', userIdentity.userAddress.cityId)
-        // console.log('got state id', userIdentity.userAddress.stateId)
+        console.log('got city id', userIdentity.userAddress.cityId)
+        console.log('got state id', userIdentity.userAddress.stateId)
         handleGeneralUserInput('city_id', Number(userIdentity.userAddress.cityId))
         handleGeneralUserInput('state_id', Number(userIdentity.userAddress.stateId))
         handleGeneralUserInput('unitNumber', userIdentity.userAddress.unitNumber)
@@ -78,7 +78,7 @@ export const AddressTabInterface = () => {
         }
         // const requstBody = changeObjKeysToCamelCaseFields(data)
         // console.log({ready_to_send_request:data})
-        dataProvider.updateUserAddress('address', {email: userIdentity?.email, id: data.address_id},data)
+        dataProvider.updateUserAddress('user_address_dashboard', {email: userIdentity?.email, id: data.address_id},data)
         .then(() => {
             notify(`Success updating Address`, { type: 'success' })
         }).catch((error) => {

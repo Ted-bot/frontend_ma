@@ -30,7 +30,6 @@ const LoginDashboardLoader = () => {
         //     redirect('/dashboard')
         // })
     }
-console.log({errorLogin: errors})
     return (
             <section className="flex flex-col w-full items-center shadow-md bg-orange-100 py-24 rounded-md px-3 md:shadow-xl">
                 <section  className={`w-full py-24 bg-orange-300 rounded-md md:w-1/2 lg:justify-center px-3 mb-6 md:mb-0`}>

@@ -23,8 +23,8 @@ const LocationInput = ({errorMessage: error, stateId, cityId, onChange, stateErr
     // const stateError = error?.state_id
     // const cityError = error?.city_id
 
-    console.log('got city id', cityId)
-    console.log('got state id', stateId)
+    // console.log('got city id', cityId)
+    // console.log('got state id', stateId)
     useEffect(() => {
         setState()
         setCities(stateId)
