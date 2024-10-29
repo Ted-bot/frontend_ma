@@ -23,7 +23,7 @@ export const AddressTabInterface = () => {
     const typeLocation = 'location'
     const notify = useNotify()
 
-    const { isPending: isLoading, error: isError, data: userIdentity = {email: '', phoneNumber: ''} } = useGetIdentity()
+    const { isPending: isLoading, error: isError, data: userIdentity = {city_id: '77339', state_id: '2612'} } = useGetIdentity()
 
     const [enteredInput, setEnteredInput] = useState(getUpdateUserObjOrStorageData(storageNameModifyUser))
     // state_id: 2612, city_id: 77618
@@ -35,8 +35,8 @@ export const AddressTabInterface = () => {
     
 
     useEffect(() => {
-        console.log('got city id', userIdentity.userAddress.cityId)
-        console.log('got state id', userIdentity.userAddress.stateId)
+        // console.log('got city id', userIdentity.userAddress.cityId)
+        // console.log('got state id', userIdentity.userAddress.stateId)
         handleGeneralUserInput('city_id', Number(userIdentity.userAddress.cityId))
         handleGeneralUserInput('state_id', Number(userIdentity.userAddress.stateId))
         handleGeneralUserInput('unitNumber', userIdentity.userAddress.unitNumber)

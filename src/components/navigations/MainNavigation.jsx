@@ -141,6 +141,11 @@ function MainNavigation() {
                     <nav className="hidden md:flex space-x-4 text-cyan-400">
                         {navList()}
                     </nav>
+                    <section
+                        className={`${openNav ? '' : 'hidden'} mt-4 bg-gradient-to-r from-violet-500 to-opacity-90 flex flex-col gap-4 p-6  rounded text-cyan-400`}
+                    >
+                        {navList()}
+                    </section>
                     
                 </section>
             </header>
