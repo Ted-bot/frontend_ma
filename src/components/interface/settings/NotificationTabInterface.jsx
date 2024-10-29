@@ -11,29 +11,31 @@ import ActionUserSubscriptionButton from "../../ui/button/ActionUserSubscription
 import { grey } from '@mui/material/colors'
 
 
-export const BillingTabInterface = () => {
+export const NotificationTabInterface = () => {
     
     const {data: userIdentity, isPending, error} = useGetIdentity()
-    const [subscriptions, setSubscriptions] = useState([])
+    const [registeredEvents, setRegisteredEvents] = useState([])
     const notify = useNotify()
     const [rowId, setRowId] = useState(false)
+    const [pageSize, setPageSize] = useState(5)
     const apiRef = useGridApiRef()
    
     console.log({userEmail: userIdentity?.email})
     useEffect(() => {
-        dataProvider.getAllSubscriptions('user_subscriptions', userIdentity?.email)
+        dataProvider.getUserRegisteredEvents('registered_events', userIdentity?.email)
                 .then((response) => {
-                    console.log({loading_subscriptions: response})
-                    setSubscriptions(response)
+                    console.log({loading_registeredEvents: response})
+                    setRegisteredEvents(response['hydra:member'])
+                    notify(`Succes loading events`, { type: 'success' })
                 }).catch((error) => {
-                    notify(`Failed loading subscriptions`, { type: 'error' })
+                    notify(`Failed loading events`, { type: 'error' })
                 })
     },[])
 
     useEffect(() => {
         const handleRowClick = (params) => {
-            if(params.row.status !== 'paid') return
-            alert(`If you want to cancell ${params.row.name} \n proceed with the cancel button`)
+            // if(params.row.status !== 'paid') return
+            // alert(`If you want to cancell ${params.row.title} \n proceed with the cancel button`)
         }
     
         // The `subscribeEvent` method will automatically unsubscribe in the cleanup function of the `useEffect`.
@@ -41,44 +43,32 @@ export const BillingTabInterface = () => {
       }, [apiRef])
 
     const columns = [
-        { field: 'name', headerName: 'Name', width: 150 },
-        { field: 'amount', headerName: 'month', width: 150 },
-        { field: 'start', headerName: 'start date', width: 130},
+        // { field: 'id', headerName: 'ID', width: 150 },
+        { field: 'title', headerName: 'Event', width: 150 },
+        { field: 'day', headerName: 'start date', width: 130},
+        { field: 'start', headerName: 'end date', width: 130 },
         { field: 'end', headerName: 'end date', width: 130 },
-        { field: 'updated', headerName: 'updated', width: 130},
-        { field: 'status', headerName: 'status', width: 100 },
-        { field: 'tokens', headerName: 'tokens', width: 150 },
-        { field: 'uuid', headerName: 'uuid', width: 150 },
-        { 
-            field: 'actions', 
-            headerName: 'cancell subscription', 
-            type:'actions', 
-            renderCell: params => <ActionUserSubscriptionButton {...{params, rowId, setRowId}} /> 
-        },
-    ]
+        // { 
+        //     field: 'actions', 
+        //     headerName: 'cancell subscription', 
+        //     type:'actions', 
+        //     renderCell: params => <ActionUserSubscriptionButton {...{params, rowId, setRowId}} /> 
+        // },
+    ]      
 
-    const [pageSize, setPageSize] = useState(5)
-      
-
-    const rows = subscriptions.map(subscription => ({
-        id: subscription.id, 
-        name: subscription.subscribedProduct.name,
-        amount: subscription.amount,
-        start: moment(subscription.dateStart.date).format('dd D-M-y'),
-        end: moment(subscription.dateEnd.date).format('dd D-M-y'),
-        updated: moment(subscription.updatedAt.date).format('dd D-M-y'),
-        status: subscription.status,
-        tokens: subscription.tokenManager.tokens,
-        uuid: subscription.uuid,
+    const rows = registeredEvents.map(registeredEvent => ({
+        id: registeredEvent.id, 
+        title: registeredEvent.title,
+        day: moment(registeredEvent.start).format('dd D-M-y'),
+        start: moment(registeredEvent.start).format('H:M'),
+        end: moment(registeredEvent.end).format('H:M'),
         })
     )
 
     // const autosizeOptions = {
     //     includeOutliers: true,
     //   }
-
-    console.log('subscriptions', subscriptions)
-
+    console.log('registeredEvents', registeredEvents)
     return(
         <>
             <Box
@@ -89,7 +79,7 @@ export const BillingTabInterface = () => {
                     component='h5'
                     sx={{ textAlign:'center', mt:3 , mb:3}}
                 >
-                    Manage subscriptions
+                    Manage registeredEvents
                 </Typography>
 
                 <DataGrid 
@@ -101,7 +91,7 @@ export const BillingTabInterface = () => {
                         columns: {
                             columnVisibilityModel: {
                               // Hide columns status and traderName, the other columns will remain visible
-                              uuid: false,
+                            //   uuid: false,
                             },
                         },
                         pagination: { paginationModel: { pageSize: 5 } },

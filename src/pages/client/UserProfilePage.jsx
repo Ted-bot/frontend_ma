@@ -36,6 +36,7 @@ const UserProfilePage = () => {
     }
   },[])
 
+
   if(userAuthenticated){
   return (
     <Card>

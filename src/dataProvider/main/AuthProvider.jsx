@@ -82,8 +82,12 @@ export const authProvider = {
         const prepareQueryObj = ApiFetchGetOptions(`/api/user_by_email/${identifier}/email`,{ 'X-Authorization': token})
         const authenticateClient = await ApiFetch(prepareQueryObj)
         const getResults = await authenticateClient.json()
+
+        delete getResults['@context']
+        delete getResults['@id']
+        delete getResults['@type']
         
-        // console.log({GEtIdentity: getResults})
+        console.log({GEtIdentity: getResults})
         // console.log({getSubscriptions: getResults.subscriptions.length !== 0 })
         const validSubscription = getResults?.subscriptions?.length !== 0
         inMemoryJwt.setValidSubscription(validSubscription)

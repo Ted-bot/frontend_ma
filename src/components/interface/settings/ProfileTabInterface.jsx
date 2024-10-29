@@ -129,7 +129,7 @@ export const ProfileTabInterface = () => {
                         <section className='w-full md:w-2/3 mt-5'>
                             <TextField
                                 className='w-full'
-                                error={errors && errors?.email}
+                                error={errors && !!errors?.email}
                                 id={'email'}
                                 // defaultValue={userIdentity?.email}
                                 value={enteredInput?.email}

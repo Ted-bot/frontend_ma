@@ -12,6 +12,7 @@ import {
  import { PasswordTabInterface } from './settings/PasswordTabInterface'
  import { AddressTabInterface } from './settings/AddressTabInterface'
 import { BillingTabInterface } from './settings/BillingTabInterface'
+import { NotificationTabInterface } from './settings/NotificationTabInterface'
 
 let isInitail = true
 
@@ -53,25 +54,7 @@ export const ProfileSettingsInterface = () => {
         setValue(newValue)
     }
 
-    // const test = useGetUserQuery()
-    // const dispatching = async () => await useGetUserQuery()
-    // dispatching()
 
-    // const notification = useSelector((state) => state.ui.notification)
-
-    // const test = useSelector(selectUsersResult)
-    
-    useEffect(() => {
-        // console.log({userREsults: test})
-        // console.log({singleUserREsults: selectUsersResult})
-        // if(notification){
-        //     setTimeout(()=> {
-        //         reduxDispatch(uiActions.showNotification(null))
-        //     }, 4000)
-        // }
-    }, []) //notification
-    
-    
     return (
         <>
             <Card>
@@ -91,7 +74,6 @@ export const ProfileSettingsInterface = () => {
                 </Box>
             </Card>
             <CustomTabPanel value={value} index={0}>
-                {/* {notification && <Notification status={notification.status} title={notification.title} message={notification.message} />} */}
                 <ProfileTabInterface />
             </CustomTabPanel>
             <CustomTabPanel value={value} index={1}>
@@ -104,7 +86,7 @@ export const ProfileSettingsInterface = () => {
                 <BillingTabInterface />
             </CustomTabPanel>
             <CustomTabPanel value={value} index={4}>
-                Item Five
+                <NotificationTabInterface />
             </CustomTabPanel>
         </>
     )

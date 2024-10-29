@@ -10,10 +10,19 @@ const ActionUserSubscriptionButton = ({params, rowId, setRowId}) => {
     const [loading, setLoading] = useState(false)
     const [success, setSuccess] = useState(false)
     const handleSubmit = async (e) => {
+        setLoading(true)
         console.log({cancel_button: e, params: params})
         dataProvider.cancelSubscription('cancel_user_subscription', params.email, {uuid: params.row.uuid, name: params.row.name})
-        .then(() => notify(`You have Cancelled your subscription`))
-        .catch(() => notify(`Currently we could not cancell your subscription, please try again at a later moment`))
+        .then(() => {
+            setLoading(false)
+            notify(`You have Cancelled your subscription`)
+            setSuccess(true)
+
+        })
+        .catch(() => {
+            setLoading(false)
+            notify(`Currently we could not cancell your subscription, please try again at a later moment`)
+        })
     }
 
     // useEffect(() => {
