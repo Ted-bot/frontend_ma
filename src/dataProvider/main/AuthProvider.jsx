@@ -4,12 +4,16 @@ import { jwtDecode } from "jwt-decode"
 import { ApiFetch, ApiFetchPostOptions } from '../../js/util/postUtil.js'
 import { ApiFetchGetOptions, getLocalStorageItem, setLocalStorageItem, deleteLocalStorageItem } from '../../js/util/getUtil.js'
 import { PostError } from '../../js/error/PostError.js'
-import inMemoryJWT from '../../js/util/inMemoryJwt.js'
-import { HttpError } from 'react-admin'
 import inMemoryJwt from '../../js/util/inMemoryJwt.js'
+import { HttpError } from 'react-admin'
+import { dataProvider } from './DataProvider.jsx'
+import { useUserIdentifier } from '../../hooks/query/usePublisedEvents.jsx'
+
 
 export const authProvider = {
     login: async ({ email, password }) => {
+        
+        // const dispatch = useDispatch()
         const apiOptions = {url: '/api/login_check', method: 'POST'} // , withCredentials: true
         const prepareQueryObj = ApiFetchPostOptions(apiOptions,{ username: email, password })
         const authenticateClient = await ApiFetch(prepareQueryObj)
@@ -19,46 +23,53 @@ export const authProvider = {
             { 
                 console.log({Login_Failed: response})
                 // throw new HttpError('Api Login error', authenticateClient.status, response)  
-                return Promise.reject(response)
+                return Promise.reject() //response
             }
+
         console.log({headerLoginJWT:authenticateClient.headers.getSetCookie(), headers:authenticateClient.headers,response: response})
         const token = response.token
         const refreshToken = response.refreshToken
         const getTokenData = jwtDecode(token)
         console.log({crack_token: getTokenData})
-        inMemoryJWT.setToken(token)
-        inMemoryJWT.setRefreshToken(refreshToken)
+
+        // AppDispatch(userLoggedIn({payload: getTokenData.username }))
+
+        inMemoryJwt.setToken(token)
+        inMemoryJwt.setRefreshToken(refreshToken)
         setLocalStorageItem('email', getTokenData.username)        
+        setLocalStorageItem('userId', getTokenData.id)        
                     
+        // return Promise.resolve({redirectTo: '/dashboard',})
         return Promise.resolve(authenticateClient)
             
     },
     logout: async () => {
         deleteLocalStorageItem('email')        
-        const request = new Request('/api/logout', { // http://localhost:80
-            method: 'GET',
-            headers: new Headers({ 
-                'Content-Type': 'application/json',
-                'X-authorization' : inMemoryJWT.getToken() 
-            }),
-            // credentials: 'include',
-        })
+        // const request = new Request('/api/logout', { // http://localhost:80
+        //     method: 'GET',
+        //     headers: new Headers({ 
+        //         'Content-Type': 'application/json',
+        //         'X-authorization' : inMemoryJwt.getToken() 
+        //     }),
+        //     // credentials: 'include',
+        // })
 
-        inMemoryJWT.ereaseToken()
+        inMemoryJwt.ereaseToken()
 
-        return fetch(request).then(() => '/dashboard/login')
-        // return Promise.resolve({ redirectTo: '/', logoutUser: true })
+        return '/'
+        // return Promise.resolve('/dashboard/login') // 
     },
     checkAuth: () => {
-        // inMemoryJWT.getToken() !== null ? Promise.resolve() : Promise.reject({ redirectTo: '/login', logoutUser: true })
-        return inMemoryJWT.waitForTokenRefresh().then(() => {
-            return inMemoryJWT.getToken() ? Promise.resolve() : Promise.reject();
+        // inMemoryJwt.getToken() !== null ? Promise.resolve() : Promise.reject({ redirectTo: '/login', logoutUser: true })
+        return inMemoryJwt.waitForTokenRefresh().then(() => {
+            return inMemoryJwt.getToken() ? Promise.resolve() : Promise.reject();
         })
     },
     checkError:  (error) => {
-        const status = error.status;
+        console.log({'AuthProvider': error})
+        const status = error?.status;
         if (status === 401 || status === 403) {
-            inMemoryJWT.ereaseToken()
+            inMemoryJwt.ereaseToken()
             return Promise.reject();
         }
         // other error code (404, 500, etc): no need to log out
@@ -67,23 +78,27 @@ export const authProvider = {
     },
     getIdentity: async () => {
         const identifier = getLocalStorageItem('email')
-        const token = inMemoryJWT.getToken()
+        const token = inMemoryJwt.getToken()
         const prepareQueryObj = ApiFetchGetOptions(`/api/user_by_email/${identifier}/email`,{ 'X-Authorization': token})
         const authenticateClient = await ApiFetch(prepareQueryObj)
         const getResults = await authenticateClient.json()
+
+        delete getResults['@context']
+        delete getResults['@id']
+        delete getResults['@type']
         
-        // console.log({GEtIdentity: getResults})
+        console.log({GEtIdentity: getResults})
         // console.log({getSubscriptions: getResults.subscriptions.length !== 0 })
-        const validSubscription = getResults.subscriptions.length !== 0
+        const validSubscription = getResults?.subscriptions?.length !== 0
         inMemoryJwt.setValidSubscription(validSubscription)
         const username = getResults["firstName"] + ' ' + getResults["lastName"]
         return Promise.resolve({...getResults, fullName: username ?? '...' })
         // return Promise.resolve()
     },
     getPermissions: () => {
-        // return inMemoryJWT.getToken() ?  Promise.resolve() : redirect('/login')
-        return inMemoryJWT.waitForTokenRefresh().then(() => {
-            return inMemoryJWT.getToken() ? Promise.resolve() : Promise.reject();
+        // return inMemoryJwt.getToken() ?  Promise.resolve() : Promise.reject()
+        return inMemoryJwt.waitForTokenRefresh().then(() => {
+            return inMemoryJwt.getToken() ? Promise.resolve() : Promise.reject();
         })
     }
 }    

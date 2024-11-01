@@ -7,13 +7,9 @@ import ErrorPage from './pages/ErrorPage.jsx'
 import { ReactQueryClientProvider } from './dataProvider/main/ReactQueryClientProvider.jsx'
 
 
+
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-     {/* <ReactQueryClientProvider> */}
-      {/* <ErrorBoundary FallbackComponent={ErrorPage} onError={() => console.log("Error (bubbeled up) caught")}> */}
-        <App />
-      {/* </ErrorBoundary>       */}
-     {/* </ReactQueryClientProvider> */}
-  </React.StrictMode>,
-  {trace:true}
+  <React.StrictMode>    
+        <App />   
+  </React.StrictMode>
 )

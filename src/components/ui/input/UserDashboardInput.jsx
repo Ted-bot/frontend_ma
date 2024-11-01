@@ -13,17 +13,17 @@ import LocationInput from './LocationInput.jsx'
 /* eslint-disable react/prop-types */
 // eslint-disable-next-line no-unused-vars
 export default function LabelNameInput({ 
-    id = 0,
+    id,
     name, 
     type, 
     error = false,
     invalid,
-    cityId = 0,
+    cityId,
     cityError, 
-    stateId = 0,
+    stateId,
     stateError,
     defaultValue = '',
-    value,
+    value = '',
     onChange,
     onBlur,
     onChangeState,
@@ -33,8 +33,10 @@ export default function LabelNameInput({
     const lowerCaseName = camelCaseToLoWithSpace(name)
 
     if(type === 'checkbox') checkBox = 1
+    if(id === 'email') console.log({defaultValue:defaultValue})
     
     const [phoneNumber, setPhoneNumber] = useState(defaultValue);
+  //const [phoneNumber, setPhoneNumber] = useState("+18182925620");
 
   const onPhoneChanged = (val) => {
     console.log({new_phone_number: val})
@@ -47,8 +49,8 @@ export default function LabelNameInput({
 
     return (
         <>
-            <section className={`${checkBox === 1 ? 'flex md:w-1/4' : 'w-full md:w-1/2'} lg:justify-center px-3 mb-6 md:mb-0`}>
-                <label className={`${checkBox === 1 ? 'flex flex-col md:w-1/4' : 'w-full md:w-1/2'} tracking-wide text-gray-700 text-xs font-bold mb-2`}>
+            <section className={`w-full md:w-[80] lg:justify-center px-3 mb-6 md:mb-0`}>
+                <label className={`w-full tracking-wide text-gray-700 text-xs font-bold mb-2`}>
                     <section className='mt-5'>
                     {
                         (type === 'text' || type === 'password' ) ?  //&& type != 'location'
@@ -56,7 +58,7 @@ export default function LabelNameInput({
                                 {/* ${error && 'border-red-500'}  */}
                             <TextField
                                 className='w-full'
-                                error={!!error}
+                                error={error}
                                 // className={`${checkBox === 1 ? 'h-8 w-8 lg:h-8 lg:w-12 accent-orange-300' : 'w-full appearance-none'}                                 
                                 // block bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`} 
                                 id={id}

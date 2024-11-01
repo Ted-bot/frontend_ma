@@ -1,5 +1,17 @@
-import {  prepRequestFields } from './auth'
+import {  prepRequestFields, prepUpdateFields } from './auth'
 import { funcValidateIBAN } from '../../components/ui/input/ValidateIBAN'
+
+const snakeToCamel = str => str.toLowerCase().replace(/(_\w)/g, m => m.toUpperCase().substr(1))
+
+const changeObjKeysToCamelCaseFields = (obj) => {
+    let convertedKeys = {}
+    for ( const [key, value] of Object.entries(obj)){
+        console.log({ChangeToCamel: key, value})
+        const newKeyName = snakeToCamel(key)
+        convertedKeys = {...convertedKeys, [newKeyName]: value}
+    }
+    return convertedKeys
+}
 
 export function ApiFetchPostOptions(defineRequest = {url : '', method : 'POST'}, data, headerOptions = null) {
     return {
@@ -27,6 +39,16 @@ export function getNewUserObjOrStorageData(name){
 
     if(!storedValues){
         return prepRequestFields
+    }
+
+    return JSON.parse(storedValues) 
+}
+
+export function getUpdateUserObjOrStorageData(name){
+    const storedValues = localStorage.getItem(name)
+
+    if(!storedValues){
+        return prepUpdateFields
     }
 
     return JSON.parse(storedValues) 
@@ -261,3 +283,6 @@ export function camelCaseToLoWithSpace(data)
     }
     return newKey
 }
+
+
+export {changeObjKeysToCamelCaseFields, snakeToCamel}

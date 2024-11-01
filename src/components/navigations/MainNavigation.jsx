@@ -141,53 +141,31 @@ function MainNavigation() {
                     <nav className="hidden md:flex space-x-4 text-cyan-400">
                         {navList()}
                     </nav>
-                    {/* <section
+                    <section
                         className={`${openNav ? '' : 'hidden'} mt-4 bg-gradient-to-r from-violet-500 to-opacity-90 flex flex-col gap-4 p-6  rounded text-cyan-400`}
                     >
                         {navList()}
-                    </section> */}
-                    {/* <section onClick={toggleAvatarDropdown} className="relative transition-all duration-500 w-24">
-                        <span className="cursor-pointer font-fondamento text-cyan-100">Wing Chun Amsterdam</span>
-                        <section className={`absolute ${openAvatarDropdown ? 'block' : 'hidden'} bg-gradient-to-r from-emerald-700/75 to-cyan-500/50 rounded shadow-md mt-2 space-y-2 hover:bg-blue-900/75`}>
-                            <section className='p-4 flex flex-col text-cyan-100'>
-                                <NavLink 
-                                    to="/"
-                                    className={({isActive}) => {
-                                        isActive ?? 'bg-yellow-500'
-                                    }}                                
-                                >
-                                    Profile
-                                </NavLink>
-                                <NavLink 
-                                    to="/sign-up"
-                                    className={({isActive}) => {
-                                        isActive ?? 'bg-yellow-500'
-                                    }}                                
-                                >
-                                    Dashboard
-                                </NavLink>
-                            </section>
-                        </section>
-                    </section> */}
+                    </section>
+                    
                 </section>
             </header>
         </>
     )
 }
-
-const MyLogoutButton = forwardRef((props, ref) => {
+// forwardRef((props, ref) => {
+const MyLogoutButton = (props, ref) => {
     const logout = useLogout();
     const handleClick = () => logout();
     return (
         <MenuItem
             onClick={handleClick}
-            ref={ref}
+            // ref={ref}
             // It's important to pass the props to allow Material UI to manage the keyboard navigation
-            {...props}
+            // {...props} 
         >
             <ExitIcon /> Logout
         </MenuItem>
-    );
-});
+    )
+}
 
 export default MainNavigation

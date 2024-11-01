@@ -1,11 +1,10 @@
-import { GetState } from "react-country-state-city/dist/cjs"
-import { countryid } from "../js/util/auth"
+import { storageNameNewUser } from "../js/util/auth"
 import { getLocalStorageItem } from "../js/util/getUtil"
+import { getStates } from "../components/class/userData/FormHelper"
 
-export async function SignUpLoader(){
-    const nameStorageItem = 'new_user'
-    const stateList = await GetState(countryid)
-    const userStoredFormData = getLocalStorageItem(nameStorageItem)
+export async function SignUpLoader(){    
+    const stateList = await getStates()
+    const userStoredFormData = getLocalStorageItem(storageNameNewUser)
 
-    return {stateList, nameStorageItem, userStoredFormData}
+    return {stateList, storageNameNewUser, userStoredFormData}
 }

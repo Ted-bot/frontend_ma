@@ -1,10 +1,10 @@
-import LabelNameInput from "../ui/input/LabelNameInput"
+import UserDashboardInput from "../ui/input/UserDashboardInput"
 
 // eslint-disable-next-line react/prop-types
-export default function CreateFormInterface({array}) {
+export default function DashboardFormInterface({array}) {
 
         return array.map((item) => (
-            <LabelNameInput
+            <UserDashboardInput
                 key={item.id}
                 {...item}
             />

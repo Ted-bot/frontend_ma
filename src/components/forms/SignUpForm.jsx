@@ -32,7 +32,7 @@ const typeLocation = 'location'
 // ps reset pw:TNrh5vrZ4N201n2
 // ps reset pw:GivjJD4guFwQhzv
 
-export default function SignUpForm({stateList, nameStorageItem, userStoredFormData}) {
+export default function SignUpForm({stateList, storageNameNewUser, userStoredFormData}) {
 
     const navigate = useNavigate()
     const navigation = useNavigation()
@@ -42,7 +42,7 @@ export default function SignUpForm({stateList, nameStorageItem, userStoredFormDa
     let isSubmitting = navigation.state === 'submitting'
     
     const [genderStatusRequired, setGenderStatusRequired] = useState(true)
-    const [enteredInput, setEnteredInput] = useState(getNewUserObjOrStorageData(nameStorageItem))
+    const [enteredInput, setEnteredInput] = useState(getNewUserObjOrStorageData(storageNameNewUser))
     const [enteredInputIsInvalid, setEnteredInputIsInvalid] = useState(inputValidList)
     const [cityList, setCityList] = useState([])
     const [firstRequest, setFirstRequest] = useState(true)
@@ -53,7 +53,7 @@ export default function SignUpForm({stateList, nameStorageItem, userStoredFormDa
             setEnteredInput(userStoredFormData)
             setFirstRequest(false)
         }
-        setLocalStorageItem(nameStorageItem,enteredInput)
+        setLocalStorageItem(storageNameNewUser,enteredInput)
     }, [enteredInput])
     
 
@@ -81,9 +81,10 @@ export default function SignUpForm({stateList, nameStorageItem, userStoredFormDa
     }
 
     const handleCitylUserInput = (identifier, value) => {
-        const city = cityList.find((city) => city.id == Number(value))
-        handleGeneralUserInput(identifier, city.name)
-        handleGeneralUserInput('city_id', city.id)
+        const city = cityList.find((city) => city.value === value)
+        // console.log({gotCity: city, value, identifier})
+        handleGeneralUserInput(identifier, city.label)
+        handleGeneralUserInput('city_id', city.value)
     }
     
     const handleStatelUserInput = (identifier, value) => {
@@ -113,7 +114,10 @@ export default function SignUpForm({stateList, nameStorageItem, userStoredFormDa
         ]
     }
 
-    function showErrors(identifier, message){ setErrors(() => { return {[identifier] : message} }) }
+    function showErrors(identifier, message){ setErrors(() => { 
+        if(identifier === 'city_id' || identifier === 'state_id') identifier = 'location'
+        return {[identifier] : message} 
+    }) }
 
     const postRequest = async (data) => {        
         try {
@@ -125,7 +129,7 @@ export default function SignUpForm({stateList, nameStorageItem, userStoredFormDa
             if(!request.ok) throw new HttpError('Something went wrong', 500, response.errors) 
 
             setErrors(inputValidList)            
-            deleteLocalStorageItem(nameStorageItem)
+            deleteLocalStorageItem(storageNameNewUser)
             navigate('/dashboard', {replace: true})
             
         } catch (error) {
@@ -151,7 +155,7 @@ export default function SignUpForm({stateList, nameStorageItem, userStoredFormDa
         }
     }    
     // console.log({ enteredInput: enteredInput })
-    // console.log({ enteredInput: errors })
+    console.log({ errorHttpRequest_SignUp: errors })
     return (
         <>'
             <section className="flex flex-col items-center shadow-md bg-slate-100 py-5 rounded-md px-3 sm:mx-4 w-full sm:px-5 sm:w-4/5 md:px-3 md:shadow-xl">

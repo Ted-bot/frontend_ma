@@ -21,6 +21,12 @@ import ErrorPage from './pages/ErrorPage.jsx'
 import { ReactQueryClientProvider } from './dataProvider/main/ReactQueryClientProvider.jsx'
 import { useUserFormContext, UserFormContextProvider } from './store/user-form-context.jsx'
 import { SignUpLoader } from './loader/SignUpLoader.jsx'
+// import { Provider } from 'react-redux'
+// import { store } from './store/index.js'
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+import { TabsProvider } from './store/tabs-context'
+
 
 function App() {
 
@@ -28,7 +34,7 @@ function App() {
     { 
       path: '/', 
       element: <RootLayout />,
-      errorElement: <ErrorPage />,
+      // errorElement: <ErrorPage />,
       id: 'root',
       loader: tokenLoader,
       children: [
@@ -45,16 +51,17 @@ function App() {
   ])
 
   return (
-    <ReactQueryClientProvider>
-        <UserFormContextProvider>
-      
-          <RouterProvider router={router} ></RouterProvider>
-      
-        </UserFormContextProvider>
-    </ReactQueryClientProvider>
-    // <QueryClientProvider client={queryClient}>
-      
-    // </QueryClientProvider>
+    // <Provider store={store}>
+      <ReactQueryClientProvider>
+          <UserFormContextProvider>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <TabsProvider>
+                <RouterProvider router={router} ></RouterProvider>
+              </TabsProvider>
+            </LocalizationProvider>        
+          </UserFormContextProvider>
+      </ReactQueryClientProvider>
+    // </Provider>
   )
 }
 

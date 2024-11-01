@@ -32,9 +32,10 @@ const UserProfilePage = () => {
 
   useEffect(() => {
     if(inMemoryJwt.getValidSubscription()){
-      dataProvider.getOneSubscription('user', email).then((response) => setData('subscription',response))
+      dataProvider.getOneSubscription('user_subscription', email).then((response) => setData('subscription',response))
     }
   },[])
+
 
   if(userAuthenticated){
   return (

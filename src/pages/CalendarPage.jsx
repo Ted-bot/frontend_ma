@@ -6,10 +6,12 @@ import CalendarModal from '../components/modal/CalendarModal.jsx'
 import { useUserCalendar } from '../hooks/query/usePublisedEvents.jsx'
 import { useQueryClient } from 'react-query'
 import inMemoryJwt from '../js/util/inMemoryJwt.js'
+import { useLoaderData } from 'react-router-dom'
 
 export default function CalendarPage(){
-    const {blackDragonEvents, status } = useUserCalendar()
-    const queryClient = useQueryClient()
+    // const {blackDragonEvents, status } = useUserCalendar()
+    const blackDragonEvents = useLoaderData()
+    // const queryClient = useQueryClient()
     const wrapName = 'Calendar'
     const token = inMemoryJwt.getToken()
     const dialog = useRef()

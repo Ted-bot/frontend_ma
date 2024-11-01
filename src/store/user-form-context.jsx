@@ -12,7 +12,7 @@ const reducer = (state, action) => {
     case 'SET_GENERAL_USER_DATA':
       return { ...state, ...action.payload }
     default:
-        return state;
+        return state
   }
 }
 

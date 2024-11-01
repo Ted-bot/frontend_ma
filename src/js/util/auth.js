@@ -4,6 +4,27 @@ export function getAuthToken(){
     // return token
 }
 
+export const storageNameNewUser = 'new_user'
+export const storageNameModifyUser = 'update_user'
+
+export const initialUserState = {
+    first_name: '',
+    last_name: '',
+    email: '',
+    password: '',
+    location: '',
+    phone_number: '',
+    region: '',
+    date_of_birth: '',
+    gender: '',
+    conversion: '',
+    city_id: null,
+    city_list: [],
+    state_id: null,
+    state_list: [],
+    // status: 'idle', // | 'loading' | 'succeeded' | 'failed'
+    // error: null
+}
 
 export function setAuthToken(data){
     if(getAuthToken() != null){
@@ -44,6 +65,18 @@ const prepRequestFields = {
     phone_number: '',
     conversion: '',
 }
+
+const prepUpdateFields = {
+    unitNumber: '',
+    streetNumber: '',
+    postalCode: '',
+    city: '',
+    city_id: 77618,
+    state:'',
+    state_id: 2612,
+    addressLine: '',
+    phone_number: '',
+} 
 
 const inputValidList = {
     gender: false,
@@ -110,4 +143,4 @@ const inputPaymentValidList = {
 || 
 */
 
-export {countryid, prepPaymentRequestFields, inputPaymentValidList, prepRequestFields, inputValidList}
+export {countryid, prepPaymentRequestFields, inputPaymentValidList, prepRequestFields, inputValidList, prepUpdateFields}

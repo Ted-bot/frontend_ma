@@ -1,15 +1,15 @@
-const inMemoryJWTManager = () => {
+const inMemoryJwtManager = () => {
     let logoutEventName = 'ra-logout'
     let refreshEndpoint = '/api/token/refresh'
-    let inMemoryJWT = null
+    let inMemoryJwt = null
     let refreshTimeOutId
     let isRefreshing = null
-    let inMemoryJWTRefresh = null
+    let inMemoryJwtRefresh = null
     let inMemoryCheckValidSubscription = false
 
     window.addEventListener('storage', (event) => {
         if (event.key === logoutEventName) {
-            inMemoryJWT = null
+            inMemoryJwt = null
         }
     })
 
@@ -40,27 +40,34 @@ const inMemoryJWTManager = () => {
         })
     }
 
-    // The method makes a call to the refresh-token endpoint
-    // If there is a valid cookie, the endpoint will return a fresh jwt.
-    const getRefreshedToken = () => {
+    const checkAvailableRefreshToken = () => {
         const cookies = document.cookie.split(';')
-        let tokenCookie = ''
         for (var i = 0; i < cookies.length; i++) {
             const cookie = cookies[i]
             const searchName = cookie.includes("xxx")
             if(searchName) {
-                tokenCookie = cookie.split("=")[1]
+                const tokenCookie = cookie.split("=")[1]
+                return tokenCookie
             }
+            return false
         }
+    }
+
+    // The method makes a call to the refresh-token endpoint
+    // If there is a valid cookie, the endpoint will return a fresh jwt.
+    const getRefreshedToken = () => {
+        
+        const tokenCookie = checkAvailableRefreshToken()
+
+        if(!tokenCookie) return
 
         const bodyJson = JSON.stringify({refreshToken: tokenCookie})
 
-        const request = new Request(refreshEndpoint, {
+        isRefreshing = fetch(refreshEndpoint, {
             method: 'POST',
             headers: new Headers({ 'Content-Type': 'application/json' }),
             body: bodyJson,
         })
-        isRefreshing = fetch(request)
             .then((response) => {
                 if (response.status !== 200) {
                     ereaseToken()
@@ -75,7 +82,7 @@ const inMemoryJWTManager = () => {
                 if (token) {
                     setRefreshToken(refreshToken)
                     setToken(token)
-                    return true
+                    return token
                 }
                 ereaseToken()
                 return false
@@ -84,7 +91,7 @@ const inMemoryJWTManager = () => {
             return isRefreshing
     }
 
-    const getToken = () => inMemoryJWT
+    const getToken = () => inMemoryJwt
     
     const getValidSubscription = () => inMemoryCheckValidSubscription
 
@@ -94,12 +101,12 @@ const inMemoryJWTManager = () => {
     }
 
     const setToken = (token) => {
-        inMemoryJWT = token
+        inMemoryJwt = token
         return true
     }
 
     const setRefreshToken = (token) => {
-        inMemoryJWTRefresh = token
+        inMemoryJwtRefresh = token
         const minutes = 10
         const expireDate = new Date()
         expireDate.setTime(expireDate.getTime()+(minutes*60*1000))
@@ -108,7 +115,7 @@ const inMemoryJWTManager = () => {
     }
 
     const ereaseToken = () => {
-        inMemoryJWT = null
+        inMemoryJwt = null
         const cookies = document.cookie.split(";");
 
         for (var i = 0; i < cookies.length; i++) {
@@ -139,8 +146,9 @@ const inMemoryJWTManager = () => {
         abordRefreshToken,
         waitForTokenRefresh,
         getValidSubscription,
-        setValidSubscription
+        setValidSubscription,
+        checkAvailableRefreshToken
     }
 }
 
-export default inMemoryJWTManager()
+export default inMemoryJwtManager()
