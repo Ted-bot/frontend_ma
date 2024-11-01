@@ -1,93 +1,81 @@
-import { useState, useEffect } from 'react'
-import PropTypes from 'prop-types'
+import { memo, useState, useCallback, useRef, useEffect } from 'react'
+import { useAuthenticated } from "react-admin"
 import { 
     Card,
     Box,
     Tabs,
     Tab,
-    TextField,
  } from "@mui/material"
- import { useAuthenticated, Title } from "react-admin"
- import { ProfileTabInterface } from './settings/ProfileTabInterface'
- import { PasswordTabInterface } from './settings/PasswordTabInterface'
- import { AddressTabInterface } from './settings/AddressTabInterface'
-import { BillingTabInterface } from './settings/BillingTabInterface'
-import { NotificationTabInterface } from './settings/NotificationTabInterface'
+ import { Title } from "react-admin"
+ import { ProfileTabInterface } from '../interface/settings/ProfileTabInterface'
+ import { PasswordTabInterface } from '../interface/settings/PasswordTabInterface'
+ import { AddressTabInterface } from '../interface/settings/AddressTabInterface'
+import { BillingTabInterface } from '../interface/settings/BillingTabInterface'
+import { NotificationTabInterface } from '../interface/settings/NotificationTabInterface'
+import { CustomTabPanel, a11yProps } from '../interface/settings/CustomTabPanel'
+import { useTabsContext } from '../../store/tabs-context'
 
-let isInitail = true
-
-function CustomTabPanel(props) {
-    const { children, value, index, ...other } = props    
-
-    return (
-        <div
-            role="tabpanel"
-            hidden={value !== index}
-            id={`simple-tabpanel-${index}`}
-            aria-labelledby={`simple-tab-${index}`}
-            {...other}
-        >
-            {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
-        </div>
-    )
-}
-
-CustomTabPanel.propTypes = {
-    children: PropTypes.node,
-    index: PropTypes.number.isRequired,
-    value: PropTypes.number.isRequired,
-}
-
-function a11yProps(index) {
-    return {
-      id: `simple-tab-${index}`,
-      'aria-controls': `simple-tabpanel-${index}`,
-    }
-  }
 
 export const ProfileSettingsInterface = () => {
     useAuthenticated()
-    // const reduxDispatch = useDispatch()
+    const {state, dispatch} = useTabsContext()
 
-    const [value, setValue] = useState(0)
-    const handleChange = (event, newValue) => {
-        setValue(newValue)
+    console.log('tabsNumber', state.tabNumber)
+    const [value, setValue] = useState(state.tabNumber)
+    const handleChange = useCallback( 
+        (event, newValue) => {
+          dispatch({type: 'CHANGE_TAB_NUMBER', payload: newValue})
+          setValue(newValue)
     }
-
+  )
 
     return (
         <>
-            <Card>
-                <Title title="Settings" />
-                <Box sx={{ borderBottom: 1, borderColor: "divider"}}>
-                    <Tabs value={value} onChange={handleChange} 
-                        TabIndicatorProps={{ sx: { display: 'none' } }}
-                        sx={{ '& .MuiTabs-flexContainer': {
-                        flexWrap: 'wrap',
-                    },  }}>
-                        <Tab label="Profile" className="hover:bg-gray-500" {...a11yProps(0)}/>
-                        <Tab label="Password" className="hover:bg-gray-500" {...a11yProps(0)}/>
-                        <Tab label="Address" className="hover:bg-gray-500" {...a11yProps(0)}/>
-                        <Tab label="Billing" className="hover:bg-gray-500" {...a11yProps(0)}/>
-                        <Tab label="Notifications" className="hover:bg-gray-500" {...a11yProps(0)}/>
-                    </Tabs>
-                </Box>
-            </Card>
-            <CustomTabPanel value={value} index={0}>
-                <ProfileTabInterface />
-            </CustomTabPanel>
-            <CustomTabPanel value={value} index={1}>
-                <PasswordTabInterface />
-            </CustomTabPanel>
-            <CustomTabPanel value={value} index={2}>
-                <AddressTabInterface />
-            </CustomTabPanel>
-            <CustomTabPanel value={value} index={3}>
-                <BillingTabInterface />
-            </CustomTabPanel>
-            <CustomTabPanel value={value} index={4}>
-                <NotificationTabInterface />
-            </CustomTabPanel>
+              <Card sx={{ width:{xs: '100vw', md:'100%'} }}>
+                  <Title title="Settings" />
+                  <Box sx={{ borderBottom: 1, borderColor: "divider"}}>
+                      <Tabs value={value} onChange={handleChange} 
+                          TabIndicatorProps={{ sx: { display: 'none' } }}
+                          sx={{ '& .MuiTabs-flexContainer': {
+                          flexWrap: 'wrap',
+                      },  }}>
+                          <Tab label="Profile" className="hover:bg-gray-500" {...a11yProps(0)}/>
+                          <Tab label="Password" className="hover:bg-gray-500" {...a11yProps(1)}/>
+                          <Tab label="Address" className="hover:bg-gray-500" {...a11yProps(2)}/>
+                          <Tab label="Billing" className="hover:bg-gray-500" {...a11yProps(3)}/>
+                          <Tab label="Notifications" className="hover:bg-gray-500" {...a11yProps(4)}/>
+                      </Tabs>
+                  </Box>
+              </Card>
+              <CustomTabPanel value={value} index={0}>
+                  <ProfileTabInterface />
+              </CustomTabPanel>
+              <CustomTabPanel value={value} index={1}>
+                  <PasswordTabInterface />
+              </CustomTabPanel>
+              <CustomTabPanel value={value} index={2}>
+                  <AddressTabInterface />
+              </CustomTabPanel>
+              <CustomTabPanel value={value} index={3}>
+                  <BillingTabInterface />
+              </CustomTabPanel>
+              <CustomTabPanel value={value} index={4}>
+                  <NotificationTabInterface />
+              </CustomTabPanel>
         </>
     )
 } 
+
+export default function Counts() {
+  const renderCount = useRef(0);
+  return (
+    <div className="mt-3">
+      <p className="dark:text-white">
+        Nothing has changed here but I've now rendered:{" "}
+        <span className="dark:text-green-300 text-grey-900">
+          {(renderCount.current ++)} time(s)
+        </span>
+      </p>
+    </div>
+  );
+}

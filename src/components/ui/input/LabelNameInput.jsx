@@ -13,17 +13,17 @@ import LocationInput from './LocationInput.jsx'
 /* eslint-disable react/prop-types */
 // eslint-disable-next-line no-unused-vars
 export default function LabelNameInput({ 
-    id,
+    id = 0,
     name, 
     type, 
     error = false,
     invalid,
-    cityId,
+    cityId = 0,
     cityError, 
-    stateId,
+    stateId = 0,
     stateError,
     defaultValue = '',
-    value = '',
+    value,
     onChange,
     onBlur,
     onChangeState,
@@ -33,10 +33,8 @@ export default function LabelNameInput({
     const lowerCaseName = camelCaseToLoWithSpace(name)
 
     if(type === 'checkbox') checkBox = 1
-    if(id === 'email') console.log({defaultValue:defaultValue})
     
     const [phoneNumber, setPhoneNumber] = useState(defaultValue);
-  //const [phoneNumber, setPhoneNumber] = useState("+18182925620");
 
   const onPhoneChanged = (val) => {
     console.log({new_phone_number: val})
@@ -58,7 +56,7 @@ export default function LabelNameInput({
                                 {/* ${error && 'border-red-500'}  */}
                             <TextField
                                 className='w-full'
-                                error={error}
+                                error={!!error}
                                 // className={`${checkBox === 1 ? 'h-8 w-8 lg:h-8 lg:w-12 accent-orange-300' : 'w-full appearance-none'}                                 
                                 // block bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`} 
                                 id={id}

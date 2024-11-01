@@ -1,11 +1,10 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo } from "react"
 import { dataProvider } from "../../../dataProvider/main/DataProvider"
 import { useGetIdentity } from 'react-admin'
 import { useNotify } from 'react-admin'
 import Box from "@mui/material/Box"
-import { DataGrid, gridClasses,useGridApiEventHandler,
-    useGridApiRef } from '@mui/x-data-grid'
-import { Fab, Typography } from "@mui/material"
+import { DataGrid, gridClasses, useGridApiRef } from '@mui/x-data-grid'
+import { Typography } from "@mui/material"
 import moment from "moment/moment"
 import ActionUserSubscriptionButton from "../../ui/button/ActionUserSubscriptionButton"
 import { grey } from '@mui/material/colors'
@@ -18,16 +17,16 @@ export const BillingTabInterface = () => {
     const notify = useNotify()
     const [rowId, setRowId] = useState(false)
     const apiRef = useGridApiRef()
+    const [pageSize, setPageSize] = useState(5)      
    
-    console.log({userEmail: userIdentity?.email})
     useEffect(() => {
         dataProvider.getAllSubscriptions('user_subscriptions', userIdentity?.email)
-                .then((response) => {
-                    console.log({loading_subscriptions: response})
-                    setSubscriptions(response)
-                }).catch((error) => {
-                    notify(`Failed loading subscriptions`, { type: 'error' })
-                })
+            .then((response) => {
+                console.log({loading_subscriptions: response})
+                setSubscriptions(response)
+            }).catch((error) => {
+                notify(`Failed loading subscriptions`, { type: 'error' })
+            })
     },[])
 
     useEffect(() => {
@@ -40,50 +39,43 @@ export const BillingTabInterface = () => {
         return apiRef.current.subscribeEvent('rowClick', handleRowClick)
       }, [apiRef])
 
-    const columns = [
-        { field: 'name', headerName: 'Name', width: 150 },
-        { field: 'amount', headerName: 'month', width: 150 },
-        { field: 'start', headerName: 'start date', width: 130},
-        { field: 'end', headerName: 'end date', width: 130 },
-        { field: 'updated', headerName: 'updated', width: 130},
-        { field: 'status', headerName: 'status', width: 100 },
-        { field: 'tokens', headerName: 'tokens', width: 150 },
-        { field: 'uuid', headerName: 'uuid', width: 150 },
+    const columns = useMemo(() => [
+        { field: 'name', headerName: 'name', resizable: true, flex: 1.2 },
+        { field: 'amount', headerName: 'amount', resizable: true, width: 80, align: 'center' },
+        { field: 'start', headerName: 'start date', resizable: true, width: 100 },
+        { field: 'end', headerName: 'end date', resizable: true, width: 100 },
+        { field: 'updated', headerName: 'updated', resizable: true, width: 100 },
+        { field: 'status', headerName: 'status', resizable: true, flex: 0.5 },
+        { field: 'tokens', headerName: 'tokens', resizable: true, flex: 0.5 },
+        { field: 'uuid', headerName: 'uuid', width: 100 },
         { 
             field: 'actions', 
             headerName: 'cancell subscription', 
             type:'actions', 
             renderCell: params => <ActionUserSubscriptionButton {...{params, rowId, setRowId}} /> 
         },
-    ]
-
-    const [pageSize, setPageSize] = useState(5)
-      
+    ], [rowId, setRowId])
 
     const rows = subscriptions.map(subscription => ({
         id: subscription.id, 
         name: subscription.subscribedProduct.name,
         amount: subscription.amount,
-        start: moment(subscription.dateStart.date).format('dd D-M-y'),
-        end: moment(subscription.dateEnd.date).format('dd D-M-y'),
-        updated: moment(subscription.updatedAt.date).format('dd D-M-y'),
+        start: moment(subscription.dateStart.date).format('dd D-M-YY'),
+        end: moment(subscription.dateEnd.date).format('dd D-M-YY'),
+        updated: moment(subscription.updatedAt.date).format('dd D-M-YY'),
         status: subscription.status,
         tokens: subscription.tokenManager.tokens,
         uuid: subscription.uuid,
-        })
+        })  
     )
 
     // const autosizeOptions = {
     //     includeOutliers: true,
     //   }
 
-    console.log('subscriptions', subscriptions)
-
     return(
         <>
-            <Box
-                sx={{ height: 400, width:'100%' }}
-            >
+            <Box sx={{ height: 400, width:{ xs:'85vw', md:'100%'} }} >
                 <Typography
                     variant='h5'
                     component='h5'
@@ -130,7 +122,6 @@ export const BillingTabInterface = () => {
                     }}
                     onRowClick={params=> setRowId(params.id)}    
                 />
-
             </Box>
         </>
     )

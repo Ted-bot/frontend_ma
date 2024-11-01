@@ -25,6 +25,8 @@ import { SignUpLoader } from './loader/SignUpLoader.jsx'
 // import { store } from './store/index.js'
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+import { TabsProvider } from './store/tabs-context'
+
 
 function App() {
 
@@ -53,7 +55,9 @@ function App() {
       <ReactQueryClientProvider>
           <UserFormContextProvider>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <RouterProvider router={router} ></RouterProvider>
+              <TabsProvider>
+                <RouterProvider router={router} ></RouterProvider>
+              </TabsProvider>
             </LocalizationProvider>        
           </UserFormContextProvider>
       </ReactQueryClientProvider>

@@ -26,7 +26,7 @@ export const NotificationTabInterface = () => {
                 .then((response) => {
                     console.log({loading_registeredEvents: response})
                     setRegisteredEvents(response['hydra:member'])
-                    notify(`Succes loading events`, { type: 'success' })
+                    // notify(`Succes loading events`, { type: 'success' })
                 }).catch((error) => {
                     notify(`Failed loading events`, { type: 'error' })
                 })
@@ -43,23 +43,23 @@ export const NotificationTabInterface = () => {
       }, [apiRef])
 
     const columns = [
-        // { field: 'id', headerName: 'ID', width: 150 },
-        { field: 'title', headerName: 'Event', width: 150 },
-        { field: 'day', headerName: 'start date', width: 130},
-        { field: 'start', headerName: 'end date', width: 130 },
-        { field: 'end', headerName: 'end date', width: 130 },
-        // { 
-        //     field: 'actions', 
-        //     headerName: 'cancell subscription', 
-        //     type:'actions', 
-        //     renderCell: params => <ActionUserSubscriptionButton {...{params, rowId, setRowId}} /> 
-        // },
+        // { field: 'id', headerName: 'ID', ,
+        { field: 'title', headerName: 'Event', resizable: true, flex: 2 },
+        { field: 'day', headerName: 'start date', resizable: true, minWidth: 110},
+        { field: 'start', headerName: 'end date', resizable: true, flex: 1, align: 'center'},
+        { field: 'end', headerName: 'end date', resizable: true, flex:1, align: 'center'},
+        { 
+            field: 'actions', 
+            headerName: 'cancell event', 
+            type:'actions', 
+            renderCell: params => <ActionUserSubscriptionButton {...{params, rowId, setRowId}} /> 
+        },
     ]      
 
     const rows = registeredEvents.map(registeredEvent => ({
         id: registeredEvent.id, 
         title: registeredEvent.title,
-        day: moment(registeredEvent.start).format('dd D-M-y'),
+        day: moment(registeredEvent.start).format('dd D-M-YY'),
         start: moment(registeredEvent.start).format('H:M'),
         end: moment(registeredEvent.end).format('H:M'),
         })
@@ -71,9 +71,7 @@ export const NotificationTabInterface = () => {
     console.log('registeredEvents', registeredEvents)
     return(
         <>
-            <Box
-                sx={{ height: 400, width:'100%' }}
-            >
+            <Box sx={{ height: 400, width:{ xs:'85vw', md:'100%'} }} >
                 <Typography
                     variant='h5'
                     component='h5'
@@ -97,6 +95,7 @@ export const NotificationTabInterface = () => {
                         pagination: { paginationModel: { pageSize: 5 } },
                       }}
                     pageSize={pageSize}
+                    pageSizeOptions={[5]}
                     rowsPerPageOptions={pageSize}
                     onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
                     // getRowHeight={() => 'auto'}

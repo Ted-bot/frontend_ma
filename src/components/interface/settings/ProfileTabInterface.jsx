@@ -10,6 +10,7 @@ import { TextField } from '@mui/material'
 import { MuiTelInput } from 'mui-tel-input'
 import { useLogout } from 'react-admin'
 import { useErrorBoundary } from "react-error-boundary"
+import { errorHandlerPostRequest } from '../../class/userData/FormHelper.jsx'
 
 
 export const ProfileTabInterface = () => {
@@ -36,7 +37,6 @@ export const ProfileTabInterface = () => {
     }) }
 
     useEffect(() => { 
-        console.log({newData: userIdentity})
         setProfileData(userIdentity)
         setPhoneNumber(defaultPhoneNumber)
         // setButtonPressed(false)
@@ -44,7 +44,6 @@ export const ProfileTabInterface = () => {
 
     function setProfileData(obj){
         for (const [key, value] of Object.entries(obj)) {
-            console.log({loadKey: key, loadValue: value})
             setEnteredInput((prevValues) => ({
                 ...prevValues,
                 [key]: value
@@ -58,11 +57,6 @@ export const ProfileTabInterface = () => {
             [identifier]: value
         }))
     }
-
-    
-    console.log({defaultNumber: defaultPhoneNumber})
-
-    // const [message, setMessage] = useState('')
     
     const handleSubmit = async (e) => {
         e.preventDefault()

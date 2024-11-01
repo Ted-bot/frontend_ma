@@ -62,7 +62,7 @@ export const PasswordTabInterface = () => {
                 <section className='flex-wrap justify-items-center mt-10'>
                     <TextField
                         className='w-full'
-                        error={errors?.password}
+                        error={!!errors?.password}
                         id={'password'}
                         // defaultValue={defaultValue}
                         value={enteredInput?.password}
