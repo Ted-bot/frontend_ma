@@ -48,8 +48,7 @@ export default function CalendarPage(){
                 return
             }
             
-            dialog.current.showModal()
-            // dialog.current.open()
+            dialog.current.open()
             const extractStartTimeEvent = new Date(event.start)
             const extractEventTimeEnd = new Date(event.end)
             

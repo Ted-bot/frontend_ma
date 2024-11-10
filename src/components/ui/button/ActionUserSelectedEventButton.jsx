@@ -2,7 +2,7 @@ import { getLocalStorageItem } from '../../../js/util/getUtil'
 import { ApiFetchPostOptions, ApiFetch} from '../../../js/util/postUtil'
 import { useMutation, useQueryClient } from 'react-query'
 import inMemoryJwt from '../../../js/util/inMemoryJwt.js'
-import { useNotify } from 'react-admin'
+import { HttpError, useNotify } from 'react-admin'
 // import { useAddToUserCalendar } from '../../../hooks/query/usePublisedEvents'
 
 export const ActionUserSelectedEventButton = ({id, buttonText, setResponse, select}) => {
@@ -23,14 +23,20 @@ export const ActionUserSelectedEventButton = ({id, buttonText, setResponse, sele
                 },
                 body: JSON.stringify({event_id: id, select: select})}
             )
-            return await postUserSelectedEvent.json()
+
+            const response = await postUserSelectedEvent.json()
+
+            if(!postUserSelectedEvent.ok) throw new HttpError(response.detail,response.status)
+
+            return response
         },
         onSuccess: (data) => {
             queryClient.invalidateQueries(["userCalendar"])
             setResponse(data)
         },
         onError: (data) => {
-            // console.log('errorAccess',data)
+            setResponse(data)
+            console.log('errorAccess',data)
             // notify(data.detail, {type: 'error'})
         }
     })

@@ -31,7 +31,7 @@ export default function Root(){
   const standardSyle = 'mt-8 p-4 mb-8 rounded-md text-center'
   const [loggedOut, setLoggedOut] = useState()
   const {state, dispatch} = useTabsContext()
-  const [userLoggedIn, setStateInStore, isLoading] = useStore('loggedIn')
+  // const [userLoggedIn, setStateInStore, isLoading] = useStore('loggedIn')
   const [message, setMessage] = useStore('message')
   const [userLoggedOut, setUserLoggedOut] = useStore('loggedOut')
   const [success, setSuccess] = useStore('success')
@@ -65,7 +65,7 @@ export default function Root(){
       <ErrorBoundary FallbackComponent={FallBackRender} onError={(error) => console.log({message: `Error (bubbeled up) caught ${error.message}`})}>
       {/* {loggedOut &&  */}
           <section className={`${classes.displayMessage} ${message ? classes.visiblityMessageActive : classes.visiblityMessageNonActive}
-            ${success ? classes.successDisplay : (error ? classes.errorDisplay : '')}
+            ${success ? classes.successDisplay : (error && classes.errorDisplay)}
           `}>
           {/* <section className={` bg-green-300 border border-green-400 text-green-700 ${standardSyle} z-10`}> */}
             {message}
