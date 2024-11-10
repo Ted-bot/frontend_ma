@@ -32,32 +32,27 @@ export default function Root(){
   const [loggedOut, setLoggedOut] = useState()
   const {state, dispatch} = useTabsContext()
   const [userLoggedIn, setStateInStore, isLoading] = useStore('loggedIn')
+  const [message, setMessage] = useStore('message')
   const [userLoggedOut, setUserLoggedOut] = useStore('loggedOut')
-  // const ref = useRef()
-  // const timeLogOut = new Date(getLocalStorageItem("ra-logout"))
+  const [success, setSuccess] = useStore('success')
+  const [error, setError] = useStore('error')
   const timeLogOut = getLocalStorageItem("ra-logout")
-  const currentTime = Date.now()
-  const timeIntervalLogout = (currentTime - timeLogOut) / 1000
-  const showMessageLogOut = timeIntervalLogout < 3.000
-  // console.log("What we got? ",ref.current)
-  // console.log({"logout Time":timeLogOut})
-  // console.log({"Current Time":currentTime})
-  // console.log({"TIME INTERVAL LOGOUT":timeIntervalLogout})
-  // console.log({"TIME COMPARE":showMessageLogOut})
   
   useEffect(() => {
-    if (!timeLogOut) return
+    if (timeLogOut) {
+        setMessage("successfully logged out!")
+        setLoggedOut(true)
+        setSuccess(true)
 
-    // console.log("Just Logged Out", timeLogOut)
-    setLoggedOut(true)
-
-    setTimeout(() => {
-      setUserLoggedOut(false)
-      setLoggedOut(false)
-      localStorage.removeItem('loggedOut')
-      localStorage.removeItem('ra-logout')
-    }, 3000) 
-
+        setTimeout(() => {
+          setUserLoggedOut(false)
+          setLoggedOut(false)
+          setMessage(false)
+          localStorage.removeItem('loggedOut')
+          localStorage.removeItem('ra-logout')
+          setSuccess(false)
+        }, 3000) 
+    }
   }, [userLoggedOut])
 
   // console.log("Logged_Out_User", userLoggedOut)
@@ -69,9 +64,11 @@ export default function Root(){
       <section className="min-w-[360px] w-full ml-2 mr-2 sm:w-full md:min-w-[601px] lg:w-full lg:min-w-[1024px] lg:max-w-[1920px]">
       <ErrorBoundary FallbackComponent={FallBackRender} onError={(error) => console.log({message: `Error (bubbeled up) caught ${error.message}`})}>
       {/* {loggedOut &&  */}
-          <section className={`${classes.loggedOut} ${loggedOut ? classes.visiblityLoggedOutActive : classes.visiblityLoggedOutNonActive}`}>
+          <section className={`${classes.displayMessage} ${message ? classes.visiblityMessageActive : classes.visiblityMessageNonActive}
+            ${success ? classes.successDisplay : (error ? classes.errorDisplay : '')}
+          `}>
           {/* <section className={` bg-green-300 border border-green-400 text-green-700 ${standardSyle} z-10`}> */}
-            {`succesfully logged out`}
+            {message}
           </section>
         {/* } */}
         <Outlet />

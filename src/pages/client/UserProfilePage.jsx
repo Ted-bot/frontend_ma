@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useAuthenticated } from 'react-admin'
-import { Title, useAuthState, useGetIdentity } from 'react-admin'
+import { useAuthenticated, Title, useAuthState, useGetIdentity, useRedirect } from 'react-admin'
 
 import {getLocalStorageItem} from "../../js/util/getUtil.js"
 import { dataProvider } from '../../dataProvider/main/DataProvider.jsx'
@@ -16,11 +15,9 @@ import useStore from '../../hooks/store/useStore.jsx'
 const UserProfilePage = () => {  
   // const itemLocalstorage = 'user'
   useAuthenticated()
+  const redirect = useRedirect()
   const [userLoggedIn, setUserLoggedIn, isLoading] = useStore('loggedIn')
-  const { isPending: authPending, authenticated: userAuthenticated } = useAuthState()
   const {data, isPending, error} = useGetIdentity()
-
-  if(authPending) return <section>...loading</section>
 
   const [errors, setErrors] = useState('')
   const [userData, setUserData] = useState({user: {}})
@@ -34,19 +31,13 @@ const UserProfilePage = () => {
   }
 
   useEffect(() => {
+    data?.email && setUserLoggedIn(true)
+
     if(inMemoryJwt.getValidSubscription() && data?.email != null){
       dataProvider.getOneSubscription('user_subscription', data?.email).then((response) => setData('subscription',response))
     }
-
-    if(data?.firstName){
-      setUserLoggedIn(true)
-      // console.log('userBeforeLoggedIn',userLoggedIn)
-      }
-
   },[])
 
-  console.log("userLoggedIn Dashboard page", userLoggedIn)
-  if(userAuthenticated){
   return (
     <Card>
       <Title title="Dashboard" />
@@ -175,7 +166,6 @@ const UserProfilePage = () => {
       </CardContent>
   </Card>
     )
-  }
   }
 
   export default UserProfilePage

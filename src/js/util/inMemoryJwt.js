@@ -123,8 +123,9 @@ const inMemoryJwtManager = () => {
             const cookie = cookies[i]
             const eqPos = cookie.indexOf("=")
             const name = eqPos > -1 ? cookie.substring(0, eqPos) : cookie
-            const expireDate = new Date()
-            document.cookie = name + "=;expires=" + expireDate.toUTCString()
+            // const expireDate = new Date()
+            // document.cookie = name + "=;expires=" + expireDate.toUTCString()
+            document.cookie = name + "=;path=/;expires=" + Date.now()
             // document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT"
         }
         localStorage.setItem('ra-logout', Date.now())

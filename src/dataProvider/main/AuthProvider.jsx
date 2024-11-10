@@ -1,5 +1,6 @@
 import { redirect } from 'react-router-dom'
 import { jwtDecode } from "jwt-decode"
+import { HttpError } from 'react-admin'
 
 import { ApiFetch, ApiFetchPostOptions } from '../../js/util/postUtil.js'
 import { ApiFetchGetOptions, getLocalStorageItem, setLocalStorageItem, deleteLocalStorageItem } from '../../js/util/getUtil.js'
@@ -24,9 +25,10 @@ export const authProvider = {
         
         if(!authenticateClient.ok)
             { 
-                console.log({Login_Failed: response})
+                console.log({Login_Failed: response.message})
+                throw new HttpError(response.message, authenticateClient.status, response)  
                 // throw new HttpError('Api Login error', authenticateClient.status, response)  
-                return Promise.reject() //response
+                // return Promise.reject() //response
             }
 
         console.log({headerLoginJWT:authenticateClient.headers.getSetCookie(), headers:authenticateClient.headers,response: response})
@@ -75,25 +77,27 @@ export const authProvider = {
         // return Promise.resolve({redirectTo: '/dashboard', logoutUser: false })
     },
     getIdentity: async () => {
-        // if(!getLocalStorageItem('email')) redirect('/')
         const identifier = getLocalStorageItem('email')
         const token = inMemoryJwt.getToken()
-        const prepareQueryObj = ApiFetchGetOptions(`/api/user_by_email/${identifier}/email`,{ 'X-Authorization': token})
-        const authenticateClient = await ApiFetch(prepareQueryObj)
-        const getResults = await authenticateClient.json()
 
-        delete getResults['@context']
-        delete getResults['@id']
-        delete getResults['@type']
-        
-        console.log({GEtIdentity: getResults})
-        // console.log({getSubscriptions: getResults.subscriptions.length !== 0 })
-        const validSubscription = getResults?.subscriptions?.length !== 0
-        inMemoryJwt.setValidSubscription(validSubscription)
-        const username = getResults["firstName"] + ' ' + getResults["lastName"]
+        if(identifier && token){
+            const prepareQueryObj = ApiFetchGetOptions(`/api/user_by_email/${identifier}/email`,{ 'X-Authorization': token})
+            const authenticateClient = await ApiFetch(prepareQueryObj)
+            const getResults = await authenticateClient.json()
 
-        return Promise.resolve({...getResults, fullName: username ?? '...' })
-        // return Promise.resolve()
+            delete getResults['@context']
+            delete getResults['@id']
+            delete getResults['@type']
+            
+            const validSubscription = getResults?.subscriptions?.length !== 0
+            inMemoryJwt.setValidSubscription(validSubscription)
+
+            const username = getResults["firstName"] + ' ' + getResults["lastName"]
+
+            return Promise.resolve({...getResults, fullName: username ?? '...' })
+        }
+
+        return Promise.resolve()
     },
     getPermissions: () => {
         // return inMemoryJwt.getToken() ?  Promise.resolve() : Promise.reject()

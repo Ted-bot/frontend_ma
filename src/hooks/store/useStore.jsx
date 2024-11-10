@@ -2,8 +2,11 @@ import { useContext, useEffect, useCallback, useState } from "react"
 import { StoreContext } from "../../store/store-context"
 
 export const initialValue = {
-    loggedIn: '',
-    loggedOut: '',
+    loggedIn: false,
+    loggedOut: false,
+    message: false,
+    success: false,
+    error: false,
     tabs: 0
 }
 
