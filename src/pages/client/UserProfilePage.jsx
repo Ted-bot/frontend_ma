@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useAuthenticated } from 'react-admin'
 import { Title, useAuthState, useGetIdentity } from 'react-admin'
 
 import {getLocalStorageItem} from "../../js/util/getUtil.js"
@@ -10,15 +11,17 @@ import Box from '@mui/material/Box'
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
 import inMemoryJwt from '../../js/util/inMemoryJwt.js'
-
+import useStore from '../../hooks/store/useStore.jsx'
 
 const UserProfilePage = () => {  
+  // const itemLocalstorage = 'user'
+  useAuthenticated()
+  const [userLoggedIn, setUserLoggedIn, isLoading] = useStore('loggedIn')
   const { isPending: authPending, authenticated: userAuthenticated } = useAuthState()
   const {data, isPending, error} = useGetIdentity()
+
   if(authPending) return <section>...loading</section>
 
-  // if(userAuthenticated) return <section>...user Authenticated</section>
-  const itemLocalstorage = 'user'
   const [errors, setErrors] = useState('')
   const [userData, setUserData] = useState({user: {}})
   const email = getLocalStorageItem('email')
@@ -31,12 +34,18 @@ const UserProfilePage = () => {
   }
 
   useEffect(() => {
-    if(inMemoryJwt.getValidSubscription()){
-      dataProvider.getOneSubscription('user_subscription', email).then((response) => setData('subscription',response))
+    if(inMemoryJwt.getValidSubscription() && data?.email != null){
+      dataProvider.getOneSubscription('user_subscription', data?.email).then((response) => setData('subscription',response))
     }
+
+    if(data?.firstName){
+      setUserLoggedIn(true)
+      // console.log('userBeforeLoggedIn',userLoggedIn)
+      }
+
   },[])
 
-
+  console.log("userLoggedIn Dashboard page", userLoggedIn)
   if(userAuthenticated){
   return (
     <Card>

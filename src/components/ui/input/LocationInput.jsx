@@ -12,7 +12,7 @@ import { getStates } from '../../class/userData/FormHelper';
 import { GetState, GetCity } from 'react-country-state-city/dist/cjs'
 import { countryid } from '../../../js/util/auth'
 import { useGetIdentity } from 'react-admin'
-import { LocationState, LocationCity } from '../../../store'
+// import { LocationState, LocationCity } from '../../../store'
 // import { GetState, GetCity } from 'react-country-state-city/dist/cjs'
 
 const LocationInput = ({errorMessage: error, stateId, cityId, onChange, stateError, cityError}) => { // id,

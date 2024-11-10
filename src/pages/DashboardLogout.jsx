@@ -1,12 +1,7 @@
 import { forwardRef } from 'react'
-import { 
-    AppBar, 
-    // Layout, 
-    UserMenu, 
-    useLogout } from 'react-admin'
 import { MenuItem } from '@mui/material'
 import ExitIcon from '@mui/icons-material/PowerSettingsNew'
-
+import { AppBar, TitlePortal, useLogout} from 'react-admin'
 
 const MyLogoutButton = forwardRef((props, ref) => {
     const logout = useLogout()
@@ -23,13 +18,21 @@ const MyLogoutButton = forwardRef((props, ref) => {
     )
 })
 
-const MyUserMenu = () => (
-    <UserMenu>
+
+const MyAppBar = () => (
+    <AppBar>
+        <TitlePortal />
         <MyLogoutButton />
-    </UserMenu>
+    </AppBar>
 )
 
-const MyAppBar = () => <AppBar userMenu={<UserMenu />} />
+// const MyUserMenu = () => (
+//     <UserMenu>
+//         <MyLogoutButton />
+//     </UserMenu>
+// )
 
+// const MyAppBar = () => <AppBar userMenu={<UserMenu />} />
 
+export {MyLogoutButton}
 export default MyAppBar

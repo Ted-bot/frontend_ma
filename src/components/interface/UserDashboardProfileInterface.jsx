@@ -18,6 +18,7 @@ import { useTabsContext } from '../../store/tabs-context'
 
 export const ProfileSettingsInterface = () => {
     useAuthenticated()
+    
     const {state, dispatch} = useTabsContext()
 
     console.log('tabsNumber', state.tabNumber)

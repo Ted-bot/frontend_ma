@@ -49,8 +49,8 @@ const inMemoryJwtManager = () => {
                 const tokenCookie = cookie.split("=")[1]
                 return tokenCookie
             }
-            return false
         }
+        return false
     }
 
     // The method makes a call to the refresh-token endpoint
@@ -59,7 +59,7 @@ const inMemoryJwtManager = () => {
         
         const tokenCookie = checkAvailableRefreshToken()
 
-        if(!tokenCookie) return
+        if(!tokenCookie) return false
 
         const bodyJson = JSON.stringify({refreshToken: tokenCookie})
 
@@ -106,11 +106,12 @@ const inMemoryJwtManager = () => {
     }
 
     const setRefreshToken = (token) => {
+        localStorage.removeItem('ra-logout')
         inMemoryJwtRefresh = token
         const minutes = 10
         const expireDate = new Date()
         expireDate.setTime(expireDate.getTime()+(minutes*60*1000))
-        document.cookie = 'xxx=' + token + '; expires=' + expireDate.toUTCString()
+        document.cookie = 'xxx=' + token + ';path=/; expires=' + expireDate.toUTCString()
         return true
     }
 
@@ -131,7 +132,6 @@ const inMemoryJwtManager = () => {
     }
 
     const setLogoutEventName = name => logoutEventName = name
-
 
 
     return {

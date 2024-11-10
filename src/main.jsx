@@ -6,10 +6,10 @@ import './index.css'
 import ErrorPage from './pages/ErrorPage.jsx'
 import { ReactQueryClientProvider } from './dataProvider/main/ReactQueryClientProvider.jsx'
 
-
-
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>    
         <App />   
   </React.StrictMode>
 )
+
+// ReactDOM.hydrateRoot(document.getElementById('root'),<React.StrictMode>   <App /></React.StrictMode>)

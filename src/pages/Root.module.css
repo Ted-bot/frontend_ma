@@ -2,3 +2,55 @@
     margin: 2rem auto;
     text-align: center;
 }
+
+.visiblityLoggedOutActive{
+    visibility: visible;
+    opacity: 80%;
+}
+
+.visiblityLoggedOutNonActive{
+    visibility: hidden;
+    opacity: 10%;
+}
+
+.loggedOut {
+    position: fixed;
+    display: flex;
+    margin-left: 0px;
+    margin-right: 0px;
+    /* top: 15%; */
+    padding: 1rem;
+    font-size: 0.8rem;
+    justify-content: center;
+    /* width: 80%; */
+    background-color: rgb(134 239 172);
+    border: 1 solid rgb(74 222 128);
+    color: rgb(21 128 61);
+    z-index: 20;
+    -webkit-transition: all 0.2s ease-in-out .30s;
+    -moz-transition: all 0.2s ease-in-out .30s;
+    -o-transition: all 0.2s ease-in-out .30s;
+    transition: all 0.2s ease-in-out .30s;
+    transition: all 0.2s;
+}
+
+@media screen and (max-width: 499px) {
+    .loggedOut {
+        top: 5rem;
+        width: 100%;
+    }
+  }
+
+  @media screen and (min-width: 500px) {
+    .loggedOut {
+        top: 10%;
+        width: 100%;
+    }
+  }
+
+  @media screen and (min-width: 1900px) {
+    .loggedOut {
+        top: 10%;
+        width: 120rem;
+    }
+  }

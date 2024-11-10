@@ -44,6 +44,41 @@ export const fetchUserCalendar = async () => {
     return {events: events, userSelectedEvents: selectedEventByUser}
 }
 
+export const fetchPublicCalendar = async () => {
+    const ApiOptions = ApiFetchGetOptions(`/api/public/events`)    
+    const request = await ApiFetch(ApiOptions)
+    const response = await request.json()
+
+    if(!request.ok){    
+        throw new HttpError('Excuse us, Black Dragon Events Not Found!', 404, response)          
+    }   
+
+    console.log('pulicEventsCalendar', response)
+
+    const blackDragonEvents = response['hydra:member'].map((response) => ({
+        id: response.id,
+        title: response.title,
+        start: new Date(response.startDate),
+        end: new Date(response.endDate),
+        resource: response.description,
+    }))
+
+    return {blackDragonEvents: blackDragonEvents}
+}
+
+export const usePublicCalendar = () => {
+    const { data: publicCalendar, status } = useQuery({
+        queryFn: fetchPublicCalendar,
+        queryKey: ["publicCalendar"], 
+        refetchOnWindowFocus: false,        
+        refetchInterval: 60000,
+        retry: 5,
+    })
+
+    return {publicCalendar: publicCalendar, status: status}
+}
+
+
 export const useUserCalendar = () => {
     const { data: userCalendar, status } = useQuery({
         queryFn: fetchUserCalendar,
@@ -55,6 +90,19 @@ export const useUserCalendar = () => {
     // const { data: userCalendar, status } = useQuery({queryKey:['userCalendar'], queryFn: fetchUserCalendar, refetchInterval: 6000})
 
     return {blackDragonEvents: userCalendar, status: status}
+}
+
+export const useUserSelectedEvents = (email, params) => {
+    const { data: events, status, refetch } = useQuery({
+        queryFn: () => dataProvider.getUserRegisteredEvents('registered_events', email),
+        queryKey: ["userSelectedEvents"], 
+        refetchOnWindowFocus: false,     
+        // refetchInterval: 600,
+        retry: 3,
+})
+    // const { data: userCalendar, status } = useQuery({queryKey:['userCalendar'], queryFn: fetchUserCalendar, refetchInterval: 6000})
+
+    return {events, status, refetch}
 }
 
 export const useUserIdentifier = () => {

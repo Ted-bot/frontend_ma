@@ -9,7 +9,7 @@ import HomePage from './pages/HomePage.jsx'
 import SignUpPage from './pages/SignUpPage.jsx'
 import LoginPage from './pages/LoginPage.jsx'
 import DashboardPage from './pages/DashboardPage.jsx'
-import CalendarPage from './pages/CalendarPage.jsx'
+import PublicCalendarPage from './pages/PublicCalendarPage.jsx'
 import OrderPage from './pages/OrderPage.jsx'
 import PaymentPage from './pages/client/PaymentPage.jsx'
 import { PaymentLoader } from './loader/PaymentLoader.jsx'
@@ -26,6 +26,8 @@ import { SignUpLoader } from './loader/SignUpLoader.jsx'
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { TabsProvider } from './store/tabs-context'
+import LoginDashboardLoader from './loader/LoginDashboardLoader.jsx'
+import { StoreProvider } from './hooks/store/StoreProvider.jsx'
 
 
 function App() {
@@ -36,12 +38,24 @@ function App() {
       element: <RootLayout />,
       // errorElement: <ErrorPage />,
       id: 'root',
-      loader: tokenLoader,
+      // loader: () => {
+      //   let logoutEventName = 'ra-logout'
+      //   window.addEventListener('storage', (event) => {
+      //     console.log("GotLogoutTOken", event)
+      //     if (event.key === logoutEventName) {
+      //         console.log("GotLogoutTOken", logoutEventName)
+      //         setLoggedIn(false)
+      //         return
+      //     }
+      //     console.log("GotLogoutTOken", logoutEventName)
+      //     setLoggedIn(true)
+      // })
+      // },
       children: [
         { path: '/', element: <HomePage /> },
         { path: '/sign-up', element: <SignUpPage />, loader: SignUpLoader },
         { path: '/work', element: <LoginPage /> },
-        { path: '/calendar', element: <CalendarPage />, loader: CalendarLoader},
+        { path: '/calendar', element: <PublicCalendarPage />, loader: CalendarLoader},
         { path: '/subscribe', element: <OrderPage />},
         { path: '/payment', element: <PaymentPage />},
         { path: '/dashboard/*', element: <DashboardPage />}, //,  loader: UserLoader
@@ -52,15 +66,17 @@ function App() {
 
   return (
     // <Provider store={store}>
-      <ReactQueryClientProvider>
-          <UserFormContextProvider>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <TabsProvider>
-                <RouterProvider router={router} ></RouterProvider>
-              </TabsProvider>
-            </LocalizationProvider>        
-          </UserFormContextProvider>
-      </ReactQueryClientProvider>
+    <StoreProvider>
+        <TabsProvider>
+          <ReactQueryClientProvider>
+              <UserFormContextProvider>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <RouterProvider router={router} ></RouterProvider>
+                </LocalizationProvider>        
+              </UserFormContextProvider>
+          </ReactQueryClientProvider>
+        </TabsProvider>
+    </StoreProvider>
     // </Provider>
   )
 }

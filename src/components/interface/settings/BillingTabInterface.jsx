@@ -40,13 +40,13 @@ export const BillingTabInterface = () => {
       }, [apiRef])
 
     const columns = useMemo(() => [
-        { field: 'name', headerName: 'name', resizable: true, flex: 1.2 },
-        { field: 'amount', headerName: 'amount', resizable: true, width: 80, align: 'center' },
-        { field: 'start', headerName: 'start date', resizable: true, width: 100 },
-        { field: 'end', headerName: 'end date', resizable: true, width: 100 },
-        { field: 'updated', headerName: 'updated', resizable: true, width: 100 },
-        { field: 'status', headerName: 'status', resizable: true, flex: 0.5 },
-        { field: 'tokens', headerName: 'tokens', resizable: true, flex: 0.5 },
+        { field: 'name', headerName: 'name', flex: 1.2 },
+        { field: 'amount', headerName: 'amount', width: 80, align: 'center' },
+        { field: 'start', headerName: 'start date', width: 100, align: 'center' },
+        { field: 'end', headerName: 'end date', width: 100, align: 'center' },
+        { field: 'updated', headerName: 'updated', flex: 1, align: 'center' },
+        { field: 'status', headerName: 'status', width: 80, align: 'center'},
+        { field: 'tokens', headerName: 'tokens', width: 80, align: 'center' },
         { field: 'uuid', headerName: 'uuid', width: 100 },
         { 
             field: 'actions', 

@@ -3,72 +3,62 @@ import { dataProvider } from "../../../dataProvider/main/DataProvider"
 import { useGetIdentity } from 'react-admin'
 import { useNotify } from 'react-admin'
 import Box from "@mui/material/Box"
-import { DataGrid, gridClasses,useGridApiEventHandler,
-    useGridApiRef } from '@mui/x-data-grid'
+import { DataGrid, gridClasses,useGridApiEventHandler} from '@mui/x-data-grid'
 import { Fab, Typography } from "@mui/material"
 import moment from "moment/moment"
-import ActionUserSubscriptionButton from "../../ui/button/ActionUserSubscriptionButton"
+import ActionUserBlackDragonEventButton from "../../ui/button/ActionUserBlackDragonEventButton"
 import { grey } from '@mui/material/colors'
+import { useUserSelectedEvents } from "../../../hooks/query/usePublisedEvents"
 
 
 export const NotificationTabInterface = () => {
     
     const {data: userIdentity, isPending, error} = useGetIdentity()
+    const eventsData = useUserSelectedEvents(userIdentity?.email)
+    // const {eventsData, status} = useUserSelectedEvents(userIdentity?.email)
     const [registeredEvents, setRegisteredEvents] = useState([])
     const notify = useNotify()
     const [rowId, setRowId] = useState(false)
     const [pageSize, setPageSize] = useState(5)
-    const apiRef = useGridApiRef()
-   
-    console.log({userEmail: userIdentity?.email})
-    useEffect(() => {
-        dataProvider.getUserRegisteredEvents('registered_events', userIdentity?.email)
-                .then((response) => {
-                    console.log({loading_registeredEvents: response})
-                    setRegisteredEvents(response['hydra:member'])
-                    // notify(`Succes loading events`, { type: 'success' })
-                }).catch((error) => {
-                    notify(`Failed loading events`, { type: 'error' })
-                })
-    },[])
 
-    useEffect(() => {
-        const handleRowClick = (params) => {
-            // if(params.row.status !== 'paid') return
-            // alert(`If you want to cancell ${params.row.title} \n proceed with the cancel button`)
-        }
-    
-        // The `subscribeEvent` method will automatically unsubscribe in the cleanup function of the `useEffect`.
-        return apiRef.current.subscribeEvent('rowClick', handleRowClick)
-      }, [apiRef])
+    console.log('test',eventsData?.events)
+
+    useEffect(() => {        
+        if(eventsData?.events) setRegisteredEvents(eventsData?.events['hydra:member'])
+        // if(status === 'success') setRegisteredEvents(eventsData)
+    },[eventsData?.events, registeredEvents])
 
     const columns = [
-        // { field: 'id', headerName: 'ID', ,
-        { field: 'title', headerName: 'Event', resizable: true, flex: 2 },
-        { field: 'day', headerName: 'start date', resizable: true, minWidth: 110},
-        { field: 'start', headerName: 'end date', resizable: true, flex: 1, align: 'center'},
-        { field: 'end', headerName: 'end date', resizable: true, flex:1, align: 'center'},
+        { field: 'title', headerName: 'Event', flex: 2 },
+        { field: 'day', headerName: 'start date', minWidth: 110},
+        { field: 'start', headerName: 'start time', flex: 1, align: 'center'},
+        { field: 'end', headerName: 'end time', flex:1, align: 'center'},
         { 
             field: 'actions', 
             headerName: 'cancell event', 
             type:'actions', 
-            renderCell: params => <ActionUserSubscriptionButton {...{params, rowId, setRowId}} /> 
+            renderCell: params => <ActionUserBlackDragonEventButton {...{params, email: userIdentity?.email, updater: setRegisteredEvents}} /> 
         },
     ]      
 
-    const rows = registeredEvents.map(registeredEvent => ({
+    console.log('registeredEvents', registeredEvents)
+    const rows = registeredEvents?.map(registeredEvent => ({
         id: registeredEvent.id, 
         title: registeredEvent.title,
-        day: moment(registeredEvent.start).format('dd D-M-YY'),
-        start: moment(registeredEvent.start).format('H:M'),
-        end: moment(registeredEvent.end).format('H:M'),
+        day: moment(registeredEvent.start).format('dd D-MM-YY'),
+        start: moment(registeredEvent.start).format('hh:mm'),
+        end: moment(registeredEvent.end).format('hh:mm'),
         })
     )
 
     // const autosizeOptions = {
     //     includeOutliers: true,
     //   }
-    console.log('registeredEvents', registeredEvents)
+
+    if(registeredEvents?.status === 'loading') return <p>Loading ...</p>
+    if(!rows) return <p>Loading ...</p>
+    if(registeredEvents?.status === 'error' || registeredEvents?.status === 'failed') notify(`Failed loading events`, { type: 'error' })
+
     return(
         <>
             <Box sx={{ height: 400, width:{ xs:'85vw', md:'100%'} }} >
@@ -80,10 +70,9 @@ export const NotificationTabInterface = () => {
                     Manage registeredEvents
                 </Typography>
 
-                <DataGrid 
+                {rows && <DataGrid 
                     rows={rows} 
                     columns={columns} 
-                    apiRef={apiRef} 
                     getRowId={(row) => row.id }
                     initialState={{
                         columns: {
@@ -118,7 +107,7 @@ export const NotificationTabInterface = () => {
                         maxHeight: "168px !important"}
                     }}
                     onRowClick={params=> setRowId(params.id)}    
-                />
+                />}
 
             </Box>
         </>

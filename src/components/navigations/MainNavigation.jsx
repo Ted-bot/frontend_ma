@@ -1,21 +1,23 @@
-import { useState, useEffect, forwardRef } from 'react'
-import { NavLink, Form, useRouteLoaderData } from 'react-router-dom'
+import { useState, useEffect, useRef } from 'react'
+import { NavLink } from 'react-router-dom'
 import {useLogout } from 'react-admin'
-import { MenuItem } from '@mui/material'
-import inMemoryJwt from '../../js/util/inMemoryJwt.js'
-import ExitIcon from '@mui/icons-material/PowerSettingsNew'
+import MyLogoutButton from '../ui/button/LogoutButton.jsx'
+import { useTabsContext } from '../../store/tabs-context.jsx'
+import useStore from '../../hooks/store/useStore.jsx'
 
 function MainNavigation() {
-    const token = inMemoryJwt.getToken()
-    const logout = useLogout()
-    const handleClick = () => logout()
 
-    const [openNav, setOpenNav] = useState(false);
-    // const [openAvatarDropdown, setOpenAvatarDropdown] = useState(false);
+    const {state, dispatch} = useTabsContext()
+    const [stateInStore, setStateInStore, isLoading] = useStore('loggedIn')
+
+    const ref = useRef()
+    let logoutEventName = 'ra-logout'
+    
+    const isUserLoggedOut = localStorage.getItem(logoutEventName)
+    const [openNav, setOpenNav] = useState(false)
 
     const toggleNav = () => {
         setOpenNav(!openNav)
-        // setOpenAvatarDropdown(false)
     }
 
     const [colorChange, setColorChange] = useState(false);
@@ -29,10 +31,20 @@ function MainNavigation() {
     }
     
     useEffect(() => {
-        changeNavbarColor()
-        window.addEventListener("scroll", changeNavbarColor);
-    }, [colorChange])
-    
+        // if (stateInStore) {
+        //     console.log("TestLogoutTOken", 'True')
+        //     setLoggedIn(true)
+        //     return
+        //     // dispatch({type: 'USER_LOGGED_IN', payload: true})
+        // } else {
+            //     setLoggedIn(false)
+            // }
+            
+            changeNavbarColor()
+            window.addEventListener("scroll", changeNavbarColor);
+        }, [])
+        
+            console.log("TestLoggedInUseInNavigation", stateInStore)
 
     const navList = () => {
         return (
@@ -69,8 +81,8 @@ function MainNavigation() {
                 >
                     contact
                 </NavLink>
-                {token &&  <MyLogoutButton /> }
-                {!token &&
+                {stateInStore &&  <MyLogoutButton ref={ref}/> }
+                {!stateInStore &&
                     <>
                         <NavLink
                             to="/sign-up"
@@ -153,19 +165,6 @@ function MainNavigation() {
     )
 }
 // forwardRef((props, ref) => {
-const MyLogoutButton = (props, ref) => {
-    const logout = useLogout();
-    const handleClick = () => logout();
-    return (
-        <MenuItem
-            onClick={handleClick}
-            // ref={ref}
-            // It's important to pass the props to allow Material UI to manage the keyboard navigation
-            // {...props} 
-        >
-            <ExitIcon /> Logout
-        </MenuItem>
-    )
-}
+
 
 export default MainNavigation

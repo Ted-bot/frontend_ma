@@ -1,23 +1,18 @@
 import {useState, useEffect, useMemo, useRef } from 'react'
 import MainContentWrap from '../components/wraps/client/MainContentWrap' 
-import CalendarInterface from '../components/interface/CalendarInterface.jsx'
+import PublicCalendarInterface from '../components/interface/PublicCalendarInterface.jsx'
 
-import CalendarModal from '../components/modal/CalendarModal.jsx'
-import { useUserCalendar } from '../hooks/query/usePublisedEvents.jsx'
-import { useQueryClient } from 'react-query'
-import inMemoryJwt from '../js/util/inMemoryJwt.js'
+import PublicCalendarModal from '../components/modal/PublicCalendarModal.jsx'
 import { useLoaderData } from 'react-router-dom'
-import { dataProvider } from '../dataProvider/main/DataProvider.jsx'
-import { useGetIdentity } from 'react-admin'
 import { useNotify } from 'react-admin'
-import { useAuthenticated } from 'react-admin'
+import { useAuthenticated } from "react-admin"
+import { usePublicCalendar } from '../hooks/query/usePublisedEvents.jsx'
 
 
-export default function CalendarPage(){
-    useAuthenticated()
-    // const {blackDragonEvents, status } = useUserCalendar()
-    const {data: userIdentity, isPending, error} = useGetIdentity()
-    // const blackDragonEvents = useLoaderData()
+export default function PublicCalendarPage(){
+    const data = useLoaderData()
+    const {publicCalendar} = data
+    // const {publicCalendar, status } = usePublicCalendar()
     const notify = useNotify()
     // const queryClient = useQueryClient()
     const wrapName = 'Calendar'
@@ -28,9 +23,8 @@ export default function CalendarPage(){
         start: 0,
         end: 0,
         resource : 1
-      }
+    }
     const [plannedEvents, setPlannedEvents] = useState([dummyPlannedEvent])
-    const [userSelectedEvents, setUserSelectedEvents] = useState([dummyPlannedEvent])
     const [responseRequest, setResponseRequest] = useState(null)
     const [showInModal, setShowInModal] = useState({
         title: '',
@@ -48,8 +42,7 @@ export default function CalendarPage(){
                 return
             }
             
-            dialog.current.showModal()
-            // dialog.current.open()
+            dialog.current.open()
             const extractStartTimeEvent = new Date(event.start)
             const extractEventTimeEnd = new Date(event.end)
             
@@ -62,7 +55,7 @@ export default function CalendarPage(){
             const extractEndTimeMin = extractEventTimeEnd.getMinutes()
             const endTimeEvent = extractEndTimeHours + ':' + extractEndTimeMin
 
-            const allReadySelected = userSelectedEvents.find((eventId) => eventId === event.id)
+            // const allReadySelected = userSelectedEvents.find((eventId) => eventId === event.id)
             
             setShowInModal(() => ({
                     id: event.id,
@@ -71,29 +64,25 @@ export default function CalendarPage(){
                     day: extractDay,
                     start: startTimeEvent,
                     end: endTimeEvent,
-                    allReadySelected: !!allReadySelected,
+                    // allReadySelected: !!allReadySelected,
                 })
             )
         }
     )
 
     useEffect(() => {
-        dataProvider.allBlackDragonEvents('subscribe', userIdentity?.email).then((blackDragonEvents) =>{
-             setUserSelectedEvents(blackDragonEvents?.userSelectedEvents)
-             setPlannedEvents(blackDragonEvents?.events)
-        }).catch(error => notify(`${error}`, {type: 'error'}))
-        // blackDragonEvents?.events && setPlannedEvents(blackDragonEvents?.events)
-        // blackDragonEvents?.userSelectedEvents && setUserSelectedEvents(blackDragonEvents?.userSelectedEvents)
-    }, [])//responseRequest?.message
+        publicCalendar && setPlannedEvents(publicCalendar)
+    }, []) // status
 
     const standardSyle = 'p-4 mb-8 rounded-md text-center'
 
-    console.log('plannedDragonEvents', plannedEvents)
-    console.log('blackDragonEvents',userSelectedEvents)
+    console.log('plannedDragonEvents', publicCalendar)
+    
+    // console.log('plannedDragonEvents', publicCalendar?.blackDragonEvents)
 
     return(
         <>
-            <CalendarModal ref={dialog} setResponseRequest={setResponseRequest}  {...showInModal} />
+            <PublicCalendarModal ref={dialog} setResponseRequest={setResponseRequest}  {...showInModal} />
             <MainContentWrap name={wrapName}>
                 <div className='flex-col'>
                     {responseRequest?.message != null && 
@@ -101,9 +90,9 @@ export default function CalendarPage(){
                             {responseRequest.message}
                         </section>
                     }
-                    <CalendarInterface
+                    <PublicCalendarInterface
                         getPlannedEvents={plannedEvents}
-                        userSelectedEvents={userSelectedEvents}
+                        // userSelectedEvents={userSelectedEvents}
                         clickHandle={handleSelectEvent} 
                         />
                 </div>    

@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { AdminGuesser,
     hydraDataProvider,
     hydraSchemaAnalyzer,
@@ -18,11 +19,22 @@ import { dataProvider } from '../dataProvider/main/DataProvider.jsx'
 import { authProvider } from '../dataProvider/main/AuthProvider.jsx'
 import { ProfileSettingsInterface } from '../components/interface/UserDashboardProfileInterface'
 import { SignUpLoader } from '../loader/SignUpLoader.jsx'
+import CalendarPage from './CalendarPage';
+import { CalendarLoader } from '../loader/CalendarLoader.jsx'
+import MyLogoutButton from '../components/ui/button/LogoutButton.jsx'
+// import MyAppBar from './DashboardLogout'
+import { useTabsContext } from '../store/tabs-context.jsx'
 
+// export const MyAppBar = () => (
+//     <AppBar>
+//         <TitlePortal />
+//         <MyLogoutButton />
+//     </AppBar>
+// )
 
 export default function DashboardPage() {
     useAuthenticated()
-
+    const {state, dispatch} = useTabsContext()
     // const user = () => {
     //     const {dragonUser} = useUserIdentifier()
     //     return dragonUser
@@ -32,7 +44,15 @@ export default function DashboardPage() {
 
     const MyLogin = () => (<LoginDashboardLoader />)
 
-    const MyLayout = props => <Layout {...props} menu={MyMenu} />
+    const MyLayout = props => <Layout {...props} menu={MyMenu}/> //appBar={MyAppBar} 
+
+
+    // useEffect(() => {
+    //     if(!state.loggedIn){
+    //         console.log('userLoggedIn',state.loggedIn)
+    //         dispatch({type: 'USER_LOGGED_IN', payload: true})
+    //     }
+    // })
 
     return (
         <>
@@ -46,7 +66,10 @@ export default function DashboardPage() {
                 authProvider={authProvider}
             >
                 <CustomRoutes>
-                    <Route path="/Settings" element={<ProfileSettingsInterface />} loader={SignUpLoader} />
+                    <Route path="/Settings" element={<ProfileSettingsInterface />} />
+                </CustomRoutes>
+                <CustomRoutes>
+                    <Route path="/Calendar" element={<CalendarPage/>} />
                 </CustomRoutes>
                 <ResourceGuesser name={"users"} create={UserCreate} />
                 <ResourceGuesser name={"classes"} />

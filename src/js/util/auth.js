@@ -1,7 +1,12 @@
-export function getAuthToken(){
-    return  localStorage.getItem('auth') != null ? JSON.parse(localStorage.getItem('auth')) : null
-    // const token = JSON.parse(localStorage.getItem('auth'))
-    // return token
+import inMemoryJwt from "./inMemoryJwt"
+
+export const getAuthToken = () => {
+    return window.addEventListener('storage', (event) => {
+        if (event.key !== 'ra-logout') {
+            return true
+        }
+        return false
+    })
 }
 
 export const storageNameNewUser = 'new_user'

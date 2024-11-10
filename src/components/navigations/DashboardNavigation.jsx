@@ -9,6 +9,7 @@ const MyMenu = () => (
         <Menu.Item to="/dashboard/profiles" primaryText="Profiles" leftIcon={<LabelIcon />} />
         <Menu.Item to="/dashboard/classes" primaryText="Classes" leftIcon={<LabelIcon />} />
         <Menu.Item to="/dashboard/settings" primaryText="Settings" leftIcon={<LabelIcon />} />
+        <Menu.Item to="/dashboard/Calendar" primaryText="Calendar" leftIcon={<LabelIcon />} />
     </Menu>
 )
 

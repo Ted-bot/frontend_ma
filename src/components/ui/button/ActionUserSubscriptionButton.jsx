@@ -15,13 +15,13 @@ const ActionUserSubscriptionButton = ({params, rowId, setRowId}) => {
         dataProvider.cancelSubscription('cancel_user_subscription', params.email, {uuid: params.row.uuid, name: params.row.name})
         .then(() => {
             setLoading(false)
-            notify(`You have Cancelled your subscription`)
+            notify(`You have Cancelled your subscription`, {type: 'success'})
             setSuccess(true)
 
         })
         .catch(() => {
             setLoading(false)
-            notify(`Currently we could not cancell your subscription, please try again at a later moment`)
+            notify(`Currently we could not cancell your subscription, please try again at a later moment`, {type: 'error'})
         })
     }
 
