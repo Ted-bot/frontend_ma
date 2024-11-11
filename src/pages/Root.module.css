@@ -45,21 +45,21 @@
 
 @media screen and (max-width: 499px) {
     .displayMessage {
-        top: 5rem;
+        top: 4.5rem;
         width: 100%;
     }
   }
 
   @media screen and (min-width: 500px) {
     .displayMessage {
-        top: 10%;
+        top: 4.5rem;
         width: 100%;
     }
   }
 
   @media screen and (min-width: 1900px) {
     .displayMessage {
-        top: 10%;
+        top: 4.5rem;
         width: 120rem;
     }
   }

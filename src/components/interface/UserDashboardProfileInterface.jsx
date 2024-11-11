@@ -44,7 +44,7 @@ export const ProfileSettingsInterface = () => {
                           <Tab label="Password" className="hover:bg-gray-500" {...a11yProps(1)}/>
                           <Tab label="Address" className="hover:bg-gray-500" {...a11yProps(2)}/>
                           <Tab label="Billing" className="hover:bg-gray-500" {...a11yProps(3)}/>
-                          <Tab label="Notifications" className="hover:bg-gray-500" {...a11yProps(4)}/>
+                          {/* <Tab label="Notifications" className="hover:bg-gray-500" {...a11yProps(4)}/> */}
                       </Tabs>
                   </Box>
               </Card>
@@ -60,9 +60,9 @@ export const ProfileSettingsInterface = () => {
               <CustomTabPanel value={value} index={3}>
                   <BillingTabInterface />
               </CustomTabPanel>
-              <CustomTabPanel value={value} index={4}>
+              {/* <CustomTabPanel value={value} index={4}>
                   <NotificationTabInterface />
-              </CustomTabPanel>
+              </CustomTabPanel> */}
         </>
     )
 } 

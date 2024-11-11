@@ -24,6 +24,7 @@ import { CalendarLoader } from '../loader/CalendarLoader.jsx'
 import MyLogoutButton from '../components/ui/button/LogoutButton.jsx'
 // import MyAppBar from './DashboardLogout'
 import { useTabsContext } from '../store/tabs-context.jsx'
+import { NotificationTabInterface } from '../components/interface/settings/NotificationTabInterface.jsx'
 
 // export const MyAppBar = () => (
 //     <AppBar>
@@ -65,6 +66,7 @@ export default function DashboardPage() {
                 loginPage={MyLogin}
                 authProvider={authProvider}
             >
+                
                 <CustomRoutes>
                     <Route path="/Settings" element={<ProfileSettingsInterface />} />
                 </CustomRoutes>
@@ -75,6 +77,9 @@ export default function DashboardPage() {
                 <ResourceGuesser name={"classes"} />
                 <ResourceGuesser name={"trainingsessions"} />
                 <ResourceGuesser name={"profiles"} list={ProfileList} />
+                <CustomRoutes>
+                    <Route path="/Notifications" element={<NotificationTabInterface />} />
+                </CustomRoutes>
             </AdminGuesser>            
         </>
     )

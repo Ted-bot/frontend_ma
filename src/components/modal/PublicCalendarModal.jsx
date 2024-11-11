@@ -109,7 +109,7 @@ import { ActionUserSelectedEventButton } from '../ui/button/ActionUserSelectedEv
                 </Box>
                 <section className="flex flex-inline justify-center mt-8">
                     <section>
-                        <Link to="/sign-up">
+                        <Link to="/subscribe">
                             <button 
                                 className={buttonStyle + ' text-2xl '}
                             >

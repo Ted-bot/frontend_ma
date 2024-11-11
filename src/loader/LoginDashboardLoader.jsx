@@ -10,16 +10,11 @@ const LoginDashboardLoader = () => {
     const login = useLogin()
 
     const handleSubmit = e => {
-        e.preventDefault()
-        
+        e.preventDefault()        
+        // .then((response) => (response))
         login({ email, password })
-        .then((response) => (response))
-        .then((response) => {
-                // redirect('/dashboard')
-                navigate('/dashboard')
-            })
+        .then((response) => {  navigate('/dashboard') })
         .catch((error) => {
-            // console.log({ error_login: error.message})
             if(error?.message) {
                 setErrors(error.message) 
             } else {
@@ -27,13 +22,15 @@ const LoginDashboardLoader = () => {
             }
         })
     }
+
     return (
             <section className="flex flex-col w-full items-center shadow-md bg-orange-100 py-24 rounded-md px-3 md:shadow-xl">
                 <section  className={`w-full py-24 bg-orange-300 rounded-md md:w-1/2 lg:justify-center px-3 mb-6 md:mb-0`}>
                     
-                <section className='flex justify-center'>
-                    {errors && <p className="text-red-500 text-xl italic py-3">{errors}</p>}
-                </section>
+                    <section className='flex justify-center'>
+                        {errors && <p className="text-red-500 text-xl italic py-3">{errors}</p>}
+                    </section>
+
                     <Form onSubmit={handleSubmit} >
                         <input
                             className={`w-full appearance-none block bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`} 

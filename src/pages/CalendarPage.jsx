@@ -3,39 +3,33 @@ import MainContentWrap from '../components/wraps/client/MainContentWrap'
 import CalendarInterface from '../components/interface/CalendarInterface.jsx'
 
 import CalendarModal from '../components/modal/CalendarModal.jsx'
-import { useUserCalendar } from '../hooks/query/usePublisedEvents.jsx'
-import { useQueryClient } from 'react-query'
-import inMemoryJwt from '../js/util/inMemoryJwt.js'
-import { useLoaderData } from 'react-router-dom'
 import { dataProvider } from '../dataProvider/main/DataProvider.jsx'
 import { useGetIdentity } from 'react-admin'
 import { useNotify } from 'react-admin'
 import { useAuthenticated } from 'react-admin'
 
+const dummyPlannedEvent = { 
+    id: 1,
+    title: 'title',
+    start: 0,
+    end: 0,
+    resource : 1
+  }
 
 export default function CalendarPage(){
     useAuthenticated()
-    // const {blackDragonEvents, status } = useUserCalendar()
     const {data: userIdentity, isPending, error} = useGetIdentity()
-    // const blackDragonEvents = useLoaderData()
     const notify = useNotify()
-    // const queryClient = useQueryClient()
     const wrapName = 'Calendar'
     const dialog = useRef()
-    const dummyPlannedEvent = { 
-        id: 1,
-        title: 'title',
-        start: 0,
-        end: 0,
-        resource : 1
-      }
+    
     const [plannedEvents, setPlannedEvents] = useState([dummyPlannedEvent])
     const [userSelectedEvents, setUserSelectedEvents] = useState([dummyPlannedEvent])
     const [responseRequest, setResponseRequest] = useState(null)
     const [showInModal, setShowInModal] = useState({
-        title: '',
-        startDateTime: '',
-        endTime: '',
+        title: 'test',
+        startDateTime: 'xx-xx-xxx',
+        endTime: 'xx-xx-xxxx',
     })
     const handleSelectEvent = useMemo(() => 
         (event) =>  { 
@@ -81,9 +75,7 @@ export default function CalendarPage(){
              setUserSelectedEvents(blackDragonEvents?.userSelectedEvents)
              setPlannedEvents(blackDragonEvents?.events)
         }).catch(error => notify(`${error}`, {type: 'error'}))
-        // blackDragonEvents?.events && setPlannedEvents(blackDragonEvents?.events)
-        // blackDragonEvents?.userSelectedEvents && setUserSelectedEvents(blackDragonEvents?.userSelectedEvents)
-    }, [])//responseRequest?.message
+    }, [])
 
     const standardSyle = 'p-4 mb-8 rounded-md text-center'
 

@@ -1,12 +1,14 @@
+import { forwardRef } from 'react'
+import { HttpError, useNotify } from 'react-admin'
 import { getLocalStorageItem } from '../../../js/util/getUtil'
 import { ApiFetchPostOptions, ApiFetch} from '../../../js/util/postUtil'
 import { useMutation, useQueryClient } from 'react-query'
 import inMemoryJwt from '../../../js/util/inMemoryJwt.js'
-import { HttpError, useNotify } from 'react-admin'
 // import { useAddToUserCalendar } from '../../../hooks/query/usePublisedEvents'
 
-export const ActionUserSelectedEventButton = ({id, buttonText, setResponse, select}) => {
+export const ActionUserSelectedEventButton = forwardRef(function ActionUserSelectedEventButton({id, buttonText, setResponse, select}, ref) {
 
+    console.log("got ref in",ref.current) //
     const token = inMemoryJwt.getToken()
     const notify = useNotify()
     const email = getLocalStorageItem('email')
@@ -24,8 +26,9 @@ export const ActionUserSelectedEventButton = ({id, buttonText, setResponse, sele
                 body: JSON.stringify({event_id: id, select: select})}
             )
 
-            const response = await postUserSelectedEvent.json()
-
+            const response = await postUserSelectedEvent.json()            
+            
+            ref.current.close()
             if(!postUserSelectedEvent.ok) throw new HttpError(response.detail,response.status)
 
             return response
@@ -58,4 +61,4 @@ export const ActionUserSelectedEventButton = ({id, buttonText, setResponse, sele
             </section>
         </>
     )
-}
+})

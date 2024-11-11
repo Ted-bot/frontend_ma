@@ -107,8 +107,8 @@ import { ActionUserSelectedEventButton } from '../ui/button/ActionUserSelectedEv
                 </Box>
                 {
                     allReadySelected
-                    ? <ActionUserSelectedEventButton id={id} buttonText={buttonTextUnsubscribe} setResponse={setResponseRequest} select={0}/>
-                    : <ActionUserSelectedEventButton id={id} buttonText={buttonTextSubscribe} setResponse={setResponseRequest} select={1}/>
+                    ? <ActionUserSelectedEventButton id={id} ref={dialog} buttonText={buttonTextUnsubscribe} setResponse={setResponseRequest} select={0}/>
+                    : <ActionUserSelectedEventButton id={id} ref={dialog} buttonText={buttonTextSubscribe} setResponse={setResponseRequest} select={1}/>
                 }
             </section>
         </dialog>,

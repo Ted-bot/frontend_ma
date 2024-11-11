@@ -25,33 +25,30 @@ const localizer = dateFnsLocalizer({
   locales,
 })
 
-// const [selected, setSelected] = useState([])
+const defaultPlannedEvents = [
+  {
+    id: 0,
+    title: 'training',
+    start: 0,
+    end: 0,
+    resource : 1
+ },
+ {
+    id: 1,
+    title: 'training',
+    start: 0,
+    end: 0,
+    resource : 1
+   }
+]
 
-
-const defaultPlannedEvents = {
-  1 : { 
-   id: 1,
-   title: 'title',
-   start: 0,
-   end: 0,
-   resource : 1
- }
-}
-
-const selectedPlannedEvents = [1, 3, 5, 8, 10 ,12 ,17 ,18, 21]
-
-// const slotPropGetter = (slotDate, isSelected) => {
-//   const isOverlap = selectedPlannedEvents.includes(slotDate.id)
-//   if(isOverlap) return {style: { backgroundColor: '#000', color: '#f2f2f2' }}
-// };
-
-const CalendarInterface = ({getPlannedEvents = defaultPlannedEvents, userSelectedEvents = [{id: 0}], clickHandle = () => {}} = {}) => {    
+const CalendarInterface = ({getPlannedEvents = defaultPlannedEvents, userSelectedEvents = [{id: 0}], clickHandle = () => {}}) => {    
     
   const components = {
-    event: (item = { event: { title: 'training'}}) => {
-      const typeEvent = item?.event?.title
+    event: ({ event }) => {
+      const {id, title: typeEvent} = event
   
-      if(userSelectedEvents.includes(item?.event?.id)) {
+      if(userSelectedEvents.includes(id)) {
         return ( <div style={{ display: 'inline-flex', justifyContent: 'center' ,backgroundColor: '#a6a6a6', color: '#004e00', fontWeight: 500, fontSize: 18, width: '100%' }}>{<IconBxCheck />} {typeEvent}</div>)
       }
   
@@ -62,13 +59,13 @@ const CalendarInterface = ({getPlannedEvents = defaultPlannedEvents, userSelecte
           return( <div style={{ backgroundColor: '#ffb732', color: '#444444' }}>{typeEvent}</div>)
         case 'expeditie':
           return( <div style={{ backgroundColor: '#00ffa5', color: '#674ea7' }}>{typeEvent}</div>)
+        default: 
+          return ( <div style={{ backgroundColor: '#f0f8ff', color: 'f0f8ff' }}>{typeEvent}</div>)
       }
     }
   }
 
   return (<Calendar
-      // eventPropGetter={slotPropGetter}
-      // selected={selectedPlannedEvents}
       localizer={localizer}
       events={getPlannedEvents}
       startAccessor="start"

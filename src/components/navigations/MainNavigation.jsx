@@ -1,26 +1,20 @@
 import { useState, useEffect, useRef } from 'react'
 import { NavLink } from 'react-router-dom'
-import {useLogout } from 'react-admin'
 import MyLogoutButton from '../ui/button/LogoutButton.jsx'
 import { useTabsContext } from '../../store/tabs-context.jsx'
 import useStore from '../../hooks/store/useStore.jsx'
 
 function MainNavigation() {
-
     const {state, dispatch} = useTabsContext()
-    const [stateInStore, setStateInStore, isLoading] = useStore('loggedIn')
+    const [stateInStore] = useStore('loggedIn')
 
     const ref = useRef()
-    let logoutEventName = 'ra-logout'
-    
-    const isUserLoggedOut = localStorage.getItem(logoutEventName)
     const [openNav, setOpenNav] = useState(false)
+    const [colorChange, setColorChange] = useState(false)
 
     const toggleNav = () => {
         setOpenNav(!openNav)
-    }
-
-    const [colorChange, setColorChange] = useState(false);
+    }    
 
     const changeNavbarColor = () => {
         if (window.scrollY >= 80) {
@@ -31,20 +25,9 @@ function MainNavigation() {
     }
     
     useEffect(() => {
-        // if (stateInStore) {
-        //     console.log("TestLogoutTOken", 'True')
-        //     setLoggedIn(true)
-        //     return
-        //     // dispatch({type: 'USER_LOGGED_IN', payload: true})
-        // } else {
-            //     setLoggedIn(false)
-            // }
-            
-            changeNavbarColor()
-            window.addEventListener("scroll", changeNavbarColor);
-        }, [])
-        
-            console.log("TestLoggedInUseInNavigation", stateInStore)
+        changeNavbarColor()
+        window.addEventListener("scroll", changeNavbarColor);
+    }, [])        
 
     const navList = () => {
         return (
@@ -81,7 +64,14 @@ function MainNavigation() {
                 >
                     contact
                 </NavLink>
-                {stateInStore &&  <MyLogoutButton ref={ref}/> }
+                {stateInStore &&  
+                <>
+                    <NavLink to="/dashboard">
+                        Dashboard
+                    </NavLink>
+                    <MyLogoutButton ref={ref}/>
+                </> 
+                }
                 {!stateInStore &&
                     <>
                         <NavLink
@@ -103,8 +93,8 @@ function MainNavigation() {
                     </>
                 }
             </>
-        );
-    };
+        )
+    }
 
     return (
         <>
@@ -164,7 +154,5 @@ function MainNavigation() {
         </>
     )
 }
-// forwardRef((props, ref) => {
-
 
 export default MainNavigation

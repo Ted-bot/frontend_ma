@@ -5,8 +5,9 @@ import {
 
 const ProfileList = props => (
     <ListGuesser {...props}>
-        <FieldGuesser source={"userName"} />
+        <FieldGuesser source={"username"} />
         <FieldGuesser source={"websiteUrl"} />
+        <FieldGuesser source={"tokenManagers"} />
         {/* <ListGuesser source={"roles"} validate={[required()]} fullWidth /> */}
         <FieldGuesser source={"description"} />
     </ListGuesser>

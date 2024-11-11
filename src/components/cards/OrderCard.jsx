@@ -8,14 +8,23 @@ import inMemoryJwt from '../../js/util/inMemoryJwt.js'
 import Box from '@mui/material/Box'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faArrowRightLong } from "@fortawesome/free-solid-svg-icons"
-
+import useStore from '../../hooks/store/useStore.jsx'
 import classes from "./OrderCard.module.css"
 
-export default function OrderCard(props){
-
+export default function OrderCard({
+    name, 
+    directOrPeriodic,
+    price,
+    durationLength,
+    duration,
+    description,
+    category,
+    sku,
+}){
     const token = inMemoryJwt.getToken()
     const navigate = useNavigate()
-
+    const [message, setMessage] = useStore('message', false)
+    const [error, setError] = useStore('error', false)
     const postRequest = async (data) => {
         try {
             const options = { url: '/api/v1/order/create', method: 'POST'}
@@ -23,10 +32,7 @@ export default function OrderCard(props){
             const request = await ApiFetch(ApiOptions)
             const response = await request.json()
         
-            if(!request.ok)
-            { //if(response.status >= 400 && response.status <= 600)
-                throw {message:'Api select order error', code: response.status}
-            }
+            if(!request.ok) throw {message:response.message, code: response.code}
 
             const redirectTo = response.redirect
 
@@ -34,41 +40,24 @@ export default function OrderCard(props){
 
         } catch (error) {
 
-            if(
-                error.response != undefined && 
-                error.response != '' &&
-                !error.response.errors.error
-            )
-            {
-                error.response.errors instanceof Array &&
-                error.response.errors.map((error) => {
-                    setErrors((prevValues) => {
-                        return {
-                            ...prevValues,
-                            [error.property] : error.message
-                        }
-                    })
-                })
-            } else {
+            console.log("GOt Error", error)
+            if(error instanceof Object && error.code > 399){
+                // const arrayProperties = error.response.errors.property[0]
+                const messageError = "Login or Create a profile to get access!"
+                // const messageError = error.message
 
-                if(error.response instanceof Object){
-                    const arrayProperties = error.response.errors.property[0]
-                    const messageError = error.response.errors.message
-                    
-                    setErrors((prevValues) => {
-                        return {
-                            ...prevValues,
-                            [arrayProperties] : messageError
-                        }
-                    })
-                } else {
-                    if(error.code === 401){
-                        inMemoryJwt.ereaseToken()
-                        navigate("/sign-up", {replace: true}) 
-                    }
-                }
+                setMessage(messageError)
+                setError(true)
+
+                navigate("/sign-up", {replace: true}) 
+                
+                // setErrors((prevValues) => {
+                //     return {
+                //         ...prevValues,
+                //         ['error'] : messageError
+                //     }
+                // })
             }
-
         }
     }
 
@@ -84,7 +73,7 @@ export default function OrderCard(props){
     return(
         <>
             <section className={`${classes.cardSubscription} flex flex-col max-w-sm p-6 bg-white border border-gray-200 rounded-lg my-2 shadow dark:bg-gray-200 dark:border-gray-700 sm:mx-2`}>
-                    <h1 className="text-2xl text-center">{props.name}</h1>
+                    <h1 className="text-2xl text-center">{name}</h1>
                     <section className={`${classes.spSection} sp-section border-1 rounded-md bg-gray-300 px-4 py-6 my-2 border-l-zinc-500 text-center`}>
                         <Box
                             marginBottom={-2}
@@ -101,29 +90,29 @@ export default function OrderCard(props){
                         >
                             <section className="text-center">
                                 <span className="pr-2 text-5xl">€</span>
-                                {props.directOrPeriodic != 0 && <span className="text-5xl">{props.price / props.durationLength}</span>}
-                                {props.directOrPeriodic != 1 && <span className="text-5xl">{props.price}</span>}
+                                {directOrPeriodic != 0 && <span className="text-5xl">{price / durationLength}</span>}
+                                {directOrPeriodic != 1 && <span className="text-5xl">{price}</span>}
                             </section>
-                            {props.directOrPeriodic != 0  &&
+                            {directOrPeriodic != 0  &&
                             <>
-                                <div className="text-sm mt-0.5"><span>per </span><span className="font-extrabold">{props.duration}</span><br />
-                                    <span className="font-extrabold">{props.price}</span>
+                                <div className="text-sm mt-0.5"><span>per </span><span className="font-extrabold">{duration}</span><br />
+                                    <span className="font-extrabold">{price}</span>
                                     <span className="font-semibold"> for </span>
-                                    <span className="font-extrabold">{props.durationLength + ' ' + (props.durationLength && props.duration + '\'s')}</span>
+                                    <span className="font-extrabold">{durationLength + ' ' + (durationLength && duration + '\'s')}</span>
                                 </div>
                             </>}
-                            {props.directOrPeriodic != 1 && 
+                            {directOrPeriodic != 1 && 
                             <>
                             <div className="text-sm mt-0.5">
                                 <span className="font-semibold">one time pay</span>
                                 <br />
                                 <span className="font-semibold">valid for </span>
-                                <span className="font-extrabold">{(props.durationLength === 0 ? 1 : props.durationLength) + ' ' + props.duration + '\'s'} </span> 
+                                <span className="font-extrabold">{(durationLength === 0 ? 1 : durationLength) + ' ' + duration + '\'s'} </span> 
                             </div>
                             </>}
-                            {props.directOrPeriodic != 1 &&
+                            {directOrPeriodic != 1 &&
                             <>
-                                <span className="line-clamp-3 text-sm">{props.description}</span>
+                                <span className="line-clamp-3 text-sm">{description}</span>
                             </>}
                         </Box>                        
                     </section>
@@ -139,7 +128,7 @@ export default function OrderCard(props){
                                 <FontAwesomeIcon icon={faArrowRightLong} className={`${classes.spHiddenFaIcon} pl-2`} />
                                 <input
                                     className={`w-full appearance-none block bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`} 
-                                    name={props.category}
+                                    name={category}
                                     type="hidden"
                                     value="trail"
                                     placeholder='Free Trail Subscription'
@@ -153,10 +142,10 @@ export default function OrderCard(props){
                                 <FontAwesomeIcon icon={faArrowRightLong} className={`${classes.spFaIcon} pl-2`} />  
                                 <input
                                     className={`w-full appearance-none block bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`} 
-                                    name={props.category}
+                                    name={category}
                                     type="hidden"
-                                    value={props.sku}
-                                    placeholder={`${props.category}: ${props.name}`}
+                                    value={sku}
+                                    placeholder={`${category}: ${name}`}
                                 />
                             </button>
                         </form>
@@ -176,7 +165,7 @@ export default function OrderCard(props){
 
                     <section className="sp-last text-center">
                         <section className="py-5">
-                            order description: {props.description}
+                            order description: {description}
                         </section>
                         <section className="py-5">
                         </section>

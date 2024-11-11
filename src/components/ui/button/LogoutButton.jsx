@@ -6,11 +6,19 @@ import { NavLink } from 'react-router-dom'
 const MyLogoutButton = forwardRef((props, ref) => {
     const [userLoggedIn, setUserLoggedIn] = useStore('loggedIn')
     const [userLoggedOut, setUserLoggedOut] = useStore('loggedOut')
+    const [message, setMessage] = useStore('message')
     
     const handleClick = () => {
         inMemoryJwt.ereaseToken()
         userLoggedIn && setUserLoggedIn(false)
         userLoggedIn && !userLoggedOut && setUserLoggedOut(true)
+        setMessage("successfully logged out!")
+
+        setTimeout(() => {
+            setUserLoggedOut(false)
+            localStorage.removeItem('loggedOut')
+            localStorage.removeItem('ra-logout')
+        }, 3000)
     }
     
     return (
