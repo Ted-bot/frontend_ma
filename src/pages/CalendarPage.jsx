@@ -7,7 +7,7 @@ import { dataProvider } from '../dataProvider/main/DataProvider.jsx'
 import { useGetIdentity } from 'react-admin'
 import { useNotify } from 'react-admin'
 import { useAuthenticated } from 'react-admin'
-
+import { Box } from '@mui/material'
 const dummyPlannedEvent = { 
     id: 1,
     title: 'title',
@@ -84,21 +84,31 @@ export default function CalendarPage(){
 
     return(
         <>
-            <CalendarModal ref={dialog} setResponseRequest={setResponseRequest}  {...showInModal} />
-            <MainContentWrap name={wrapName}>
-                <div className='flex-col'>
-                    {responseRequest?.message != null && 
-                        <section className={responseRequest.status >= 399 ? `bg-red-300 border border-red-400 text-red-700 ${standardSyle}` :`bg-green-300 border border-green-400 text-green-700 ${standardSyle}`}>
-                            {responseRequest.message}
-                        </section>
-                    }
-                    <CalendarInterface
-                        getPlannedEvents={plannedEvents}
-                        userSelectedEvents={userSelectedEvents}
-                        clickHandle={handleSelectEvent} 
-                        />
-                </div>    
-            </MainContentWrap>
+            <Box 
+                display="flex"
+                flexDirection="column"
+                zIndex={1}
+                minHeight="100vh"
+                backgroundColor="theme.palette.background.default"
+                position="relative"
+                // sx={{ '& .RaLayout-contentWithSidebar': { marginTop: 55 } }}
+            >
+                <CalendarModal ref={dialog} setResponseRequest={setResponseRequest}  {...showInModal} />
+                <MainContentWrap name={wrapName}>
+                    <div className='flex-col'>
+                        {responseRequest?.message != null && 
+                            <section className={responseRequest.status >= 399 ? `bg-red-300 border border-red-400 text-red-700 ${standardSyle}` :`bg-green-300 border border-green-400 text-green-700 ${standardSyle}`}>
+                                {responseRequest.message}
+                            </section>
+                        }
+                        <CalendarInterface
+                            getPlannedEvents={plannedEvents}
+                            userSelectedEvents={userSelectedEvents}
+                            clickHandle={handleSelectEvent} 
+                            />
+                    </div>    
+                </MainContentWrap>
+            </Box>
         </>
     )
  }

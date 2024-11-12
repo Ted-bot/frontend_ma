@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Form, redirect, useNavigate} from 'react-router-dom'
 import { useLogin } from 'react-admin'
+import { Box } from '@mui/material'
 
 const LoginDashboardLoader = () => {
     const navigate = useNavigate()
@@ -24,8 +25,18 @@ const LoginDashboardLoader = () => {
     }
 
     return (
-            <section className="flex flex-col w-full items-center shadow-md bg-orange-100 py-24 rounded-md px-3 md:shadow-xl">
-                <section  className={`w-full py-24 bg-orange-300 rounded-md md:w-1/2 lg:justify-center px-3 mb-6 md:mb-0`}>
+        <Box 
+            display="flex"
+            flexDirection="column"
+            zIndex={1}
+            minHeight="100vh"
+            // width="100%"
+            backgroundColor="theme.palette.background.default"
+            // backgroundColor="theme.palette.background.default"
+            position="relative"
+        >
+            {/* <section className="flex flex-col w-full items-center shadow-md bg-orange-100 py-24 rounded-md px-3 md:shadow-xl">
+                <section  className={`w-full py-24 bg-orange-300 rounded-md md:w-1/2 lg:justify-center px-3 mb-6 md:mb-0`}> */}
                     
                     <section className='flex justify-center'>
                         {errors && <p className="text-red-500 text-xl italic py-3">{errors}</p>}
@@ -57,8 +68,9 @@ const LoginDashboardLoader = () => {
                             Login
                         </button>
                     </Form>
-                </section>
-            </section>
+                {/* </section>
+            </section> */}
+        </Box>
     )
 }
 

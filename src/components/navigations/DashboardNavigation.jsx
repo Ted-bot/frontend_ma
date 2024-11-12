@@ -15,6 +15,7 @@ const MyMenu = () => (
         <Menu.DashboardItem />
         <Menu.Item to="./../" primaryText="Home Page" leftIcon={<HomeIcon />} />
         <Menu.Item to="/dashboard/users" primaryText="Users" leftIcon={<PeopleAltIcon />} />
+        <Menu.Item to="/dashboard/signup" primaryText="SignUp" leftIcon={<PeopleAltIcon />} />
         <Menu.Item to="/dashboard/trainingsessions" primaryText="Trainingsessions" leftIcon={<SportsMartialArtsIcon />} />
         <Menu.Item to="/dashboard/profiles" primaryText="Profiles" leftIcon={<RecentActorsIcon />} />
         <Menu.Item to="/dashboard/notifications" primaryText="Notifications" leftIcon={<NotificationsNoneIcon />} />

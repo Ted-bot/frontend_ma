@@ -12,7 +12,7 @@ export default function SignUpPage() {
     return (
         <>
             <FormWrap>
-                <SignUpForm stateList={stateList} storageNameNewUser={storageNameNewUser} userStoredFormData={userStoredFormData}/>
+                <SignUpForm  storageNameNewUser={storageNameNewUser} userStoredFormData={userStoredFormData}/>
             </FormWrap>
         </>
     )

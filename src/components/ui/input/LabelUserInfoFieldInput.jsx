@@ -110,7 +110,7 @@ export default function LabelUserInfoFieldInput({
             {invalid && type == 'number' &&  <p className="text-rose-300 text-lg italic">Please fill in your {name} </p>}
             {invalid && type == 'tel' &&  <p className="text-rose-300 text-lg italic">Please fill in your {name}</p>}
             {invalid && type == 'checkbox' &&  <p className="text-rose-300 text-lg italic">Please fill gender</p>}
-            {invalid && type == 'date' &&  <p className="text-rose-300 text-lg italic">Sorry, only between the age of 7 and 60 years can sign in!</p>}
+            {invalid && type == 'date' &&  <p className="text-rose-300 text-lg italic">Select a date between the age 17 and 65</p>}
             {(error != undefined && error != '') && <section className="text-rose-300 text-lg italic">{error}</section>}
             {(errorRegion != undefined && error != '') && <section className="text-rose-300 text-lg italic">{errorRegion}</section>}
         </section>

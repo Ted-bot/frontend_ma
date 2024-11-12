@@ -19,6 +19,10 @@ const patterns = [
   "/dashboard/"
 ]
 
+const dashboardPatterns = [
+  "/dashboard/signup"
+]
+
 export default function Root(){
   const NavbarComponent = <MainNavigation />
   const { pathname } = useLocation()
@@ -26,6 +30,7 @@ export default function Root(){
   let logoutEventName = 'ra-logout'
   const isUserLoggedOut = localStorage.getItem(logoutEventName)
   const match = patterns.find(path => (matchPath(path, proxyDashboardLogin))) ? true : false
+  const dashboardMatch = dashboardPatterns.find(path => (!matchPath(path, proxyDashboardLogin))) ? true : false
   
   const obj = {message: true, status: 200}
   const standardSyle = 'mt-8 p-4 mb-8 rounded-md text-center'
@@ -43,20 +48,21 @@ export default function Root(){
         setTimeout(() => {
           setMessage(false)          
           setSuccess(false)
-        }, 3000) 
+        }, 4000) 
     } else if (error){
         setTimeout(() => {
           setMessage(false)
           setError(false)
-        }, 3000) 
+        }, 4000) 
     }
   }, [success, error])
 
   return (
   <>
     {match !== true && NavbarComponent}
-    <main className="flex flex-col items-center pt-12">
-      <section className="min-w-[360px] w-full ml-2 mr-2 sm:w-full md:min-w-[601px] lg:w-full lg:min-w-[1024px] lg:max-w-[1920px]">
+    {dashboardMatch !== true && NavbarComponent}
+    <main className={!match ? "flex flex-col items-center pt-12" : ''}>
+      <section className={!match ? "min-w-[360px] w-full ml-2 mr-2 sm:w-full md:min-w-[601px] lg:w-full lg:min-w-[1024px] lg:max-w-[1920px]" : ''}>
       <ErrorBoundary FallbackComponent={FallBackRender} onError={(error) => console.log({message: `Error (bubbeled up) caught ${error.message}`})}>
     
           <section

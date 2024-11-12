@@ -132,10 +132,9 @@ export default function LabelNameInput({
                 {invalid && type == 'password' &&  <p className="text-red-500 text-xs italic">Please fill in a {lowerCaseName} </p>}
                 {invalid && type == 'location' &&  <p className="text-red-500 text-xs italic">Please fill in a {lowerCaseName} </p>}
                 {invalid && type == 'text' &&  <p className="text-red-500 text-xs italic">Please fill in your {lowerCaseName} </p>}
-                {invalid && type == 'date' &&  <p className="text-red-500 text-xs italic">Sorry, only between the age of 7 and 60 years can sign in!</p>}
+                {invalid && type == 'date' &&  <p className="text-red-500 text-xs italic  text-center">Selected date cannot be processed</p>}
                 {invalid && type == 'tel' &&  <p className="text-red-500 text-xs italic">Please fill in your {lowerCaseName}</p>}
-                {(error != undefined && error != '') && <section className="text-red-500 text-xs italic">{error}</section>}
-                
+                {(error != undefined && error != '') && <section className="text-red-500 text-xs italic">{error}</section>}               
                 
             </section>
         </>

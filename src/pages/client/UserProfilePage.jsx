@@ -37,29 +37,34 @@ const UserProfilePage = () => {
     data?.email && setUserLoggedIn(true)
 
     if(inMemoryJwt.getValidSubscription() && data?.email != null){
-      dataProvider.getOneSubscription('user_subscription', data?.email).then((response) => setData('subscription',response))
+      dataProvider.getOneSubscription('user_subscription', data?.email).then((response) => {
+        setData('subscription',{...response})
+        console.log("got Subcsription", response)
+      })
     }
   },[])
+
+  
 
   return (
     <Card>
       <Title title="Dashboard" />
       <CardHeader sx={{ mx: 2 }} title={`${data?.firstName} Dashboard`} />
       
-      <CardContent>
-        {errors && <p className="text-red-500 text-5xl italic py-3 "> {errors} </p>}
-      </CardContent>
-      <CardContent className='text-center'>
+      
+        {errors && <CardContent><p className="text-red-500 text-5xl italic py-3 "> {errors} </p></CardContent>}
+      
+      
         {
           userData?.subscription?.start 
-          ? <p className="text-red-500 text-3xl italic py-3 ">
+          ? <CardContent className='text-center border-none'><p className="text-red-500 text-3xl italic py-3 ">
             Your Subscription valid<br />
             From: {userData.subscription.start} <br />
             Untill: {userData.subscription.end}
-          </p>
+          </p></CardContent>
           : ''
         }
-      </CardContent>
+      
       <Divider variant="middle" component="div"  />
       <CssBaseline />
       <CardContent>
@@ -90,7 +95,7 @@ const UserProfilePage = () => {
                   {userData?.subscription?.sessions_followed ?? 0}
                 </h1>
               </Box>
-              <Divider variant="middle" component="div" />
+              {/* <Divider variant="middle" component="div" /> */}
             </Grid>
             
             <Grid container direction="column" sx={{ flexGrow: 1 }} >
@@ -121,7 +126,7 @@ const UserProfilePage = () => {
                 {userData?.subscription?.tokens_owned ?? 0}
                 </h1>
               </Box>    
-              <Divider variant="middle" component="div"  />
+              {/* <Divider variant="middle" component="div"  /> */}
             </Grid>
 
             <Grid container direction="column" sx={{ flexGrow: 1 }} >
@@ -145,8 +150,17 @@ const UserProfilePage = () => {
               >
                 <h1 className='text-center text-md md:text-xl lg:text-lg'>                  
                   {
-                    userData?.subscription?.next_session?.next_training_day 
-                    ? userData?.subscription 
+                    userData?.subscription?.next_session.next_training_day
+                    ? <>
+                      <p>
+                        {userData?.subscription?.next_session.next_training_day}    
+                      </p>
+                      <p>
+                      <br />
+                        {userData?.subscription?.next_session?.start + " - " + userData?.subscription?.next_session?.end}
+                      </p>
+                                      
+                    </>
                     : <NavLink 
                         className={`flex justify-center drop-shadow-lg text-sm border-4 border-double border-yellow-800 rounded-2xl p-2 2xl:translate-x-6 hover:bg-neutral-700 hover:shadow-slate-100 hover:text-orange-400 lg:p-4 2xl:w-3/4`}
                         to="./../subscribe"
@@ -155,10 +169,10 @@ const UserProfilePage = () => {
                       </NavLink> 
                   }
                   <br />
-                  {userData?.subscription?.next_session?.start ?? ''}
+                  {userData?.next_session?.start ?? ''}
                 </h1>
               </Box>
-              <Divider variant="middle" component="div"  />
+              {/* <Divider variant="middle" component="div"  /> */}
             </Grid>
           </Box>
       </CardContent>

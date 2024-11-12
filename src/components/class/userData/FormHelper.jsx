@@ -5,7 +5,7 @@ export const getStates = async () => {return await GetState(countryid)}
 
 export const checkForInvalidInputUser = (enteredInputIsInvalid) => {
     for (const [key, value] of Object.entries(enteredInputIsInvalid)){
-        if(value && key !== 'undefined'){
+        if(!value || key === 'undefined'){
             return {bool: false, invalidField: key}
         }
     }
@@ -45,15 +45,15 @@ export function inputBlurHandle(identifier, event, setEnteredInputIsInvalid) {
 
     if(identifier === 'date_of_birth' )
         {
-            const currentYear = new Date().getFullYear();
-            const yearOfBirth = event.split("-")[0]
-            const age = currentYear - yearOfBirth
+            // const currentYear = new Date().getFullYear();
+            // const yearOfBirth = event.split("-")[0]
+            // const age = currentYear - yearOfBirth
 
-            console.log({ageUser: age > 17})
+            // console.log({ageUser: age > 17})
 
             setEnteredInputIsInvalid((prevValues) => ({
                 ...prevValues,
-                [identifier] : (age > 17) || (age < 60) ? false : true
+                [identifier] : !!event
             }))
             return
         }
@@ -104,6 +104,7 @@ export function errorPayloadHandler(error, showErrors){
 
 export function errorHandlerPostRequest(error, showErrors){
     const ifArrayErrors = error?.body
+    console.log("Got error body", ifArrayErrors)
     if(Array.isArray(ifArrayErrors) && (ifArrayErrors.length > 1))
     {
         console.log('{cameIn: 1}', ifArrayErrors)

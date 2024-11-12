@@ -62,6 +62,7 @@ const LocationInput = ({errorMessage: error, stateId, cityId, onChange, stateErr
     const selectCityHandler = id => {
         handleGeneralUserInput('city_id', id)
         const city = cityList.find((city) => city.id === id )
+        console.log("Got City Location", city)
         onChange(city?.name)
     }
     

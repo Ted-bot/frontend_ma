@@ -28,7 +28,10 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { TabsProvider } from './store/tabs-context'
 import LoginDashboardLoader from './loader/LoginDashboardLoader.jsx'
 import { StoreProvider } from './hooks/store/StoreProvider.jsx'
+import { createTheme, ThemeProvider, styled } from '@mui/material/styles'
+import { unstable_createMuiStrictModeTheme } from '@mui/material/styles';
 
+const theme = unstable_createMuiStrictModeTheme();
 
 function App() {
 
@@ -68,12 +71,14 @@ function App() {
     // <Provider store={store}>
     <StoreProvider>
         <TabsProvider>
-          <ReactQueryClientProvider>
-              <UserFormContextProvider>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <RouterProvider router={router} ></RouterProvider>
-                </LocalizationProvider>        
-              </UserFormContextProvider>
+            <ReactQueryClientProvider>
+              <ThemeProvider theme={theme}>
+                <UserFormContextProvider>
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      <RouterProvider router={router} ></RouterProvider>
+                  </LocalizationProvider>        
+                </UserFormContextProvider>
+              </ThemeProvider>
           </ReactQueryClientProvider>
         </TabsProvider>
     </StoreProvider>

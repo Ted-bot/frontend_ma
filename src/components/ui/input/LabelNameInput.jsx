@@ -1,17 +1,13 @@
 import { useState } from 'react'
-import PhoneInput from 'react-phone-number-input'
 import TextField from '@mui/material/TextField'
 import 'react-phone-number-input/style.css'
 import { MuiTelInput } from 'mui-tel-input'
-import { DatePicker } from '@mui/x-date-pickers/DatePicker'
 
-import NativeSelect from '@mui/material/NativeSelect'
 import { camelCaseToLoWithSpace } from '../../../js/util/postUtil'
 
 import LocationInput from './LocationInput.jsx'
+import { DatePickerNewUserInput } from './DatePickerNewUserInput.jsx'
 
-/* eslint-disable react/prop-types */
-// eslint-disable-next-line no-unused-vars
 export default function LabelNameInput({ 
     id = 0,
     name, 
@@ -26,24 +22,60 @@ export default function LabelNameInput({
     value,
     onChange,
     onBlur,
-    onChangeState,
-    onChangeCity
+    checked
 }) {
     let checkBox = 0    
     const lowerCaseName = camelCaseToLoWithSpace(name)
+    // const minDate = () => {
+    //     let currentDate = moment()
+    //     let minDate = currentDate.subtract(65, 'years')
+    //     return minDate.format('DD-MM-YYYY')
+    // }
+
+    // const maxDate = () => {
+    //     let currentDate = moment()
+    //     let maxDate = currentDate.subtract(17, 'years')
+    //     return maxDate.format('DD-MM-YYYY')   
+    // }    
+
+    const [checkBoxError, setCheckBoxError] = useState(null)
+    // const errorMessage = useMemo(() => {
+    //     switch (checkBoxError) {
+    //      case "maxDate": {
+    //         return "Registration age cannot be younger than 17"
+    //        }
+    //      case "minDate": {
+    //       return "Registration age unfortunatley cannot be older than 65"
+    //      }
+    //      case "invalidDate": {
+    //       return "Your date is not valid";
+    //      }
+    //      default: {
+    //       return "";
+    //      }
+    //     }
+    //    }, [checkBoxError])
+
+    
 
     if(type === 'checkbox') checkBox = 1
     
-    const [phoneNumber, setPhoneNumber] = useState(defaultValue);
+    const [phoneNumber, setPhoneNumber] = useState(defaultValue)
+    
 
-  const onPhoneChanged = (val) => {
-    console.log({new_phone_number: val})
-    onChange(val)
-    setPhoneNumber(val)
-  }
-  if(id === 'street_number'){
-      console.log({Is_Invalid_StreetNumber : invalid})
-  }
+    const onPhoneChanged = (val) => {
+        console.log({new_phone_number: val})
+        onChange(val)
+        setPhoneNumber(val)
+    }
+
+    // const maxDateObj = dayjs(maxDate())
+    // const minDateObj = dayjs(minDate())
+
+
+    if(id === 'street_number'){
+        console.log({Is_Invalid_StreetNumber : invalid})
+    }
 
     return (
         <>
@@ -73,13 +105,9 @@ export default function LabelNameInput({
                                 {/* {invalid && type == 'checkbox' &&  <p className="text-red-500 text-xs italic"> Select gender</p>} */}
                             </section>
                         : type === 'date' ?
-                            <DatePicker 
-                                className='w-full'
-                                label={name}
-                                // defaultValue={defaultValue}
-                                onChange={onChange}
-                                onBlur={onBlur}
-                            />
+
+                            <DatePickerNewUserInput label={name} onChange={onChange} onBlur={onBlur}/>
+                            
                         : type === 'tel' ?
                             <MuiTelInput
                                 className='w-full'
@@ -96,20 +124,23 @@ export default function LabelNameInput({
                                 // sx={{height: 100}}
                             />
                         : type === 'checkbox' ?
-                            <section>
-                                
+                            <section>                                
                                 <input
                                     className={`${checkBox === 1 ? 'h-8 w-8 lg:h-8 lg:w-12 accent-orange-300' : 'w-full appearance-none'} 
                                     ${error && 'border-red-500'} 
                                     block bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`} 
                                     id={id}
+                                    value={value}
                                     name={name} 
                                     type={type}
-                                    />
-                                    {type === 'checkbox' && <section className={`${checkBox === 1 ? 'text-center' : ''}`}>
+                                    onChange={onChange}
+                                    checked={checked}
+                                />
+                                    {type === 'checkbox' &&
+                                    <section className={`${checkBox === 1 ? 'text-center' : ''}`}>
                                         {name}                
                                     </section>}
-                                    {invalid && type == 'checkbox' &&  <p className="text-red-500 text-xs italic"> Select gender</p>}
+                                {invalid && type == 'checkbox' &&  <p className="text-red-500 text-xs italic"> Select gender</p>}
                             </section>
                         :
                         <>
@@ -130,7 +161,7 @@ export default function LabelNameInput({
                 {invalid && type == 'password' &&  <p className="text-red-500 text-xs italic">Please fill in a {lowerCaseName} </p>}
                 {invalid && type == 'location' &&  <p className="text-red-500 text-xs italic">Please fill in a {lowerCaseName} </p>}
                 {invalid && type == 'text' &&  <p className="text-red-500 text-xs italic">Please fill in your {lowerCaseName} </p>}
-                {invalid && type == 'date' &&  <p className="text-red-500 text-xs italic">Sorry, only between the age of 7 and 60 years can sign in!</p>}
+                {invalid && type == 'date' &&  <p className="text-red-500 text-xs italic text-center">Selected date cannot be processed</p>}
                 {invalid && type == 'tel' &&  <p className="text-red-500 text-xs italic">Please fill in your {lowerCaseName}</p>}
                 {(error != undefined && error != '') && <section className="text-red-500 text-xs italic">{error}</section>}
                 

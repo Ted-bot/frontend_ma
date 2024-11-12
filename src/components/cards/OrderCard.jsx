@@ -43,7 +43,7 @@ export default function OrderCard({
             console.log("GOt Error", error)
             if(error instanceof Object && error.code > 399){
                 // const arrayProperties = error.response.errors.property[0]
-                const messageError = "Login or Create a profile to get access!"
+                const messageError = "Login or Create a profile to proceed Subscription payment!"
                 // const messageError = error.message
 
                 setMessage(messageError)
