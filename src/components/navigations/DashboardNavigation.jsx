@@ -13,7 +13,6 @@ import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone'
 const MyMenu = () => (
     <Menu>
         <Menu.DashboardItem />
-        <Menu.Item to="./../" primaryText="Home Page" leftIcon={<HomeIcon />} />
         <Menu.Item to="/dashboard/users" primaryText="Users" leftIcon={<PeopleAltIcon />} />
         {/* <Menu.Item to="/dashboard/signup" primaryText="SignUp" leftIcon={<PeopleAltIcon />} /> */}
         <Menu.Item to="/dashboard/trainingsessions" primaryText="Trainingsessions" leftIcon={<SportsMartialArtsIcon />} />
@@ -22,6 +21,7 @@ const MyMenu = () => (
         <Menu.Item to="/dashboard/classes" primaryText="Classes" leftIcon={<SchoolIcon />} />
         <Menu.Item to="/dashboard/settings" primaryText="Settings" leftIcon={<SettingsIcon />} />
         <Menu.Item to="/dashboard/Calendar" primaryText="Calendar" leftIcon={<CalendarMonthIcon />} />
+        <Menu.Item to="./../" primaryText="Home Page" leftIcon={<HomeIcon />} />
         <Menu.Item to="./../subscribe" primaryText="Shop" leftIcon={<ShoppingCartIcon />} />
     </Menu>
 )

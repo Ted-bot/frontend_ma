@@ -24,8 +24,7 @@ export const NotificationTabInterface = () => {
     console.log('test',eventsData?.events)
 
     useEffect(() => {        
-        if(eventsData?.events) setRegisteredEvents(eventsData?.events['hydra:member'])
-        // if(status === 'success') setRegisteredEvents(eventsData)
+        if(eventsData?.events['hydra:member'] != 'No Subscribed Events Available') setRegisteredEvents(eventsData?.events['hydra:member'])
     },[eventsData?.events, registeredEvents])
 
     const columns = [
@@ -55,6 +54,8 @@ export const NotificationTabInterface = () => {
     //     includeOutliers: true,
     //   }
 
+   console.log("registeredEvents ",registeredEvents)
+
     if(registeredEvents?.status === 'loading') return <p>Loading ...</p>
     if(!rows) return <p>Loading ...</p>
     if(registeredEvents?.status === 'error' || registeredEvents?.status === 'failed') notify(`Failed loading events`, { type: 'error' })
@@ -70,7 +71,7 @@ export const NotificationTabInterface = () => {
                     Manage registeredEvents
                 </Typography>
 
-                {rows && <DataGrid 
+                {rows ? <DataGrid 
                     rows={rows} 
                     columns={columns} 
                     getRowId={(row) => row.id }
@@ -107,7 +108,8 @@ export const NotificationTabInterface = () => {
                         maxHeight: "168px !important"}
                     }}
                     onRowClick={params=> setRowId(params.id)}    
-                />}
+                />
+            : <p>No Notifications set</p>}
 
             </Box>
         </>

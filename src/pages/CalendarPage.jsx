@@ -72,7 +72,8 @@ export default function CalendarPage(){
 
     useEffect(() => {
         dataProvider.allBlackDragonEvents('subscribe', userIdentity?.email).then((blackDragonEvents) =>{
-             setUserSelectedEvents(blackDragonEvents?.userSelectedEvents)
+            console.log("userCalendar", blackDragonEvents) 
+            setUserSelectedEvents(blackDragonEvents?.userSelectedEvents ?? [])
              setPlannedEvents(blackDragonEvents?.events)
         }).catch(error => notify(`${error}`, {type: 'error'}))
     }, [])

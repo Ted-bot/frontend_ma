@@ -44,17 +44,18 @@ export const AddressTabInterface = () => {
     const [enteredInputIsInvalid, setEnteredInputIsInvalid] = useState(inputValidList)
     const {showBoundary} = useErrorBoundary()
 
-    
 
     useEffect(() => {
         // console.log('got city id', userIdentity.userAddress.cityId)
         // console.log('got state id', userIdentity.userAddress.stateId)
-        handleGeneralUserInput('city_id', Number(userIdentity?.userAddress.cityId))
-        handleGeneralUserInput('state_id', Number(userIdentity?.userAddress.stateId))
-        handleGeneralUserInput('unitNumber', userIdentity?.userAddress.unitNumber)
-        handleGeneralUserInput('streetNumber', userIdentity?.userAddress.streetNumber)
-        handleGeneralUserInput('postalCode', userIdentity?.userAddress.postalCode)
-        handleGeneralUserInput('addressLine', userIdentity?.userAddress.addressLine)
+        if(userIdentity?.userAddress){
+            handleGeneralUserInput('city_id', Number(userIdentity?.userAddress.cityId))
+            handleGeneralUserInput('state_id', Number(userIdentity?.userAddress.stateId))
+            handleGeneralUserInput('unitNumber', userIdentity?.userAddress.unitNumber)
+            handleGeneralUserInput('streetNumber', userIdentity?.userAddress.streetNumber)
+            handleGeneralUserInput('postalCode', userIdentity?.userAddress.postalCode)
+            handleGeneralUserInput('addressLine', userIdentity?.userAddress.addressLine)
+        }
     },[])
     
     const handleGeneralUserInput = (identifier, value) => {

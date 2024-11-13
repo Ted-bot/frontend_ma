@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate, useNavigation } from 'react-router-dom'
+import { useNavigate, useNavigation, Form } from 'react-router-dom'
 import CreateFormInterface from '../interface/CreateFormInterface.jsx'
 import { changeObjKeysToCamelCaseFields } from '../../js/util/postUtil.js'
 
@@ -16,6 +16,10 @@ import { useErrorBoundary } from "react-error-boundary"
 import { inputBlurHandle, checkForInvalidInputUser } from '../class/userData/FormHelper.jsx'
 import { errorHandlerPostRequest } from '../class/userData/FormHelper.jsx'
 import dayjs from 'dayjs'
+import { useLogin } from 'react-admin'
+
+import classes from "./SignUpForm.module.css"
+
 
 const typeText = 'text'
 const typePassword = 'password'
@@ -30,10 +34,11 @@ const typeLocation = 'location'
 // ps reset pw:GivjJD4guFwQhzv
 
 export default function SignUpForm({storageNameNewUser, userStoredFormData}) {
-
+    const login = useLogin()
     const navigate = useNavigate()
     const navigation = useNavigation()
     const {showBoundary} = useErrorBoundary()
+    
     // const {state, dispatch} = useUserFormContext()
     
     let isSubmitting = navigation.state === 'submitting'
@@ -114,7 +119,17 @@ export default function SignUpForm({storageNameNewUser, userStoredFormData}) {
 
             setErrors(inputValidList)            
             deleteLocalStorageItem(storageNameNewUser)
-            navigate('/dashboard', {replace: true})
+            console.log("login user", {email: data.email, password: data.password })
+            // navigate('/dashboard', {replace: true})
+            login({email: data.email, password: data.password })
+            .then((response) => {  navigate('/dashboard') })
+            .catch((error) => {
+                if(error?.message) {
+                    setErrors(error.message) 
+                } else {
+                    setErrors("unknown error, please try again later") 
+                }
+            })
             
         } catch (error) {
             // console.log("SignUp Error",error)
@@ -141,6 +156,7 @@ export default function SignUpForm({storageNameNewUser, userStoredFormData}) {
             if(value.id === 'undefined' || !value.id || !value.value) continue
             if(value.id === 'male' || value.id === 'female') continue
             if(value.id === ':r19:' ) continue // "02/03/1999"                   
+            if(value.id === ':r1r:' ) continue // "02/03/1999"                   
             data = {...data, [value.id]: value.value}
         }
         
@@ -148,6 +164,7 @@ export default function SignUpForm({storageNameNewUser, userStoredFormData}) {
         
         if(checkInputUser.bool){
             const requestBody = changeObjKeysToCamelCaseFields(data)
+            console.log("SignupRequest", requestBody)
             postRequest(requestBody)            
         } else {
             const invalidField = checkInputUser.invalidField
@@ -168,7 +185,7 @@ export default function SignUpForm({storageNameNewUser, userStoredFormData}) {
 
                 <h1 className="pt-3 pb-6 text-2xl">{InterfaceConfiguration.title}</h1>
 
-                <form onSubmit={(e) => handleSubmit(e, enteredInput, setEnteredInputIsInvalid)} name='sign-up' id='sign-up'>
+                <Form onSubmit={(e) => handleSubmit(e, enteredInput, setEnteredInputIsInvalid)} name='sign-up' id='sign-up'>
 
                     <section className="flex flex-wrap mx-3 mb-6 justify-center">
                        <CreateFormInterface array={InterfaceConfiguration.setItems} />                        
@@ -194,8 +211,7 @@ export default function SignUpForm({storageNameNewUser, userStoredFormData}) {
                     </p>}
                     {/* ${lockedSubmitButton && 'opacity-50'} ${!lockedSubmitButton && 'hover:bg-[#686c6f] '} */}
                     <button 
-                        className={`w-full py-3 mt-10 bg-[#063070] rounded-md
-                        font-medium text-white uppercase focus:outline-none hover:shadow-none `}
+                        className={classes.buttonSignUp}
                     >
                         {isSubmitting ? 'Submitting...' : InterfaceConfiguration.buttonname}
                     </button>
@@ -203,7 +219,7 @@ export default function SignUpForm({storageNameNewUser, userStoredFormData}) {
                     <section className="flex justify-center pt-6 pb-4">
                         <p><a>Already have a account? Sign in here!</a></p>
                     </section>
-                </form>
+                </Form>
             </section>
             </section>
         </>
