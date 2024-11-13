@@ -106,11 +106,7 @@ const UserProfilePage = () => {
                 alignContent="center"
               >
                 <h1 className='text-center py-2 text-md text-orange-300 md:text-xl lg:text-2xl lg:py-10'>
-                  Training 
-                  <br />
-                  Acces
-                  <br />
-                  Points
+                  Tokens
                 </h1>
               </Box>
               
@@ -137,7 +133,7 @@ const UserProfilePage = () => {
                 alignContent="center"
               >
                 <h1 className='text-center py-2 text-md text-orange-300 md:text-xl lg:text-2xl lg:py-10'>
-                  Next Class
+                  Training Level
                 </h1>
               </Box>
               <Divider variant="middle" component="div"  />
@@ -148,7 +144,7 @@ const UserProfilePage = () => {
                 alignContent="center"
                 mx={'auto'}
               >
-                <h1 className='text-center text-md md:text-xl lg:text-lg'>                  
+                <h1 className='text-center text-md md:text-xl lg:text-2xl lg:py-10'>                  
                   {
                     userData?.subscription?.next_session.next_training_day
                     ? <>
@@ -161,12 +157,7 @@ const UserProfilePage = () => {
                       </p>
                                       
                     </>
-                    : <NavLink 
-                        className={`flex justify-center drop-shadow-lg text-sm border-4 border-double border-yellow-800 rounded-2xl p-2 2xl:translate-x-6 hover:bg-neutral-700 hover:shadow-slate-100 hover:text-orange-400 lg:p-4 2xl:w-3/4`}
-                        to="./../subscribe"
-                      > 
-                        Subscribe to Join Class
-                      </NavLink> 
+                    : 0 
                   }
                   <br />
                   {userData?.next_session?.start ?? ''}
@@ -178,18 +169,31 @@ const UserProfilePage = () => {
       </CardContent>
       
       <CardContent>
-        <section className='px-4 text-md md:text-xl lg:text-2xl '>
-          Training Session:
-        </section>
-        <section className="flex justify-center px-4 text-md md:text-xl lg:text-2xl lg:py-10">
-          <section className='w-1/2 text-center'>
-              Group
+        <section className="flex justify-center mt-2 px-4 text-md md:text-xl lg:text-2xl lg:py-10">
+          <section className='w-1/2 text-center translate-y-8 -translate-x-4 md:translate-y-4 lg:translate-y-8'>
+              Next Class
           </section>
           <Divider orientation="vertical" flexItem />
           <section className='w-1/2 text-center'>
-              Not set in a group yet.
-              <br />
-              Sign up for a class to get set in a group
+          {
+                    userData?.subscription?.next_session.next_training_day
+                    ? <>
+                        <p>
+                          {userData?.subscription?.next_session.next_training_day}    
+                        </p>
+                        <p>
+                        <br />
+                          {userData?.subscription?.next_session?.start + " - " + userData?.subscription?.next_session?.end}
+                        </p>
+                    </>
+                    : <p className='text-sm pl-2 lg:text-lg'> You have no tokens currently.
+                        <br />
+                      Go to the shop and get tokens.
+                      <br />
+                      Then select a day to join a class inside the calendar
+                    </p>
+                  }
+              
           </section>
         </section>
       </CardContent>

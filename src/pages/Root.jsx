@@ -45,17 +45,20 @@ export default function Root(){
   
   useEffect(() => {
     if (success) {
-        setTimeout(() => {
-          setMessage(false)          
-          setSuccess(false)
-        }, 4000) 
+      setTimeout(() => {
+        setMessage(false)          
+        setSuccess(false)
+      }, 4000) 
     } else if (error){
-        setTimeout(() => {
-          setMessage(false)
-          setError(false)
-        }, 4000) 
+      setTimeout(() => {
+        setMessage(false)
+        setError(false)
+      }, 4000) 
     }
   }, [success, error])
+
+  console.log("success state", success)
+  console.log("message state", message)
 
   return (
   <>

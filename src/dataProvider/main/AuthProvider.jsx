@@ -54,8 +54,10 @@ export const authProvider = {
         if(!getLocalStorageItem('loggedIn')) return
         if(getLocalStorageItem('loggedIn') === false) return
         inMemoryJwt.ereaseToken()
-        setLocalStorageItem('loggedOut', true)
+        // setLocalStorageItem('loggedOut', true)
         setLocalStorageItem('loggedIn', false)
+        setLocalStorageItem('message', "successfully loged out!")
+        setLocalStorageItem('success', true)
         
         return '/'
     },

@@ -39,6 +39,7 @@ import merge from "lodash/merge"
 import { light } from '@mui/material/styles/createPalette.js'
 import createPalette from '@mui/material/styles/createPalette.js'
 import { Typography } from '@mui/material'
+import { components } from 'react-select'
 
 
 
@@ -65,54 +66,37 @@ const typography = {
     color: palette.text.primary,
 };
 
+
 const myTheme = {
         ...defaultLightTheme,
         palette: {
             ...defaultLightTheme.palette,
-            primary: {
-                // light: orange[400],
-                main: green[500],
-            },
             secondary: {
-                main: "#fd5335",
-                // main: orange[900/1],
-                // light: indigo[600]
+                main: "#E50000",
             }
         },
         components: {       
             MuiFormLabel: { //MuiFormLabel-root
                 styleOverrides: { // label text input
                     root: {
-                        // invisible border when not active, to avoid position flashs
                         marginTop: '10px',
                         height: '50px', 
-                        // '&.MuiInputBase-input': {
-                        //     // borderLeft: '15px solid #ff9958',
-                        //     height: '50px'
-                        // },
                     },
                 },
             },
             MuiInputBase: {
                 styleOverrides: {
                     root: {
-                        // invisible border when not active, to avoid position flashs
                         marginTop: '10px',
-                        height: '50px', 
-                        // '&.MuiInputBase-input': {
-                        //     // borderLeft: '15px solid #ff9958',
-                        //     height: '50px'
-                        // },
+                        height: '50px',
                     },
                 },
             }, //
             MuiScopedCssBaseline: {
                 styleOverrides: {
                     root: {
-                        // invisible border when not active, to avoid position flashs
                         background: 'transparent', 
                         '&.MuiInputBase-input': {
-                            // borderLeft: '15px solid #ff9958',
                             height: '50px'
                         },
                     },
@@ -124,55 +108,73 @@ const myTheme = {
                         // invisible border when not active, to avoid position flashs
                         borderLeft: '3px solid transparent', 
                         '&.RaMenuItemLink-active': {
-                            borderLeft: '15px solid #ff9958',
+                            borderTopRightRadius: '80px 80px',
+                            borderBottomRightRadius: '80px 80px',
+                            color: 'white', 
+                            background: 'linear-gradient(160deg, #E50000, #ab0926 )',
                             height: '50px'
                         },
-                        // borderRight: '3px solid #ffd086', 
+                        '&.RaMenuItemLink-active .RaMenuItemLink-icon': {
+                            color: 'white',
+                        },
                         '&.RaMenuItemLink': {
                             borderRight: '15px solid #ff9958',
-                            // height: '50px'
                         },
                         '& .RaMenuItemLink-icon': {
                             color: '#4C4C4C',
-                            // color: '#ff9958',
                         },
                     },
                 },
-           },
+            },
+            MuiTableBody: {
+                styleOverrides: {
+                    root: { 
+                        background: '#F8F8F8', //#ffd086, #C45267                        
+                    }
+                }
+            },
             MuiCardContent: {
                 styleOverrides: {
                     root: { // main content inner component
-                        // backgroundColor: orange[300],
-                        borderTop: '5px solid #ffd086',
-                        "& .MuiCardContent-root": { // sideBar
-                            backgroundColor: indigo[500],
-                            // border: '5px solid green',
-                            // border: '5px solid blue',
-                            borderColor: indigo[400]
-                    },
-                }
+                        margin: '15px 5px 10px 10px',
+                        // borderTop: '5px solid #ffd086',
+                        background: '#F6E6E9',
+                        boxShadow: '-2px 3px 8px 1px #ab0926',
+                        borderLeft: '2px solid #E5B5BD',
+                        borderTopLeftRadius: '15px 15px',
+                        borderTopRightRadius: '15px 15px',
+                        borderBottomLeftRadius: '15px 15px',
+                        borderBottomRightRadius: '15px 15px',
+                        borderBottom: '2px solid #ab0926',
+                        // boxShadow: 5,
+                        
+                    }
                 }
             },
             RaLayout: {
                 styleOverrides: {
                   root: {
-                    background: 'linear-gradient(160deg, #ffd086, #ab0926 )',
+                    '& .RaLayout-content .css-bhp9pd-MuiPaper-root-MuiCard-root': {
+                        background: 'transparent',
+                        boxShadow: 'none',
+                        borderRight: 'none'
+                        // borderRight: '5px solid #E50000'
+                    },
+                    '& .MuiCardHeader-root .css-1pqodoe-MuiCardHeader-root': {
+                        background: 'yellow',
+                    },
+                    background: 'linear-gradient(160deg, #ffd086, #C45267 )', //#ab0926
                     "& .RaLayout-contentWithSidebar": { // whole screen: content + sidebar
-                    //   border: '15px solid #ff9958',
-                    //   borderColor: indigo[400]
+                    },
+                    "& .RaLayout-content": { // whole screen: content + sidebar
+                      background: 'linear-gradient(-20deg, #CC6B7C, #f6bf7e )',
                     },
                     "& .RaSidebar-docked": { // sideBar
-                        // backgroundColor: indigo[500],
-                        borderLeft: '5px solid #ff9958',
-                        // borderRight: '5px solid #ff9958',
-                        borderTop: '5px solid #ff9958',
-                        // borderColor: indigo[400]
+                        borderLeft: '5px solid #E50000',
                       },
                     "& .RaLayout-content": { // main layout
-                        // borderLeft: 'solid 5px #ffd086',
-                        background: 'linear-gradient(-20deg, #CC6B7C, #f6bf7e )'
+                        background: 'transparent',
                     }
-
                 }
             },
         }
@@ -210,9 +212,7 @@ export default function DashboardPage() {
         <>
             <AdminGuesser
                 defaultTheme='light'
-                darkTheme={null}
                 theme={myTheme}
-                lightTheme={null}
                 basename='/dashboard'
                 dashboard={UserProfilePage}
                 layout={MyLayout}
