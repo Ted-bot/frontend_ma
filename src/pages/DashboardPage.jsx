@@ -1,14 +1,10 @@
-import { useEffect } from 'react'
 import { AdminGuesser,
-    hydraDataProvider,
     hydraSchemaAnalyzer,
     ResourceGuesser,
 } from '@api-platform/admin'
 import { Layout, CustomRoutes, useAuthenticated, defaultTheme, defaultDarkTheme, defaultLightTheme} from 'react-admin'
 import { Route } from 'react-router-dom'
-// import { createTheme } from '@mui/material/styles'
 
-import SignUpForm from '../components/forms/SignUpForm.jsx'
 import MyMenu from '../components/navigations/DashboardNavigation.jsx'
 import ProfileList from '../dataProvider/Profile/ProfileList.jsx'
 import UserCreate from '../dataProvider/User/UserCreate.jsx'
@@ -18,30 +14,14 @@ import UserProfilePage from './client/UserProfilePage'
 import { dataProvider } from '../dataProvider/main/DataProvider.jsx'
 import { authProvider } from '../dataProvider/main/AuthProvider.jsx'
 import { ProfileSettingsInterface } from '../components/interface/UserDashboardProfileInterface'
-import { SignUpLoader } from '../loader/SignUpLoader.jsx'
-import CalendarPage from './CalendarPage';
-import { CalendarLoader } from '../loader/CalendarLoader.jsx'
+import CalendarPage from './CalendarPage'
 import SignUpPage from './SignUpPage.jsx'
-// import MyAppBar from './DashboardLogout'
 import { useTabsContext } from '../store/tabs-context.jsx'
 import { NotificationTabInterface } from '../components/interface/settings/NotificationTabInterface.jsx'
-import { storageNameNewUser } from "../js/util/auth"
-import { getLocalStorageItem } from "../js/util/getUtil"
 
-import indigo from '@mui/material/colors/indigo'
-import pink from '@mui/material/colors/pink'
-import green from '@mui/material/colors/green'
-import red from '@mui/material/colors/red'
-import orange from '@mui/material/colors/orange'
 import { deepmerge } from '@mui/utils'
-import { createTheme, ThemeProvider } from '@mui/material/styles'
 import merge from "lodash/merge"
-import { light } from '@mui/material/styles/createPalette.js'
 import createPalette from '@mui/material/styles/createPalette.js'
-import { Typography } from '@mui/material'
-import { components } from 'react-select'
-
-
 
 const palette = createPalette(
     merge({}, defaultTheme.palette, {
@@ -64,17 +44,31 @@ const typography = {
     fontWeightMedium: 600,
     fontWeightBold: 700,
     color: palette.text.primary,
-};
-
+}
 
 const myTheme = {
         ...defaultLightTheme,
         palette: {
             ...defaultLightTheme.palette,
+            // primary: {myText: '#E50000'},
             secondary: {
                 main: "#E50000",
+                shadowColor: "#E50000",
+            },
+            common: {
+                white: '#E50000'
             }
         },
+        overrides: {
+            MuiGrid: {
+                '& .MuiGrid-root .css-sinu4y': {
+                // backgroundColor: palette.common.white,
+                color: 'green',
+                // height: "100%",
+                boxShadow:
+                "2px 0px 1px -1px rgba(0,0,0,0.2), 1px 0px 3px 0px rgba(0,0,0,0.1)",}
+            },
+          },
         components: {       
             MuiFormLabel: { //MuiFormLabel-root
                 styleOverrides: { // label text input
@@ -136,6 +130,7 @@ const myTheme = {
             MuiCardContent: {
                 styleOverrides: {
                     root: { // main content inner component
+                        color: '#ab0926',
                         margin: '15px 5px 10px 10px',
                         // borderTop: '5px solid #ffd086',
                         background: '#F6E6E9',
@@ -151,6 +146,17 @@ const myTheme = {
                     }
                 }
             },
+            // MuiBox: {
+            //     styleOverrides: {
+            //         root: {
+            //             boxShadow: '5px 5px 5px blue',
+            //             color: 'green',
+            //             '&.MuiBox-root .css-18uuk9m' : {
+            //                 boxShadow: '5px 5px 5px blue'
+            //             }
+            //         }
+            //     }
+            // },
             RaLayout: {
                 styleOverrides: {
                   root: {
@@ -182,31 +188,12 @@ const myTheme = {
 }
 
 
-
-const myThemeDark = deepmerge(defaultDarkTheme, {palette: {mode: 'dark'}})
-
 export default function DashboardPage() {
     useAuthenticated()
-    const {state, dispatch} = useTabsContext()
-    // const user = () => {
-    //     const {dragonUser} = useUserIdentifier()
-    //     return dragonUser
-    // }
     
     const schemaAnalyzer = hydraSchemaAnalyzer()
-
     const MyLogin = () => (<LoginDashboardLoader />)
-
     const MyLayout = props => <Layout {...props} menu={MyMenu}/> //appBar={MyAppBar} 
-
-
-    
-    // useEffect(() => {
-    //     if(!state.loggedIn){
-    //         console.log('userLoggedIn',state.loggedIn)
-    //         dispatch({type: 'USER_LOGGED_IN', payload: true})
-    //     }
-    // })
 
     return (
         <>

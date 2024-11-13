@@ -1,31 +1,60 @@
 import { useState, useEffect } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
-import { useAuthenticated, Title, useAuthState, useGetIdentity, useRedirect } from 'react-admin'
+import { useAuthenticated, Title, useGetIdentity, useRedirect } from 'react-admin'
 
 import {getLocalStorageItem} from "../../js/util/getUtil.js"
 import { dataProvider } from '../../dataProvider/main/DataProvider.jsx'
 
-
-import { Card, CardContent, CardHeader } from "@mui/material"
+import { Card, CardContent, CardHeader, createTheme } from "@mui/material"
 import CssBaseline from '@mui/material/CssBaseline'
 import Box from '@mui/material/Box'
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
 import inMemoryJwt from '../../js/util/inMemoryJwt.js'
 import useStore from '../../hooks/store/useStore.jsx'
+import { styled } from '@mui/system'
+import { orange } from '@mui/material/colors'
+
+
+const TitleComponent = styled('div',{
+  name: 'CustomTitle',
+  slot: 'Root',
+  overridesResolver: (props, styles) => [
+    styles.root,
+    props.color === 'primary' && styles.primary,
+    props.color === 'secondary' && styles.secondary,
+  ],
+})(({ theme }) => ({
+  // color: theme.palette.common.white,
+  border: theme.palette.secondary.main,
+  // color: theme.palette.secondary.main,
+  // padding: theme.spacing(1),
+  // borderRadius: theme.shape.borderRadius,
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "center",
+  textAlign: 'center',
+  color: theme.palette.secondary.main,
+  fontWeight: '1rem',
+  fontSize: { xs: "1rem", md: "1.25rem", lg: "1.50rem" },
+  padding: { xs: "-5px", md: "10px", lg: "15px" },
+  boxShadow: `1px 2px 3px ${theme.palette.secondary.shadowColor}`,
+  marginTop: '16px',
+  height: '8rem',
+  fontSize: '1.25rem',
+  padding: '10px',
+}))
+
 
 const UserProfilePage = () => {  
-  // const itemLocalstorage = 'user'
   useAuthenticated()
-  const navigate = useNavigate()
-  const redirect = useRedirect()
   const [userLoggedIn, setUserLoggedIn, isLoading] = useStore('loggedIn')
   const {data, isPending, error} = useGetIdentity()
 
   const [errors, setErrors] = useState('')
-  const [userData, setUserData] = useState({user: {}})
-  const email = getLocalStorageItem('email')
-
+  const [userData, setUserData] = useState({}) //user: {}
+  // const classes = useStyles()
+  
   function setData(identifier, data){
     setUserData((prevValues) => ({
         ...prevValues,
@@ -44,17 +73,17 @@ const UserProfilePage = () => {
     }
   },[])
 
+  const theme = createTheme({
+    status: {
+      warning: orange[500],
+    },
+  })
   
 
   return (
     <Card>
       <Title title="Dashboard" />
-      <CardHeader sx={{ mx: 2 }} title={`${data?.firstName} Dashboard`} />
-      
-      
-        {errors && <CardContent><p className="text-red-500 text-5xl italic py-3 "> {errors} </p></CardContent>}
-      
-      
+      <CardHeader sx={{ mx: 2 }} title={`${data?.firstName} Dashboard`} />      
         {
           userData?.subscription?.start 
           ? <CardContent className='text-center border-none'><p className="text-red-500 text-3xl italic py-3 ">
@@ -70,21 +99,13 @@ const UserProfilePage = () => {
       <CardContent>
         <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)' }}>
             <Grid container direction="column" sx={{ flexGrow: 1}} >
-              <Box 
-                  display='block'
-                  my={2}
-                  height= {{ xs:'4rem', sm:'4rem', md:'8rem', lg:'10rem'}}
-                  alignContent="center"
-              >
-                <h1 className='text-center text-md text-orange-300 md:text-xl lg:text-2xl lg:py-10'>
-                    Training 
-                    <br />
-                    sessions 
-                    <br />
-                    followed
-                  </h1>
-              </Box>
-              <Divider variant="middle" component="div"  />
+              <TitleComponent>
+                  Training 
+                  <br />
+                  sessions 
+                  <br />
+                  followed
+              </TitleComponent>
               <Box 
                 display='block'
                 my={2}
@@ -95,22 +116,18 @@ const UserProfilePage = () => {
                   {userData?.subscription?.sessions_followed ?? 0}
                 </h1>
               </Box>
+              
               {/* <Divider variant="middle" component="div" /> */}
             </Grid>
             
             <Grid container direction="column" sx={{ flexGrow: 1 }} >
-              <Box 
-                display='block'
-                my={2}
-                height= {{ xs:'4rem', sm:'4rem', md:'8rem', lg:'10rem'}}
-                alignContent="center"
-              >
-                <h1 className='text-center py-2 text-md text-orange-300 md:text-xl lg:text-2xl lg:py-10'>
+              <TitleComponent>
+                {/* <h1 className='text-center py-2 text-md text-orange-300 md:text-xl lg:text-2xl lg:py-10'> */}
                   Tokens
-                </h1>
-              </Box>
+                {/* </h1> */}
+              </TitleComponent>
               
-              <Divider variant="middle" component="div"  />
+              {/* <Divider variant="middle" component="div"  /> */}
               
               <Box 
                 display='block'
@@ -122,21 +139,15 @@ const UserProfilePage = () => {
                 {userData?.subscription?.tokens_owned ?? 0}
                 </h1>
               </Box>    
-              {/* <Divider variant="middle" component="div"  /> */}
             </Grid>
 
             <Grid container direction="column" sx={{ flexGrow: 1 }} >
-              <Box
-                display='block'
-                my={2}
-                height= {{ xs:'4rem', sm:'4rem', md:'8rem', lg:'10rem'}}
-                alignContent="center"
-              >
-                <h1 className='text-center py-2 text-md text-orange-300 md:text-xl lg:text-2xl lg:py-10'>
+              <TitleComponent>
+                {/* <h1 className='text-center py-2 text-md text-orange-300 md:text-xl lg:text-2xl lg:py-10'> */}
                   Training Level
-                </h1>
-              </Box>
-              <Divider variant="middle" component="div"  />
+                {/* </h1> */}
+              </TitleComponent>
+              {/* <Divider variant="middle" component="div"  /> */}
               <Box 
                 display='block'
                 my={2}
@@ -163,7 +174,6 @@ const UserProfilePage = () => {
                   {userData?.next_session?.start ?? ''}
                 </h1>
               </Box>
-              {/* <Divider variant="middle" component="div"  /> */}
             </Grid>
           </Box>
       </CardContent>
