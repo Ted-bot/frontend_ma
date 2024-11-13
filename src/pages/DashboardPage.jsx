@@ -21,7 +21,7 @@ import { ProfileSettingsInterface } from '../components/interface/UserDashboardP
 import { SignUpLoader } from '../loader/SignUpLoader.jsx'
 import CalendarPage from './CalendarPage';
 import { CalendarLoader } from '../loader/CalendarLoader.jsx'
-import MyLogoutButton from '../components/ui/button/LogoutButton.jsx'
+import SignUpPage from './SignUpPage.jsx'
 // import MyAppBar from './DashboardLogout'
 import { useTabsContext } from '../store/tabs-context.jsx'
 import { NotificationTabInterface } from '../components/interface/settings/NotificationTabInterface.jsx'
@@ -229,7 +229,7 @@ export default function DashboardPage() {
                     <Route path="/Calendar" element={<CalendarPage/>} />
                 </CustomRoutes>
                 <CustomRoutes noLayout> {/* //noLayout */}
-                    <Route path="/SignUp" element={<SignUpForm storageNameNewUser={storageNameNewUser} userStoredFormData={getLocalStorageItem(storageNameNewUser)}/>} />
+                    <Route path="/SignUp" element={<SignUpPage/>} />
                 </CustomRoutes>
                 <ResourceGuesser name={"users"} create={UserCreate} />
                 <ResourceGuesser name={"classes"} />

@@ -29,7 +29,7 @@ const typeLocation = 'location'
 // ps reset pw:TNrh5vrZ4N201n2
 // ps reset pw:GivjJD4guFwQhzv
 
-export default function SignUpForm({stateList, storageNameNewUser, userStoredFormData}) {
+export default function SignUpForm({storageNameNewUser, userStoredFormData}) {
 
     const navigate = useNavigate()
     const navigation = useNavigation()
@@ -163,14 +163,14 @@ export default function SignUpForm({stateList, storageNameNewUser, userStoredFor
     // console.log({ Entered_Input_SignUp: enteredInput })
     return (
         <>
-        <section className='flex justify-center h-svh md:h-auto md:pt-12'> 
-            <section className="flex flex-col items-center shadow-md bg-slate-100 py-5 rounded-md w-full px-3 sm:mx-4 sm:px-5 sm:w-3/5 md:px-3 md:shadow-xl lg:w-3/5">
+        <section className='flex justify-center max-h-full md:h-auto md:pt-14'> 
+            <section className="flex flex-col items-center shadow-md bg-slate-100 py-5 rounded-md w-full px-3 sm:mx-4 sm:px-5 sm:w-3/5 md:px-3 md:shadow-xl lg:w-1/2">
 
                 <h1 className="pt-3 pb-6 text-2xl">{InterfaceConfiguration.title}</h1>
 
                 <form onSubmit={(e) => handleSubmit(e, enteredInput, setEnteredInputIsInvalid)} name='sign-up' id='sign-up'>
 
-                    <section className="flex flex-wrap -mx-3 mb-6">
+                    <section className="flex flex-wrap mx-3 mb-6 justify-center">
                        <CreateFormInterface array={InterfaceConfiguration.setItems} />                        
                     </section>
 
