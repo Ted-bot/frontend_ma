@@ -4,7 +4,7 @@ import {
 } from '@api-platform/admin'
 import { fetchUtils } from 'react-admin'
 import { ApiFetch, ApiFetchPostOptions } from '../../js/util/postUtil'
-import { ApiFetchGetOptions} from '../../js/util/getUtil'
+import { ApiFetchGetOptions, deleteLocalStorageItem} from '../../js/util/getUtil'
 import { parseHydraDocumentation } from "@api-platform/api-doc-parser"
 import inMemoryJwt from '../../js/util/inMemoryJwt.js'
 import { HttpError } from 'react-admin'
@@ -177,7 +177,8 @@ export const dataProvider = ({
         const response = await request.json()               
         
         if(!request.ok){
-            throw new HttpError('messageError')
+            throw new HttpError(response.message)
+            // throw new HttpError('messageError')
         }
         return response
 
@@ -197,4 +198,33 @@ export const dataProvider = ({
 
         return response  
     },
+    getUserDataForPayment: async (resource, params) => {
+        const deleteStorageValeus = ['amount', 'locale', 'description', 'order_number', 'EUR', 'lines', 'user_address']
+
+        deleteStorageValeus.forEach(key => {
+            deleteLocalStorageItem(key)
+            // console.log({deleteSuccessExample_Lines: localStorage.getItem(`${key}`), key})
+        })
+
+        const token = inMemoryJwt.getToken()
+        // const ApiOptions = ApiFetchGetOptions('/api/v1/order/payment',{'X-Authorization': token})
+        const ApiOptions = ApiFetchGetOptions(resource,{'X-Authorization': token})
+        const response = await ApiFetch(ApiOptions)
+        const getResults = await response.json()       
+
+        if(!response.ok){
+            console.log("got payment:error", response)
+            console.log("got payment:error json", getResults)
+            if(response.code === 401 && response.message === 'Invalid JWT Token'){
+                // setLocalStorageItem('message',"We couldn't verify you if you still here, please try loggin again")
+                // setLocalStorageItem('error',true)
+                // inMemoryJwt.ereaseToken()
+                throw new HttpError(response.message, response.code)
+                // navigate('/')
+            }
+            // redirect('/')
+        }   
+
+        return getResults
+    }
 })

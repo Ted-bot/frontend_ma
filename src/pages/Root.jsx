@@ -20,7 +20,8 @@ const patterns = [
 ]
 
 const dashboardPatterns = [
-  "/dashboard/signup"
+  "/dashboard/signup",
+  "/dashboard/payment",
 ]
 
 export default function Root(){
@@ -30,7 +31,7 @@ export default function Root(){
   let logoutEventName = 'ra-logout'
   const isUserLoggedOut = localStorage.getItem(logoutEventName)
   const match = patterns.find(path => (matchPath(path, proxyDashboardLogin))) ? true : false
-  const dashboardMatch = dashboardPatterns.find(path => (!matchPath(path, proxyDashboardLogin))) ? true : false
+  // const dashboardMatch = dashboardPatterns.find(path => (!matchPath(path, proxyDashboardLogin))) ? true : false
   
   const obj = {message: true, status: 200}
   const standardSyle = 'mt-8 p-4 mb-8 rounded-md text-center'
@@ -63,7 +64,7 @@ export default function Root(){
   return (
   <>
     {match !== true && NavbarComponent}
-    {dashboardMatch !== true && NavbarComponent}
+    {/* {dashboardMatch !== true && NavbarComponent} */}
     <main className={!match ? "flex flex-col items-center pt-12" : ''}>
       <section className={!match ? "min-w-[360px] w-full ml-2 mr-2 sm:w-full md:min-w-[601px] lg:w-full lg:min-w-[1024px] lg:max-w-[1920px]" : ''}>
       <ErrorBoundary FallbackComponent={FallBackRender} onError={(error) => console.log({message: `Error (bubbeled up) caught ${error.message}`})}>

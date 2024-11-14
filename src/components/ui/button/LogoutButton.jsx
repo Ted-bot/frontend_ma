@@ -25,6 +25,7 @@ const MyLogoutButton = forwardRef((props, ref) => {
     
     return (
         <NavLink
+            to="/dashboard/login"
             onClick={handleClick}
             ref={ref}
             // It's important to pass the props to allow Material UI to manage the keyboard navigation

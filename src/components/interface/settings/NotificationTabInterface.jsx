@@ -9,23 +9,46 @@ import moment from "moment/moment"
 import ActionUserBlackDragonEventButton from "../../ui/button/ActionUserBlackDragonEventButton"
 import { grey } from '@mui/material/colors'
 import { useUserSelectedEvents } from "../../../hooks/query/usePublisedEvents"
+import { getLocalStorageItem } from "../../../js/util/getUtil"
 
 
 export const NotificationTabInterface = () => {
     
-    const {data: userIdentity, isPending, error} = useGetIdentity()
-    const eventsData = useUserSelectedEvents(userIdentity?.email)
+    // const {data: userIdentity, isPending, error} = useGetIdentity()
+    const email = getLocalStorageItem('email')
+    
     // const {eventsData, status} = useUserSelectedEvents(userIdentity?.email)
-    const [registeredEvents, setRegisteredEvents] = useState([])
+    const [registeredEvents, setRegisteredEvents] = useState(false)
     const notify = useNotify()
     const [rowId, setRowId] = useState(false)
     const [pageSize, setPageSize] = useState(5)
+    const [records, setRecords] = useState(false)
+    const newUserCalendarMessage = 'No event selected yet, select one in the Calendar'
+    const nonValue = [{key:1, id:1, title:newUserCalendarMessage, day:moment(Date.now()).format('dd D-MM-YY'), start:moment(Date.now()).format('hh:mm'), end:moment(Date.now()).format('hh:mm')}]
 
-    console.log('test',eventsData?.events)
+    console.log('email',email)
+    let eventsData = email && useUserSelectedEvents(email)
+    console.log('test',eventsData)
 
     useEffect(() => {        
-        if(eventsData?.events['hydra:member'] != 'No Subscribed Events Available') setRegisteredEvents(eventsData?.events['hydra:member'])
-    },[eventsData?.events, registeredEvents])
+        if(eventsData.status === 'success' && eventsData?.events) {
+            const getData = eventsData?.events['hydra:member']
+            console.log("got data", getData)
+            getData.map(registeredEvent => ({
+                id: registeredEvent.id, 
+                title: registeredEvent.title,
+                day: moment(registeredEvent.start).format('dd D-MM-YY'),
+                start: moment(registeredEvent.start).format('hh:mm'),
+                end: moment(registeredEvent.end).format('hh:mm'),
+                })
+            )
+            setRecords(true)
+            setRegisteredEvents(getData)
+        } else {
+            setRegisteredEvents(nonValue)
+            setRecords(false)
+        }
+    },[eventsData?.status])
 
     const columns = [
         { field: 'title', headerName: 'Event', flex: 2 },
@@ -36,29 +59,9 @@ export const NotificationTabInterface = () => {
             field: 'actions', 
             headerName: 'cancell event', 
             type:'actions', 
-            renderCell: params => <ActionUserBlackDragonEventButton {...{params, email: userIdentity?.email, updater: setRegisteredEvents}} /> 
+            renderCell: params => records ? <ActionUserBlackDragonEventButton {...{params, email: email, updater: setRegisteredEvents}} /> : <button>x</button>
         },
     ]      
-
-    console.log('registeredEvents', registeredEvents)
-    const rows = registeredEvents?.map(registeredEvent => ({
-        id: registeredEvent.id, 
-        title: registeredEvent.title,
-        day: moment(registeredEvent.start).format('dd D-MM-YY'),
-        start: moment(registeredEvent.start).format('hh:mm'),
-        end: moment(registeredEvent.end).format('hh:mm'),
-        })
-    )
-
-    // const autosizeOptions = {
-    //     includeOutliers: true,
-    //   }
-
-   console.log("registeredEvents ",registeredEvents)
-
-    if(registeredEvents?.status === 'loading') return <p>Loading ...</p>
-    if(!rows) return <p>Loading ...</p>
-    if(registeredEvents?.status === 'error' || registeredEvents?.status === 'failed') notify(`Failed loading events`, { type: 'error' })
 
     return(
         <>
@@ -71,8 +74,8 @@ export const NotificationTabInterface = () => {
                     Manage registeredEvents
                 </Typography>
 
-                {rows ? <DataGrid 
-                    rows={rows} 
+                <DataGrid 
+                    rows={registeredEvents} 
                     columns={columns} 
                     getRowId={(row) => row.id }
                     initialState={{
@@ -109,8 +112,6 @@ export const NotificationTabInterface = () => {
                     }}
                     onRowClick={params=> setRowId(params.id)}    
                 />
-            : <p>No Notifications set</p>}
-
             </Box>
         </>
     )

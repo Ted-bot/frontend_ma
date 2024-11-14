@@ -98,7 +98,7 @@ export const useUserSelectedEvents = (email, params) => {
         queryKey: ["userSelectedEvents"], 
         refetchOnWindowFocus: false,     
         // refetchInterval: 600,
-        retry: 3,
+        retry: 1,
 })
     // const { data: userCalendar, status } = useQuery({queryKey:['userCalendar'], queryFn: fetchUserCalendar, refetchInterval: 6000})
 

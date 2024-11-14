@@ -29,7 +29,7 @@ import { TabsProvider } from './store/tabs-context'
 import LoginDashboardLoader from './loader/LoginDashboardLoader.jsx'
 import { StoreProvider } from './hooks/store/StoreProvider.jsx'
 import { createTheme, ThemeProvider, styled } from '@mui/material/styles'
-import { unstable_createMuiStrictModeTheme } from '@mui/material/styles';
+import { unstable_createMuiStrictModeTheme } from '@mui/material/styles'
 
 const theme = unstable_createMuiStrictModeTheme();
 
@@ -60,7 +60,7 @@ function App() {
         { path: '/work', element: <LoginPage /> },
         { path: '/calendar', element: <PublicCalendarPage />, loader: CalendarLoader},
         { path: '/subscribe', element: <OrderPage />},
-        { path: '/payment', element: <PaymentPage />},
+        { path: '/payment', element: <PaymentPage />}, //, loader: PaymentLoader
         { path: '/dashboard/*', element: <DashboardPage />}, //,  loader: UserLoader
         { path: '/contact', element: <ContactPage />},
       ]  

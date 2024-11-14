@@ -18,7 +18,7 @@ import CalendarPage from './CalendarPage'
 import SignUpPage from './SignUpPage.jsx'
 import { useTabsContext } from '../store/tabs-context.jsx'
 import { NotificationTabInterface } from '../components/interface/settings/NotificationTabInterface.jsx'
-
+import PaymentPage from './client/PaymentPage.jsx'
 import { deepmerge } from '@mui/utils'
 import merge from "lodash/merge"
 import createPalette from '@mui/material/styles/createPalette.js'
@@ -217,6 +217,9 @@ export default function DashboardPage() {
                 </CustomRoutes>
                 <CustomRoutes noLayout> {/* //noLayout */}
                     <Route path="/SignUp" element={<SignUpPage/>} />
+                </CustomRoutes>
+                <CustomRoutes noLayout> {/* //noLayout */}
+                    <Route path="/payment" element={<PaymentPage/>} />
                 </CustomRoutes>
                 <ResourceGuesser name={"users"} create={UserCreate} />
                 <ResourceGuesser name={"classes"} />

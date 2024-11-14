@@ -4,7 +4,7 @@ import SignUpForm from "../components/forms/SignUpForm.jsx"
 // import LoginForm from "../components/forms/LoginForm.js
 import { storageNameNewUser } from "../js/util/auth"
 import { getLocalStorageItem } from "../js/util/getUtil"
-
+import MainNavigation from "../components/navigations/MainNavigation.jsx"
 export default function SignUpPage() {
 
     // const data = useLoaderData()
@@ -13,6 +13,7 @@ export default function SignUpPage() {
 
     return (
         <>
+            <MainNavigation />
             <FormWrap>
                 <SignUpForm storageNameNewUser={storageNameNewUser} userStoredFormData={getLocalStorageItem(storageNameNewUser)}/>
                 {/* <SignUpForm  storageNameNewUser={storageNameNewUser} userStoredFormData={userStoredFormData}/> */}

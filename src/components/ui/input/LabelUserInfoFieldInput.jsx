@@ -2,17 +2,22 @@ import { useRef, useState, useContext } from 'react'
 import {OrderContext} from '../../../store/shop-order-context.js'
 import NativeSelect from '@mui/material/NativeSelect'
 import PhoneInput from 'react-phone-number-input/input'
+import LocationInput from './LocationInput.jsx'
 
 export default function LabelUserInfoFieldInput({
     id,
-    state_id,
+    stateId,
+    cityId,
     name,
     type,
     value,
     invalid,
     onBlur,
     error,
-    errorRegion,
+    onChange,
+    stateError,
+    cityError,
+    st,
     handleKeyDown,
     ...props}){
 
@@ -26,18 +31,18 @@ export default function LabelUserInfoFieldInput({
             console.log({nan_value: value, id, currentUserCity, currentUserState})
         }
     
-        if(type === 'location'){
-            optionStateList = availableStates.map((state) => ({
-                label: state.name,
-                value: state.id
-            }))
+        // if(type === 'location'){
+        //     optionStateList = availableStates.map((state) => ({
+        //         label: state.name,
+        //         value: state.id
+        //     }))
             
-            optionCitiesList = availableCities.map((city) => ({
-                label: city.name,
-                value: city.id
-            }))
-        }
-        
+        //     optionCitiesList = availableCities.map((city) => ({
+        //         label: city.name,
+        //         value: city.id
+        //     }))
+        // }
+        // console.log("stateId", stateId)
     return (
         <>
         <section className={`w-full lg:justify-center px-3 mb-6 md:mb-0`}>
@@ -69,36 +74,47 @@ export default function LabelUserInfoFieldInput({
                         ref={ref}
                         value={`${value}`}
                         id={id}
-                        {...props}
+                        onChange={onChange}
+                        // {...props}
                     />
                 :
-                    <section className='flex w-full justify-evenly'>
-                        <NativeSelect
-                            className={`${errorRegion && 'border-4 border-rose-500 '}w-full block text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`}
-                            id={state_id}
-                            onChange={(e) => updateUserInput('state', e)}
-                            value={currentUserState}
-                        >
-                            {
-                                optionStateList instanceof Array && 
-                                optionStateList?.length > 0 && 
-                                optionStateList?.map((value, index) => (<option key={index} value={value.value}>{value.label}</option>))
-                            }
-                        </NativeSelect>
-                        <NativeSelect
-                            className={`${error && 'border-4 border-rose-500 '}w-full block text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`}
-                            id={id}
-                            onChange={(e) => updateUserInput('city', e)}
-                            // onClose{onBlur}
-                            value={currentUserCity}
-                        >
-                            {
-                                optionCitiesList instanceof Array && 
-                                optionCitiesList?.length > 0 && 
-                                optionCitiesList.map((value, index) => (<option key={index} value={value.value}>{value.label}</option>))
-                            }
-                        </NativeSelect>
-                    </ section>
+                <section className='flex w-full justify-evenly'>
+                    <LocationInput 
+                        stateId={stateId}
+                        cityId={cityId}
+                        errorMessage={error} 
+                        onChange={onChange}
+                        cityError={cityError}
+                        stateError={stateError}
+                    />
+                </ section> 
+                    // <section className='flex w-full justify-evenly'>
+                    //     <NativeSelect
+                    //         className={`${errorRegion && 'border-4 border-rose-500 '}w-full block text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`}
+                    //         id={state_id}
+                    //         onChange={(e) => updateUserInput('state', e)}
+                    //         value={currentUserState}
+                    //     >
+                    //         {
+                    //             optionStateList instanceof Array && 
+                    //             optionStateList?.length > 0 && 
+                    //             optionStateList?.map((value, index) => (<option key={index} value={value.value}>{value.label}</option>))
+                    //         }
+                    //     </NativeSelect>
+                    //     <NativeSelect
+                    //         className={`${error && 'border-4 border-rose-500 '}w-full block text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`}
+                    //         id={id}
+                    //         onChange={(e) => updateUserInput('city', e)}
+                    //         // onClose{onBlur}
+                    //         value={currentUserCity}
+                    //     >
+                    //         {
+                    //             optionCitiesList instanceof Array && 
+                    //             optionCitiesList?.length > 0 && 
+                    //             optionCitiesList.map((value, index) => (<option key={index} value={value.value}>{value.label}</option>))
+                    //         }
+                    //     </NativeSelect>
+                    // </ section>
                 }
             </label>
 
@@ -112,7 +128,7 @@ export default function LabelUserInfoFieldInput({
             {invalid && type == 'checkbox' &&  <p className="text-rose-300 text-lg italic">Please fill gender</p>}
             {invalid && type == 'date' &&  <p className="text-rose-300 text-lg italic">Select a date between the age 17 and 65</p>}
             {(error != undefined && error != '') && <section className="text-rose-300 text-lg italic">{error}</section>}
-            {(errorRegion != undefined && error != '') && <section className="text-rose-300 text-lg italic">{errorRegion}</section>}
+            {/* {(errorRegion != undefined && error != '') && <section className="text-rose-300 text-lg italic">{errorRegion}</section>} */}
         </section>
         </>
     )

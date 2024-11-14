@@ -7,7 +7,7 @@ export default function OrderClosureInput({name, qty, price, subscriptionData, t
     // console.log({checkSubcriptionLength:subscriptionData?.length})
     return (
         <>
-            <section className="flex-col grid justify-items-center justify-self-center rounded-lg border-4 border-slate-300 my-2 py-8 text-left sm:w-full md:w-3/5">
+            <section className="flex-col grid justify-items-center rounded-lg border-4 border-slate-300 my-2 py-8 text-left sm:w-full md:w-3/5 md:justify-self-center ">
                 {/* <label className=""> */}
                 <section>
                     <section className="text-neutral-500/80 justify-center sm:text-sm md:text-base">

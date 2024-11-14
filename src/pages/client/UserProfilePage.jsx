@@ -25,11 +25,7 @@ const TitleComponent = styled('div',{
     props.color === 'secondary' && styles.secondary,
   ],
 })(({ theme }) => ({
-  // color: theme.palette.common.white,
   border: theme.palette.secondary.main,
-  // color: theme.palette.secondary.main,
-  // padding: theme.spacing(1),
-  // borderRadius: theme.shape.borderRadius,
   display: "flex",
   flexDirection: "column",
   justifyContent: "center",
@@ -38,7 +34,7 @@ const TitleComponent = styled('div',{
   fontWeight: '1rem',
   fontSize: { xs: "1rem", md: "1.25rem", lg: "1.50rem" },
   padding: { xs: "-5px", md: "10px", lg: "15px" },
-  boxShadow: `1px 2px 3px ${theme.palette.secondary.shadowColor}`,
+  boxShadow: `2px 3px 3px ${theme.palette.secondary.shadowColor}`,
   marginTop: '16px',
   height: '8rem',
   fontSize: '1.25rem',
@@ -53,7 +49,6 @@ const UserProfilePage = () => {
 
   const [errors, setErrors] = useState('')
   const [userData, setUserData] = useState({}) //user: {}
-  // const classes = useStyles()
   
   function setData(identifier, data){
     setUserData((prevValues) => ({

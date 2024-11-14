@@ -30,7 +30,7 @@ const typeLocation = 'location'
 
 // ps mace@email.com pw:7k_b3N&8@@*!
 // ps reset pw:84N@^7ad8sh
-// ps reset pw:TNrh5vrZ4N201n2
+// ps reset pw:TNrh5vrZ4N201n2\
 // ps reset pw:GivjJD4guFwQhzv
 
 export default function SignUpForm({storageNameNewUser, userStoredFormData}) {
@@ -181,7 +181,7 @@ export default function SignUpForm({storageNameNewUser, userStoredFormData}) {
     return (
         <>
         <section className='flex justify-center max-h-full md:h-auto md:pt-14'> 
-            <section className="flex flex-col items-center shadow-md bg-slate-100 py-5 rounded-md w-full px-3 sm:mx-4 sm:px-5 sm:w-3/5 md:px-3 md:shadow-xl lg:w-1/2">
+            <section className="flex flex-col items-center shadow-md bg-slate-100 py-5 rounded-md w-full px-3 sm:mx-4 sm:px-5 sm:w-3/5 md:px-3 md:shadow-xl lg:w-4/5">
 
                 <h1 className="pt-3 pb-6 text-2xl">{InterfaceConfiguration.title}</h1>
 

@@ -4,12 +4,12 @@ export default function UserOrderInfoInterface({array, handleKeyDown}) {
 
         return array.map((item) => (
         <LabelUserInfoFieldInput 
-            name={item.name}
-            type={item.type}
+            // name={item.name}
+            // type={item.type}
             handleKeyDown={handleKeyDown}
             key={item.id}
-            error={item?.error}
-            errorRegion={item?.errorRegion}
+            // error={item?.error}
+            // errorRegion={item?.errorRegion}
             {...item}
         />
         ))

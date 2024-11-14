@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef, createRef } from 'react'
 import inMemoryJwt from '../../js/util/inMemoryJwt.js'
 import { OrderContext } from '../../store/shop-order-context.js'
 import { GetState, GetCity } from "react-country-state-city"
+import { redirect } from 'react-router-dom'
 
 import { 
     ApiFetchPostOptions,
@@ -32,17 +33,23 @@ import PaymentLineSection from '../../components/section/PaymentLineSection'
 import { validateAndSetStatus } from '../../components/ui/input/ValidateIBAN.jsx'
 import { handleKeyDown } from '../../js/keyBoardUtil.js'
 import { paymentInputBlurHandle } from '../../components/class/userData/PaymentFormHelper.jsx'
+import useStore from '../../hooks/store/useStore.jsx'
+import { dataProvider } from '../../dataProvider/main/DataProvider.jsx'
+import MainNavigation from '../../components/navigations/MainNavigation.jsx'
+import { useAuthenticated } from 'react-admin'
 
 
 const PaymentPage = () => {
-
+    useAuthenticated()
     const typeFirstAndLastName = 'firstAndLastName'
     const addressStorageName = 'user_address'
-    const data = useLoaderData()
+    // const data = useLoaderData()
     const navigate = useNavigate()
     const regexSearchText = /^[A-Za-z]+$/
     // const regexSearchFirstAndLastName = /^[a-zA-Z]+\s[a-zA-Z]+$/
     const regexSearchInt = /^\d+$/
+    const [error, setError] = useStore('error')
+    const [message, setMessage] = useStore('message')
     
     const [paymentType, setPaymentType] = useState({
         ideal : false,
@@ -50,6 +57,7 @@ const PaymentPage = () => {
         pay_pal : false,
     })    
 
+    // console.log("got User Payment Data", data)
     const [enteredInputIsInvalid, setEnteredInputIsInvalid] = useState(inputPaymentValidList)
 
     const [stateList, setStateList] = useState([]) 
@@ -57,6 +65,7 @@ const PaymentPage = () => {
     
     const userFormInfo = getUserInfoObjOrStorageData(addressStorageName)
     const [enteredInput, setEnteredInput] = useState(userFormInfo)
+    const [dialogOpen, setDialogOpen] = useState(false)
     const dialogUserAddress = useRef()
     const dialogUserPaymentMethod = useRef()
 
@@ -94,17 +103,17 @@ const PaymentPage = () => {
         )
     )}
 
-    const getState = useCallback(
-        () => GetState(countryid).then((result) => {
-            setStateList(result)
-        })  
-    , [countryid])
+    // const getState = useCallback(
+    //     () => GetState(countryid).then((result) => {
+    //         setStateList(result)
+    //     })  
+    // , [countryid])
     
-    const getCity = useCallback(
-        () => GetCity(countryid, Number(userData?.userAddress.reactStateNr)).then((result) => {
-            setCityList(result)
-        }) 
-    ,[countryid, userData?.userAddress.reactStateNr])
+    // const getCity = useCallback(
+    //     () => GetCity(countryid, Number(userData?.userAddress.reactStateNr)).then((result) => {
+    //         setCityList(result)
+    //     }) 
+    // ,[countryid, userData?.userAddress.reactStateNr])
 
     function updateEnteredInputState(identifier, value){
         setEnteredInput((prevValues) => {
@@ -116,57 +125,53 @@ const PaymentPage = () => {
     }
 
     useEffect(() => {
-        ApiData()
-        getState()
-        getCity()
+        dataProvider.getUserDataForPayment('/api/v1/order/payment')
+        .then((response) => {
+            console.log("shit",response)
+            ApiData(response)
 
-        setEnteredInput((prevValue) => ({
-            ...prevValue,
-            ['city_id']: Number(userData?.userAddress.reactCityNr)
-        }))
-        
-        setEnteredInput((prevValue) => ({
-            ...prevValue,
-            ['state_id']: Number(userData?.userAddress.reactStateNr)
-        }))
-        
-        Object.keys(userData?.userInfo).forEach(key => {
-            const value = userData?.userInfo[key]
-            setEnteredInput((prevValue) => ({
-                ...prevValue,
-                [key]: value
-            }))
-        })
-        
-        Object.keys(userData?.userAddress).forEach(key => {
-            const value = userData?.userAddress[key]
-            setEnteredInput((prevValue) => ({
-                ...prevValue,
-                [key]: value
-            }))
-        })
-        
-        if(data?.address){
-            const { id, firstAndLastName, email, unitNumber, reactStateNr, reactCityNr, ...deconstructLoadedUserData} = data?.address 
-            
-            for (const [key, value] of Object.entries(deconstructLoadedUserData)) {
-                
-                if(key === 'addressLine'){                    
-                    value === "" && setInvalidTypeStatus(key, true)
-                    continue
-                }
-
-                if(key === 'streetNumber'){            
-                    // console.log({strNmber: key, value})        
-                    !regexSearchInt.test(value) && setInvalidTypeStatus(key, true)
-                    continue
-                }
-
-                if(!value){
-                    setInvalidTypeStatus(key, true)
-                }
+            if(response.user){
+                Object.entries(response.user).map(([k,v]) => updateEnteredInputState(k, v))
             }
-        }
+
+            // if(response?.address){
+            //     const { id, firstAndLastName, email, unitNumber, reactStateNr, reactCityNr, ...deconstructLoadedUserData} = response?.address 
+                
+            //     for (const [key, value] of Object.entries(deconstructLoadedUserData)) {
+                    
+            //         if(key === 'addressLine'){                    
+            //             value === "" && setInvalidTypeStatus(key, true)
+            //             continue
+            //         }
+    
+            //         if(key === 'streetNumber'){            
+            //             // console.log({strNmber: key, value})        
+            //             !regexSearchInt.test(value) && setInvalidTypeStatus(key, true)
+            //             continue
+            //         }
+    
+            //         if(!value){
+            //             setInvalidTypeStatus(key, true)
+            //         }
+            //     }
+            // }
+        }).catch(error => {
+            // setLocalStorageItem('message',"We couldn't verify you if you still here, please try loggin again")
+            // setLocalStorageItem('error',true)
+            console.log("shit",error)
+            // inMemoryJwt.ereaseToken()
+            // if(error.code === 401 && error.message === 'Invalid JWT Token'){
+            //     setMessage("We couldn't verify you if you still here, please try loggin again")
+            //     setError(true)
+            //     navigate('/')
+            // }
+        })
+        
+        // getState()
+        // getCity()
+
+        
+        
     }, [userData?.userAddress.reactStateNr])
 
     useEffect(() => {
@@ -244,9 +249,9 @@ const PaymentPage = () => {
     }
     
     const ApiData = useCallback(
-        async () => {
-            const response = data
-            
+         (response) => {
+            // const response = data
+            console.log("got data", response)
             if(!response?.lines){
                 console.log({ apiResponseError : response})
                 // throw {error: 'Not Found!'}
@@ -274,13 +279,18 @@ const PaymentPage = () => {
             setLocalStorageItem('order_number',response?.orderId)
             setLocalStorageItem(response?.curreny.name,response?.curreny.symbol)                  
             setLocalStorageItem('lines', response?.lines)                   
-    }, [data])
+    }, [])
+    
 
-    const userAddressModalHandler = useCallback(
-        (event) =>  { 
-            dialogUserAddress.current.open()
+    const userAddressModalHandler = () =>  { 
+            setDialogOpen(true)
         }
-    )
+
+    const closeUserAddressModalHandler = () =>  { 
+            console.log({ButtonHit: 'close'})
+            setDialogOpen(false)
+            // dialogUserAddress.current.open()
+        }
 
     const paymentMethodModalHandler = useCallback(
         (event) => {
@@ -524,12 +534,17 @@ const PaymentPage = () => {
         onBlur: inputBlurHandle,
     }
 
-    console.log({enteredInputIsInvalid, enteredInput})
+    console.log({dialogState:dialogOpen})
+    // console.log({enteredInputIsInvalid, enteredInput, got_user: userData?.userInfo})
     return (
         <>     
+        <MainNavigation />
             {/* <OrderContext.Provider value={ctxValue}> */}
                 <UserDataModal 
-                    ref={dialogUserAddress} 
+                    // ref={dialogOpen} 
+                    dialog={dialogOpen}
+                    closeDialog={closeUserAddressModalHandler} 
+                    // ref={dialogUserAddress} 
                     enteredInput={enteredInput} 
                     formSubmit={userAddressHandler} 
                     handleKeyDown={handleKeyDown}
@@ -539,7 +554,7 @@ const PaymentPage = () => {
 
                 <UserChoosePaymentModal ref={dialogUserPaymentMethod} paymentMethodOptions={paymentMethodOptions} />
 
-                <section className="flex-col shadow-md w-full bg-slate-100 py-5 rounded-md px-3 sm:mx-2 sm:px-5 md:grid md:mx-2 md:shadow-xl">
+                <section className="flex-col shadow-md w-full bg-slate-100 py-5 rounded-md px-3 md:w-4/5 md:ml-auto md:mr-auto sm:mx-2 sm:px-5 md:grid md:mx-2 md:shadow-xl">
 
                     <h1 ref={pushRef}className={`pt-3 pb-6 mt-12 text-2xl text-center`} >Address & Peronsal Information</h1>
                     {userData?.userInfo && userData?.userAddress && 
