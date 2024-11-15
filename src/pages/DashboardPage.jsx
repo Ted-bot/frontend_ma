@@ -66,7 +66,8 @@ const myTheme = {
                 color: 'green',
                 // height: "100%",
                 boxShadow:
-                "2px 0px 1px -1px rgba(0,0,0,0.2), 1px 0px 3px 0px rgba(0,0,0,0.1)",}
+                "2px 0px 1px -1px rgba(0,0,0,0.2), 1px 0px 3px 0px rgba(0,0,0,0.1)",
+            }
             },
           },
         components: {       
@@ -132,7 +133,6 @@ const myTheme = {
                     root: { // main content inner component
                         color: '#ab0926',
                         margin: '15px 5px 10px 10px',
-                        // borderTop: '5px solid #ffd086',
                         background: '#F6E6E9',
                         boxShadow: '-2px 3px 8px 1px #ab0926',
                         borderLeft: '2px solid #E5B5BD',
@@ -141,22 +141,9 @@ const myTheme = {
                         borderBottomLeftRadius: '15px 15px',
                         borderBottomRightRadius: '15px 15px',
                         borderBottom: '2px solid #ab0926',
-                        // boxShadow: 5,
-                        
                     }
                 }
             },
-            // MuiBox: {
-            //     styleOverrides: {
-            //         root: {
-            //             boxShadow: '5px 5px 5px blue',
-            //             color: 'green',
-            //             '&.MuiBox-root .css-18uuk9m' : {
-            //                 boxShadow: '5px 5px 5px blue'
-            //             }
-            //         }
-            //     }
-            // },
             RaLayout: {
                 styleOverrides: {
                   root: {
