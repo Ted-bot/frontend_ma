@@ -1,8 +1,6 @@
 import { useState, useEffect, useCallback, useRef, createRef } from 'react'
 import inMemoryJwt from '../../js/util/inMemoryJwt.js'
-import { OrderContext } from '../../store/shop-order-context.js'
-import { GetState, GetCity } from "react-country-state-city"
-import { redirect } from 'react-router-dom'
+import {  GetCity } from "react-country-state-city"
 
 import { 
     ApiFetchPostOptions,
@@ -37,16 +35,13 @@ import useStore from '../../hooks/store/useStore.jsx'
 import { dataProvider } from '../../dataProvider/main/DataProvider.jsx'
 import MainNavigation from '../../components/navigations/MainNavigation.jsx'
 import { useAuthenticated } from 'react-admin'
-
+import { OrderContext } from '../../store/shop-order-context.js'
 
 const PaymentPage = () => {
     useAuthenticated()
-    const typeFirstAndLastName = 'firstAndLastName'
+    
     const addressStorageName = 'user_address'
-    // const data = useLoaderData()
     const navigate = useNavigate()
-    const regexSearchText = /^[A-Za-z]+$/
-    // const regexSearchFirstAndLastName = /^[a-zA-Z]+\s[a-zA-Z]+$/
     const regexSearchInt = /^\d+$/
     const [error, setError] = useStore('error')
     const [message, setMessage] = useStore('message')
@@ -103,17 +98,17 @@ const PaymentPage = () => {
         )
     )}
 
-    // const getState = useCallback(
-    //     () => GetState(countryid).then((result) => {
-    //         setStateList(result)
-    //     })  
-    // , [countryid])
+    const getState = useCallback(
+        () => GetState(countryid).then((result) => {
+            setStateList(result)
+        })  
+    , [countryid])
     
-    // const getCity = useCallback(
-    //     () => GetCity(countryid, Number(userData?.userAddress.reactStateNr)).then((result) => {
-    //         setCityList(result)
-    //     }) 
-    // ,[countryid, userData?.userAddress.reactStateNr])
+    const getCity = useCallback(
+        () => GetCity(countryid, Number(userData?.userAddress.reactStateNr)).then((result) => {
+            setCityList(result)
+        }) 
+    ,[countryid, userData?.userAddress.reactStateNr])
 
     function updateEnteredInputState(identifier, value){
         setEnteredInput((prevValues) => {
@@ -130,11 +125,17 @@ const PaymentPage = () => {
             console.log("shit",response)
             ApiData(response)
 
+            updateEnteredInputState('country', 'NL')
+            // updateEnteredInputState('country', 'NL')
+
             if(response.user){
                 Object.entries(response.user).map(([k,v]) => updateEnteredInputState(k, v))
             }
 
-            // if(response?.address){
+            if(response?.address.length != 0){
+                getState()
+                getCity()
+            }
             //     const { id, firstAndLastName, email, unitNumber, reactStateNr, reactCityNr, ...deconstructLoadedUserData} = response?.address 
                 
             //     for (const [key, value] of Object.entries(deconstructLoadedUserData)) {
@@ -167,8 +168,7 @@ const PaymentPage = () => {
             // }
         })
         
-        // getState()
-        // getCity()
+        
 
         
         
@@ -262,7 +262,7 @@ const PaymentPage = () => {
             setStorageUserSelectedSubscription(jsonToObj)
 
             updateUserData('userInfo', {...response?.user})
-            updateUserData('userAddress', {...response?.address})
+            updateUserData('userAddress', {...response?.address}) //organizationName' : 'none' ,
             updateUserData('userOrder', 
                 {
                     // orderId: response?.orderId,
@@ -329,7 +329,7 @@ const PaymentPage = () => {
             title: 'Mr.', // set gender check
             givenName : userNameArray[0],
             familyName : userNameArray[1],
-            organisationName: '', // set gender check
+            organizationName: '', // set gender check
             streetAndNumber : streetAndNumber.trim(),
             streetAdditional : addintionalNumber,
             postalCode : mollieOrder.postalCode,
@@ -345,7 +345,7 @@ const PaymentPage = () => {
             amount: amount,
             order_id: orderNumber.toString(),
             redirectUrl: 'http://localhost:5173/dashboard', // set user dashbpoard {id}
-            webhookUrl: 'https://15e2-95-96-151-55.ngrok-free.app',
+            webhookUrl: 'https://8373-95-96-151-55.ngrok-free.app',
             billingAddress: billingAddress,
             shippingAddress: billingAddress,
             metadata: { order_id : orderNumber.toString()},
@@ -386,70 +386,73 @@ const PaymentPage = () => {
     const userAddressHandler = async (event) => {
         event.preventDefault()
 
-        if(findInvalidInput(enteredAddress))
-            {
-                const { firstAndLastName, email, phoneNumber, ...deconstructInvalidList} = inputPaymentValidList 
-                setEnteredInputIsInvalid(deconstructInvalidList)
-            }
+        console.log("get request payment", event)
+        console.log("get request enteredInput", enteredInput)
 
-        let userAddressInfo = prepareInputForRequest(enteredInput, setEnteredInputIsInvalid, enteredInput.cityId, ctxValue.availableCities, enteredInput.stateId, ctxValue.availableStates)
+        // if(findInvalidInput(enteredAddress))
+        //     {
+        //         const { firstAndLastName, email, phoneNumber, ...deconstructInvalidList} = inputPaymentValidList 
+        //         setEnteredInputIsInvalid(deconstructInvalidList)
+        //     }
+
+        // let userAddressInfo = prepareInputForRequest(enteredInput, setEnteredInputIsInvalid, enteredInput.cityId, ctxValue.availableCities, enteredInput.stateId, ctxValue.availableStates)
         
-        userAddressInfo = { ...userAddressInfo, ['location']: enteredInput.city}
-        userAddressInfo = { ...userAddressInfo, ['region']: enteredInput.state}
-        userAddressInfo = { ...userAddressInfo, ['reactStateNr']: ctxValue.currentUserState.toString()}
-        userAddressInfo = { ...userAddressInfo, ['reactCityNr']: ctxValue.currentUserCity.toString()}
+        // userAddressInfo = { ...userAddressInfo, ['location']: enteredInput.city}
+        // userAddressInfo = { ...userAddressInfo, ['region']: enteredInput.state}
+        // userAddressInfo = { ...userAddressInfo, ['reactStateNr']: ctxValue.currentUserState.toString()}
+        // userAddressInfo = { ...userAddressInfo, ['reactCityNr']: ctxValue.currentUserCity.toString()}
         
-        const options = { url: '/api/v1/order/address', method: 'POST'}
-        const ApiUserAddressOptions = ApiFetchPostOptions(options, userAddressInfo, {'X-Authorization': token})            
+        // const options = { url: '/api/v1/order/address', method: 'POST'}
+        // const ApiUserAddressOptions = ApiFetchPostOptions(options, userAddressInfo, {'X-Authorization': token})            
         
-        try {
-            const response = await ApiFetch(ApiUserAddressOptions)
-            const getResults = await response?.json()
+        // try {
+        //     const response = await ApiFetch(ApiUserAddressOptions)
+        //     const getResults = await response?.json()
             
-            if(!response?.ok)
-            {   //if(response?.status >= 400 && response?.status <= 600)
-                // const errorJson = await response?.json()
-                throw {message: 'Api error send order address error!', errors: getResults.errors}                
-            }
+        //     if(!response?.ok)
+        //     {   //if(response?.status >= 400 && response?.status <= 600)
+        //         // const errorJson = await response?.json()
+        //         throw {message: 'Api error send order address error!', errors: getResults.errors}                
+        //     }
 
-        } catch (error) {
+        // } catch (error) {
             
-            if(Array.isArray(error.errors) && (error.errors.length > 1))
-            {
-                let collectErrors = [];
+        //     if(Array.isArray(error.errors) && (error.errors.length > 1))
+        //     {
+        //         let collectErrors = [];
 
-                error.errors.map((error) => {
-                    collectErrors[error.property] = error.message
-                })
+        //         error.errors.map((error) => {
+        //             collectErrors[error.property] = error.message
+        //         })
 
-                updateErrors('userAddress', collectErrors)
+        //         updateErrors('userAddress', collectErrors)
 
-            } else if(Array.isArray(error.errors) && (error.errors.length == 1) ){
+        //     } else if(Array.isArray(error.errors) && (error.errors.length == 1) ){
 
-                let arrayProperties = error.errors[0].property
+        //         let arrayProperties = error.errors[0].property
 
-                if (Array.isArray(arrayProperties)) arrayProperties = arrayProperties[0]
+        //         if (Array.isArray(arrayProperties)) arrayProperties = arrayProperties[0]
 
-                const messageError = error.errors[0].message
+        //         const messageError = error.errors[0].message
                 
-                updateErrors('userAddress', {[arrayProperties]: messageError})
+        //         updateErrors('userAddress', {[arrayProperties]: messageError})
 
-            } else {
+        //     } else {
                 
-                if(error.errors?.property instanceof Array){
-                    let arrayProperties = error.errors.property
+        //         if(error.errors?.property instanceof Array){
+        //             let arrayProperties = error.errors.property
                     
-                    if (Array.isArray(arrayProperties)) arrayProperties = arrayProperties[0]
+        //             if (Array.isArray(arrayProperties)) arrayProperties = arrayProperties[0]
                     
-                    const messageError = error.errors.message
+        //             const messageError = error.errors.message
                     
-                    updateErrors('userAddress', {[arrayProperties]: messageError})
-                }
+        //             updateErrors('userAddress', {[arrayProperties]: messageError})
+        //         }
 
-                console.log({unHandledError: error})
-            }
+        //         console.log({unHandledError: error})
+        //     }
         }
-    }    
+  
 
     const handleUserSelectLocation = (identifier, event) => {
 
@@ -461,7 +464,7 @@ const PaymentPage = () => {
 
         if(identifier === 'state')
             {
-                const state = stateList.find((state) => state.id == Number(event.target.value)); //here you will get full state object.
+                const state = stateList.find((state) => state.id == Number(event)); //here you will get full state object.
                 updateEnteredInputState('state_id', state.id)       
                 updateEnteredInputState(identifier, state.name)
                 GetCity(countryid, state.id).then((result) => {
@@ -473,7 +476,7 @@ const PaymentPage = () => {
             
         if(identifier === 'city')
             {
-                const city = cityList.find((city) => city.id == Number(event.target.value))
+                const city = cityList.find((city) => city.id == Number(event))
                 updateEnteredInputState('city_id', city.id)
                 updateEnteredInputState(identifier, city.name)
                 checkLocationStatus('location')
@@ -485,7 +488,8 @@ const PaymentPage = () => {
     
         if(identifier === 'streetNumber')
             {
-                const convertStrToInt = Number(event.target.value)
+                console.log('streetNumber', event)
+                const convertStrToInt = Number(event)
                 const checkIfNumber = typeof convertStrToInt == 'number'
                 
                 if(!checkIfNumber){
@@ -495,7 +499,7 @@ const PaymentPage = () => {
                     }))
                     return
                 } else {
-                    updateEnteredInputState(identifier, event.target.value)
+                    updateEnteredInputState(identifier, event)
                     return
                 }                
             }
@@ -509,7 +513,8 @@ const PaymentPage = () => {
         
         if(identifier !== undefined && event !== '')
             {
-                updateEnteredInputState(identifier, event.target.value)
+                console.log("incoming input", event)
+                updateEnteredInputState(identifier, event)
             }
     }
 
@@ -526,8 +531,8 @@ const PaymentPage = () => {
     }
 
     const ctxValue = {
-        availableStates: stateList,
-        availableCities: cityList,
+    //     availableStates: stateList,
+    //     availableCities: cityList,
         currentUserState: enteredInput.state_id,
         currentUserCity: enteredInput.city_id,
         updateUserInput: handleUserSelectLocation,
@@ -539,7 +544,7 @@ const PaymentPage = () => {
     return (
         <>     
         <MainNavigation />
-            {/* <OrderContext.Provider value={ctxValue}> */}
+            <OrderContext.Provider value={ctxValue}>
                 <UserDataModal 
                     // ref={dialogOpen} 
                     dialog={dialogOpen}
@@ -574,12 +579,12 @@ const PaymentPage = () => {
                         selectedType={enteredInput.paymentMethodName}
                     />
 
-                    {enteredInput.paymentMethodId && <section className='grid flex-col md:justify-items-center'>
+                    {enteredInput?.paymentMethodId && <section className='grid flex-col md:justify-items-center'>
                         <section className={`border-4 rounded-lg py-4 mt-4 sm:w-full md:w-3/5 hover:bg-slate-200 ${enteredInputIsInvalid.iban ? 'border-red-300' : 'border-slate-300' }`}>
                             <h2 ref={pushRef} className={`text-center ${enteredInputIsInvalid.iban && 'text-rose-600'}`}>please enter your IBAN/ bank account number </h2><br />
                             <span className='flex justify-center'>
                                 <label>
-                                    <input id='iban' type="text" onChange={(e) => ctxValue.updateUserInput('iban',e)} onBlur={(e) => validateAndSetStatus( e, setInvalidTypeStatus)} />
+                                    <input id='iban' type="text" onChange={(e) => updateEnteredInputState('iban',e.target.value)} onBlur={(e) => validateAndSetStatus( e, setInvalidTypeStatus)} />
                                 </label>
                             </span>
                         </section>
@@ -605,7 +610,7 @@ const PaymentPage = () => {
                     </Form>
 
                 </section>
-            {/* </OrderContext.Provider> */}
+            </OrderContext.Provider>
         </>
     )
 }

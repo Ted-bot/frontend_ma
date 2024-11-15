@@ -1,7 +1,7 @@
-export const handleKeyDown = (identifier,event) => {
+export const handleKeyDown = (event, value, updateUserData) => {
     if(event.key !== "Backspace") return
-    const eniProperty = enteredInput[identifier]
+    const eniProperty = value
     const backspaceInput = eniProperty.substring(0, eniProperty.length - 1)
-    // console.log({keyPressed: event.key, identifier, eniProperty, checkLength: eniProperty.length, backspaceInput})
-    if(eniProperty.length > 0) updateUserData( identifier, backspaceInput)
+    // pre define function so only take new value
+    if(eniProperty.length > 0) updateUserData(backspaceInput) 
 }

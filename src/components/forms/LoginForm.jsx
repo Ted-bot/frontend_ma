@@ -56,8 +56,8 @@ export default function LoginForm() {
     const createInterfaceForm = (array) => {
         const createListItems = array.map((item) => (
             <LabelNameInput 
-                name={item.name}
-                type={item.type}
+                // name={item.name}
+                // type={item.type}
                 key={item.id}
                 {...item}
             />

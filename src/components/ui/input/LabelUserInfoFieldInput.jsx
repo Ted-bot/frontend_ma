@@ -15,6 +15,8 @@ export default function LabelUserInfoFieldInput({
     onBlur,
     error,
     onChange,
+    onChangeState,
+    onChangeCity,
     stateError,
     cityError,
     st,
@@ -59,10 +61,11 @@ export default function LabelUserInfoFieldInput({
                     } 
                     ref={ref}
                     id={id}
-                    onKeyDown={(e) => handleKeyDown(id,e)}
+                    onKeyDown={(e) => handleKeyDown(e, value, onChange)}
                     type={type}
                     defaultValue={value}
                     onBlur={onBlur}
+                    onChange={(e) => onChange(e.target.value)}
                     {...props}
                 />
                 : (type === 'tel') ?
@@ -83,7 +86,8 @@ export default function LabelUserInfoFieldInput({
                         stateId={stateId}
                         cityId={cityId}
                         errorMessage={error} 
-                        onChange={onChange}
+                        onChangeCity={onChangeCity}
+                        onChangeState={onChangeState}
                         cityError={cityError}
                         stateError={stateError}
                     />

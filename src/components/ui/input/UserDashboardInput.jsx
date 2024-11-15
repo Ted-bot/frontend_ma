@@ -120,7 +120,8 @@ export default function LabelNameInput({
                                     stateId={stateId}
                                     cityId={cityId}
                                     errorMessage={error} 
-                                    onChange={onChange}
+                                    onChangeState={onChangeState}
+                                    onChangeCity={onChangeCity}
                                     cityError={cityError}
                                     stateError={stateError}
                                 />

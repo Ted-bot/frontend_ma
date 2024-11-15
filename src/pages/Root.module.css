@@ -60,6 +60,6 @@
   @media screen and (min-width: 1900px) {
     .displayMessage {
         top: 4.5rem;
-        width: 120rem;
+        width: 100%
     }
   }

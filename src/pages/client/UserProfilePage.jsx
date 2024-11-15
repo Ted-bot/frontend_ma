@@ -15,7 +15,6 @@ import useStore from '../../hooks/store/useStore.jsx'
 import { styled } from '@mui/system'
 import { orange } from '@mui/material/colors'
 
-
 const TitleComponent = styled('div',{
   name: 'CustomTitle',
   slot: 'Root',
@@ -49,6 +48,8 @@ const UserProfilePage = () => {
 
   const [errors, setErrors] = useState('')
   const [userData, setUserData] = useState({}) //user: {}
+  const [message, setMessage] = useStore('message', false)
+  const [merror, setError] = useStore('error', false)
   
   function setData(identifier, data){
     setUserData((prevValues) => ({
@@ -64,6 +65,9 @@ const UserProfilePage = () => {
       dataProvider.getOneSubscription('user_subscription', data?.email).then((response) => {
         setData('subscription',{...response})
         console.log("got Subcsription", response)
+      }).catch(error => {
+        setMessage('If you have paid and don\'t see you tokens, please go the the contact page')
+        setError(true)
       })
     }
   },[])

@@ -87,6 +87,8 @@ export const authProvider = {
             const authenticateClient = await ApiFetch(prepareQueryObj)
             const getResults = await authenticateClient.json()
 
+            console.log("see user info",getResults)
+
             delete getResults['@context']
             delete getResults['@id']
             delete getResults['@type']

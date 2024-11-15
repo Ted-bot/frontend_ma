@@ -1,9 +1,11 @@
 export function paymentInputBlurHandle(identifier, event, type, setEnteredInputIsInvalid) {
-
+     const regexSearchInt = /^\d+$/
+     const regexSearchText = /^[A-Za-z]+$/
     if(identifier === 'unitNumber') return
     
     if(type === 'text')
         {
+            // console.log({text: event, type})
             setEnteredInputIsInvalid((prevValues) => ({
                 ...prevValues,
                 [identifier] : regexSearchText.test(event.target.value) ? false : true
@@ -11,19 +13,19 @@ export function paymentInputBlurHandle(identifier, event, type, setEnteredInputI
             return
         }  
         
-    if(type === typeFirstAndLastName)
+    if(type === 'firstAndLastName')
         {
             setEnteredInputIsInvalid((prevValues) => ({
                 ...prevValues,
                 // [identifier] : regexSearchFirstAndLastName.test(event.target.value) ? false : true
-                [identifier] : event.target.value !== "" ? false : true
+                [identifier] : event !== "" ? false : true
             }))
             return
         }  
 
     if(type === 'number')
         {
-            console.log({regex: event.target.value})
+            // console.log({regex: event, type})
             setEnteredInputIsInvalid((prevValues) => ({
                 ...prevValues,
                 [identifier] : regexSearchInt.test(event.target.value) ? false : true
@@ -36,13 +38,13 @@ export function paymentInputBlurHandle(identifier, event, type, setEnteredInputI
         console.log({locationEvent:event})
         setEnteredInputIsInvalid((prevValues) => ({
             ...prevValues,
-            [identifier] : (event.target.value == '') ? true : false
+            [identifier] : (event === '') ? true : false
         })) 
     }
 
     setEnteredInputIsInvalid((prevValues) => ({
         ...prevValues,
-        [identifier] : (!event.target.value) ? true : false
+        [identifier] : (!event) ? true : false
     }))            
 }
 

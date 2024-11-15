@@ -16,6 +16,8 @@ const UserDataModal = function UserDataModal({ closeDialog,handleKeyDown,errors,
     const typeText = 'text'
     const typeFirstAndLastName = 'firstAndLastName'
     const typeMixed = 'mixed'    
+
+    
     
     
     const userForm = {
@@ -55,7 +57,7 @@ const UserDataModal = function UserDataModal({ closeDialog,handleKeyDown,errors,
                 invalid: enteredInputIsInvalid.phoneNumber, 
                 error: errors?.phone_number, 
                 required : true, 
-                onChange: (e) => updateUserInput('phoneNumber', e, 'tel'), 
+                onChange: (e) => updateUserInput('phoneNumber', e), 
                 onBlur: (e) => onBlur('phoneNumber', e, 'tel')
             },
         ],
@@ -122,8 +124,10 @@ const UserDataModal = function UserDataModal({ closeDialog,handleKeyDown,errors,
                 type: typeLocation, 
                 invalid: enteredInputIsInvalid.city,
                 required: true,
-                onChange: (e) => updateUserInput('city', e),
-                onBlur : (e) => onBlur('city', e, typeLocation)
+                onChangeState: e => updateUserInput('state_id',e),
+                onChangeCity: e => updateUserInput('city_id',e),
+                // onChange: (e) => updateUserInput('city', e),
+                onBlur : (e) => onBlur('city_id', e, typeLocation)
             },
         ],
     }
