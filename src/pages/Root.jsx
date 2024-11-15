@@ -55,8 +55,12 @@ export default function Root(){
         setMessage(false)
         setError(false)
       }, 4000) 
+    } else if (message){
+      setTimeout(() => {
+        setMessage(false)
+      }, 4000) 
     }
-  }, [success, error])
+  }, [success, error, message])
 
   console.log("success state", success)
   console.log("message state", message)

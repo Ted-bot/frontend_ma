@@ -61,6 +61,7 @@ const PaymentPage = () => {
     const userFormInfo = getUserInfoObjOrStorageData(addressStorageName)
     const [enteredInput, setEnteredInput] = useState(userFormInfo)
     const [dialogOpen, setDialogOpen] = useState(false)
+    const [dialogOpenPaymentMethod, setDialogOpenPaymentMethod] = useState(false)
     const dialogUserAddress = useRef()
     const dialogUserPaymentMethod = useRef()
 
@@ -292,11 +293,19 @@ const PaymentPage = () => {
             // dialogUserAddress.current.open()
         }
 
-    const paymentMethodModalHandler = useCallback(
-        (event) => {
-            dialogUserPaymentMethod.current.open()
-        }
-    )  
+    const userPaymentMethodModalHandler = () =>  { 
+        setDialogOpenPaymentMethod(true)
+    }
+
+    const closeUserPaymentMethodModalHandler = () =>  { 
+        console.log({ButtonHit: 'close'})
+        setDialogOpenPaymentMethod(false)
+        // dialogUserAddress.current.open()
+    }
+
+    const paymentMethodModalHandler = () => {
+        setDialogOpenPaymentMethod(true)
+    }
 
     const payOrderHandler = async (event) => {
         event.preventDefault()
@@ -345,7 +354,7 @@ const PaymentPage = () => {
             amount: amount,
             order_id: orderNumber.toString(),
             redirectUrl: 'http://localhost:5173/dashboard', // set user dashbpoard {id}
-            webhookUrl: 'https://8373-95-96-151-55.ngrok-free.app',
+            webhookUrl: 'https://5b4d-95-96-151-55.ngrok-free.app',
             billingAddress: billingAddress,
             shippingAddress: billingAddress,
             metadata: { order_id : orderNumber.toString()},
@@ -389,69 +398,70 @@ const PaymentPage = () => {
         console.log("get request payment", event)
         console.log("get request enteredInput", enteredInput)
 
-        // if(findInvalidInput(enteredAddress))
-        //     {
-        //         const { firstAndLastName, email, phoneNumber, ...deconstructInvalidList} = inputPaymentValidList 
-        //         setEnteredInputIsInvalid(deconstructInvalidList)
-        //     }
+        if(findInvalidInput(enteredAddress))
+            {
+                const { firstAndLastName, email, phoneNumber, ...deconstructInvalidList} = inputPaymentValidList 
+                setEnteredInputIsInvalid(deconstructInvalidList)
+            }
 
-        // let userAddressInfo = prepareInputForRequest(enteredInput, setEnteredInputIsInvalid, enteredInput.cityId, ctxValue.availableCities, enteredInput.stateId, ctxValue.availableStates)
+        let userAddressInfo = prepareInputForRequest(enteredInput, setEnteredInputIsInvalid, enteredInput.cityId, ctxValue.availableCities, enteredInput.stateId, ctxValue.availableStates)
         
-        // userAddressInfo = { ...userAddressInfo, ['location']: enteredInput.city}
-        // userAddressInfo = { ...userAddressInfo, ['region']: enteredInput.state}
-        // userAddressInfo = { ...userAddressInfo, ['reactStateNr']: ctxValue.currentUserState.toString()}
-        // userAddressInfo = { ...userAddressInfo, ['reactCityNr']: ctxValue.currentUserCity.toString()}
+        userAddressInfo = { ...userAddressInfo, ['location']: enteredInput.city}
+        userAddressInfo = { ...userAddressInfo, ['region']: enteredInput.state}
+        userAddressInfo = { ...userAddressInfo, ['reactStateNr']: ctxValue.currentUserState.toString()}
+        userAddressInfo = { ...userAddressInfo, ['reactCityNr']: ctxValue.currentUserCity.toString()}
         
-        // const options = { url: '/api/v1/order/address', method: 'POST'}
-        // const ApiUserAddressOptions = ApiFetchPostOptions(options, userAddressInfo, {'X-Authorization': token})            
+        const options = { url: '/api/v1/order/address', method: 'POST'}
+        const ApiUserAddressOptions = ApiFetchPostOptions(options, userAddressInfo, {'X-Authorization': token})            
         
-        // try {
-        //     const response = await ApiFetch(ApiUserAddressOptions)
-        //     const getResults = await response?.json()
+        try {
+            const response = await ApiFetch(ApiUserAddressOptions)
+            const getResults = await response?.json()
             
-        //     if(!response?.ok)
-        //     {   //if(response?.status >= 400 && response?.status <= 600)
-        //         // const errorJson = await response?.json()
-        //         throw {message: 'Api error send order address error!', errors: getResults.errors}                
-        //     }
+            if(!response?.ok)
+            {   //if(response?.status >= 400 && response?.status <= 600)
+                // const errorJson = await response?.json()
+                throw {message: 'Api error send order address error!', errors: getResults.errors}                
+            }
 
-        // } catch (error) {
+        } catch (error) {
             
-        //     if(Array.isArray(error.errors) && (error.errors.length > 1))
-        //     {
-        //         let collectErrors = [];
+            if(Array.isArray(error.errors) && (error.errors.length > 1))
+            {
+                let collectErrors = [];
 
-        //         error.errors.map((error) => {
-        //             collectErrors[error.property] = error.message
-        //         })
+                error.errors.map((error) => {
+                    collectErrors[error.property] = error.message
+                })
 
-        //         updateErrors('userAddress', collectErrors)
+                updateErrors('userAddress', collectErrors)
 
-        //     } else if(Array.isArray(error.errors) && (error.errors.length == 1) ){
+            } else if(Array.isArray(error.errors) && (error.errors.length == 1) ){
 
-        //         let arrayProperties = error.errors[0].property
+                let arrayProperties = error.errors[0].property
 
-        //         if (Array.isArray(arrayProperties)) arrayProperties = arrayProperties[0]
+                if (Array.isArray(arrayProperties)) arrayProperties = arrayProperties[0]
 
-        //         const messageError = error.errors[0].message
+                const messageError = error.errors[0].message
                 
-        //         updateErrors('userAddress', {[arrayProperties]: messageError})
+                updateErrors('userAddress', {[arrayProperties]: messageError})
 
-        //     } else {
+            } else {
                 
-        //         if(error.errors?.property instanceof Array){
-        //             let arrayProperties = error.errors.property
+                if(error.errors?.property instanceof Array){
+                    let arrayProperties = error.errors.property
                     
-        //             if (Array.isArray(arrayProperties)) arrayProperties = arrayProperties[0]
+                    if (Array.isArray(arrayProperties)) arrayProperties = arrayProperties[0]
                     
-        //             const messageError = error.errors.message
+                    const messageError = error.errors.message
                     
-        //             updateErrors('userAddress', {[arrayProperties]: messageError})
-        //         }
+                    updateErrors('userAddress', {[arrayProperties]: messageError})
+                }
 
         //         console.log({unHandledError: error})
-        //     }
+            }
         }
+    }
   
 
     const handleUserSelectLocation = (identifier, event) => {
@@ -543,7 +553,7 @@ const PaymentPage = () => {
     // console.log({enteredInputIsInvalid, enteredInput, got_user: userData?.userInfo})
     return (
         <>     
-        <MainNavigation />
+            <MainNavigation />
             <OrderContext.Provider value={ctxValue}>
                 <UserDataModal 
                     // ref={dialogOpen} 
@@ -557,7 +567,7 @@ const PaymentPage = () => {
                     errors={errors.userAddress}
                 />
 
-                <UserChoosePaymentModal ref={dialogUserPaymentMethod} paymentMethodOptions={paymentMethodOptions} />
+                <UserChoosePaymentModal dialog={dialogOpenPaymentMethod} closeDialog={closeUserPaymentMethodModalHandler} paymentMethodOptions={paymentMethodOptions} />
 
                 <section className="flex-col shadow-md w-full bg-slate-100 py-5 rounded-md px-3 md:w-4/5 md:ml-auto md:mr-auto sm:mx-2 sm:px-5 md:grid md:mx-2 md:shadow-xl">
 
@@ -575,7 +585,7 @@ const PaymentPage = () => {
                     <UserSelectPaymentMethodForm
                         errorClass={`${!enteredInput.paymentMethodId && 'border-red-300'}`}
                         symbol={enteredInput.paymentMethodId}
-                        paymentMethodModalHandler={paymentMethodModalHandler}
+                        paymentMethodModalHandler={userPaymentMethodModalHandler}
                         selectedType={enteredInput.paymentMethodName}
                     />
 

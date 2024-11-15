@@ -33,7 +33,7 @@ const TitleComponent = styled('div',{
   boxShadow: `-2px 1px 2.5px ${theme.palette.secondary.shadowColor}`,
   borderRadius: '5px',
   marginTop: '16px',
-  marginRight: '5px',
+  marginRight: "5px",
   height: '8rem',
   fontSize: '1.25rem',
   padding: '10px',
@@ -139,21 +139,8 @@ const UserProfilePage = () => {
               >
                 <h1 className='text-center text-md md:text-xl lg:text-2xl lg:py-10'>                  
                   {
-                    userData?.subscription?.next_session.next_training_day
-                    ? <>
-                      <p>
-                        {userData?.subscription?.next_session.next_training_day}    
-                      </p>
-                      <p>
-                      <br />
-                        {userData?.subscription?.next_session?.start + " - " + userData?.subscription?.next_session?.end}
-                      </p>
-                                      
-                    </>
-                    : 0 
+                    0
                   }
-                  <br />
-                  {userData?.next_session?.start ?? ''}
                 </h1>
               </Box>
             </Grid>

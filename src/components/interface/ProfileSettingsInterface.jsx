@@ -7,12 +7,12 @@ import {
     Tab,
  } from "@mui/material"
  import { Title } from "react-admin"
- import { ProfileTabInterface } from '../interface/settings/ProfileTabInterface'
- import { PasswordTabInterface } from '../interface/settings/PasswordTabInterface'
- import { AddressTabInterface } from '../interface/settings/AddressTabInterface'
-import { BillingTabInterface } from '../interface/settings/BillingTabInterface'
-import { NotificationTabInterface } from '../interface/settings/NotificationTabInterface'
-import { CustomTabPanel, a11yProps } from '../interface/settings/CustomTabPanel'
+ import { ProfileTabInterface } from './settings/ProfileTabInterface'
+ import { PasswordTabInterface } from './settings/PasswordTabInterface'
+ import { AddressTabInterface } from './settings/AddressTabInterface'
+import { BillingTabInterface } from './settings/BillingTabInterface'
+import { NotificationTabInterface } from './settings/NotificationTabInterface'
+import { CustomTabPanel, a11yProps } from './settings/CustomTabPanel'
 import { useTabsContext } from '../../store/tabs-context'
 
 
@@ -34,7 +34,7 @@ export const ProfileSettingsInterface = () => {
         <>
               <Card sx={{ width:{xs: '100vw', md:'100%'} }}>
                   <Title title="Settings" />
-                  <Box sx={{ borderBottom: 1, borderColor: "divider"}}>
+                  <Box sx={{  borderColor: "divider"}}> {/* borderBottom: 1, */}
                       <Tabs value={value} onChange={handleChange} 
                           TabIndicatorProps={{ sx: { display: 'none' } }}
                           sx={{ '& .MuiTabs-flexContainer': {
@@ -60,9 +60,6 @@ export const ProfileSettingsInterface = () => {
               <CustomTabPanel value={value} index={3}>
                   <BillingTabInterface />
               </CustomTabPanel>
-              {/* <CustomTabPanel value={value} index={4}>
-                  <NotificationTabInterface />
-              </CustomTabPanel> */}
         </>
     )
 } 

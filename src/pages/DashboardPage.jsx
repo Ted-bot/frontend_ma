@@ -13,7 +13,7 @@ import LoginDashboardLoader from '../loader/LoginDashboardLoader.jsx'
 import UserProfilePage from './client/UserProfilePage'
 import { dataProvider } from '../dataProvider/main/DataProvider.jsx'
 import { authProvider } from '../dataProvider/main/AuthProvider.jsx'
-import { ProfileSettingsInterface } from '../components/interface/UserDashboardProfileInterface'
+import { ProfileSettingsInterface } from '../components/interface/ProfileSettingsInterface'
 import CalendarPage from './CalendarPage'
 import SignUpPage from './SignUpPage.jsx'
 import { useTabsContext } from '../store/tabs-context.jsx'
@@ -50,26 +50,14 @@ const myTheme = {
         ...defaultLightTheme,
         palette: {
             ...defaultLightTheme.palette,
-            // primary: {myText: '#E50000'},
             secondary: {
                 main: "#E50000",
                 shadowColor: "#E50000",
             },
-            common: {
+            common: { // remove
                 white: '#E50000'
             }
         },
-        overrides: {
-            MuiGrid: {
-                '& .MuiGrid-root .css-sinu4y': {
-                // backgroundColor: palette.common.white,
-                color: 'green',
-                // height: "100%",
-                boxShadow:
-                "2px 0px 1px -1px rgba(0,0,0,0.2), 1px 0px 3px 0px rgba(0,0,0,0.1)",
-            }
-            },
-          },
         components: {       
             MuiFormLabel: { //MuiFormLabel-root
                 styleOverrides: { // label text input
@@ -87,6 +75,68 @@ const myTheme = {
                     },
                 },
             }, //
+            MuiBox: {
+                styleOverrides: {
+                    root : {
+                        borderBottom: 'none',
+                        borderColor: 'none',
+                        '&& .MuiBox-root .css-1gsv261': {
+                            borderBottom: 'none',
+                            borderColor: 'none',
+                        }
+                    }
+                }
+            },
+            MuiPaper : {
+                styleOverrides: {
+                    root: {
+                        background: 'transparent',
+                        boxShadow: 'none',
+                    }
+                }
+            },
+            MuiTabs: {
+                styleOverrides: {
+                    root : {
+                        background: 'linear-gradient(160deg, #E50000, #ab0926 )',
+                        "&& .Mui-selected": {
+                            color: 'yellow',
+                            backgroundColor: "pink"
+                        }
+                    }
+                }
+            },
+            MuiTab: {
+                styleOverrides: {
+                    root: {
+                        color: 'white'
+                    }
+                }
+            },
+            MuiCard : {
+                styleOverrides: {
+                    root: {
+                        // color: 'green',
+                        '&& .MuiTypography-h5' : {
+                            color: '#C45267',
+                            fontWeight: 600,
+                            textShadow: '-2px 1px 5px #ffd086, -2px 2px 3px #474747',
+                        }
+                    }
+                }
+            },
+            MuiButtonBase : {
+                styleOverrides: {
+                    root: {
+                        color: 'white',
+                        '&[aria-selected=true]' : {
+                            backgroundColor: '#ff9958',
+                            color: '#ffd400',
+                            border:  '1px solid #757575',
+                        },
+                    },
+                },
+            },
             MuiScopedCssBaseline: {
                 styleOverrides: {
                     root: {
