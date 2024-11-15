@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react'
-import { NavLink, useNavigate } from 'react-router-dom'
-import { useAuthenticated, Title, useGetIdentity, useRedirect } from 'react-admin'
+import { useAuthenticated, Title, useGetIdentity } from 'react-admin'
 
-import {getLocalStorageItem} from "../../js/util/getUtil.js"
 import { dataProvider } from '../../dataProvider/main/DataProvider.jsx'
 
 import { Card, CardContent, CardHeader, createTheme } from "@mui/material"
@@ -13,7 +11,6 @@ import Grid from '@mui/material/Grid'
 import inMemoryJwt from '../../js/util/inMemoryJwt.js'
 import useStore from '../../hooks/store/useStore.jsx'
 import { styled } from '@mui/system'
-import { orange } from '@mui/material/colors'
 
 const TitleComponent = styled('div',{
   name: 'CustomTitle',
@@ -43,8 +40,8 @@ const TitleComponent = styled('div',{
 
 const UserProfilePage = () => {  
   useAuthenticated()
-  const [userLoggedIn, setUserLoggedIn, isLoading] = useStore('loggedIn')
-  const {data, isPending, error} = useGetIdentity()
+  const [userLoggedIn, setUserLoggedIn] = useStore('loggedIn')
+  const {data} = useGetIdentity()
 
   const [errors, setErrors] = useState('')
   const [userData, setUserData] = useState({}) //user: {}
@@ -70,14 +67,8 @@ const UserProfilePage = () => {
         setError(true)
       })
     }
-  },[])
+  },[data?.email])
 
-  const theme = createTheme({
-    status: {
-      warning: orange[500],
-    },
-  })
-  
 
   return (
     <Card>
@@ -115,19 +106,12 @@ const UserProfilePage = () => {
                   {userData?.subscription?.sessions_followed ?? 0}
                 </h1>
               </Box>
-              
-              {/* <Divider variant="middle" component="div" /> */}
             </Grid>
             
             <Grid container direction="column" sx={{ flexGrow: 1 }} >
               <TitleComponent>
-                {/* <h1 className='text-center py-2 text-md text-orange-300 md:text-xl lg:text-2xl lg:py-10'> */}
                   Tokens
-                {/* </h1> */}
               </TitleComponent>
-              
-              {/* <Divider variant="middle" component="div"  /> */}
-              
               <Box 
                 display='block'
                 my={2}
@@ -142,11 +126,8 @@ const UserProfilePage = () => {
 
             <Grid container direction="column" sx={{ flexGrow: 1 }} >
               <TitleComponent>
-                {/* <h1 className='text-center py-2 text-md text-orange-300 md:text-xl lg:text-2xl lg:py-10'> */}
                   Training Level
-                {/* </h1> */}
               </TitleComponent>
-              {/* <Divider variant="middle" component="div"  /> */}
               <Box 
                 display='block'
                 my={2}
