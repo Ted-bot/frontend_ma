@@ -71,7 +71,7 @@ const UserProfilePage = () => {
     }
   },[data?.email])
 
-
+  // console.log("roles user",inMemoryJwt.getRoles())
   return (
     <Card>
       <Title title="Dashboard" />

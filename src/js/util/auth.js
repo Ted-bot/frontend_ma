@@ -119,7 +119,7 @@ const prepPaymentRequestFields = {
     city: '',
     region: '',
     postalCode: '',
-    state:'',
+    state: null,
     city_id:'',
     state_id:'',
     paymentMethodName:'no payment method selected!',

@@ -68,7 +68,7 @@ export const AddressTabInterface = () => {
             { name: 'Street Name', id: 'address_line', type: typeText, placeholder: 'address line', value: enteredInput?.addressLine ?? '', invalid: enteredInputIsInvalid?.address_line, error: errors?.address_line, onChange: (e) => handleGeneralUserInput('addressLine', e.target.value), onBlur: (e) => inputBlurHandle('address_line', e.target.value, setEnteredInputIsInvalid)},
             { name: 'Postal Code', id: 'postal_code', type: typeText, placeholder: 'postal code', value: enteredInput?.postalCode ?? '', invalid: enteredInputIsInvalid?.postal_code, error: errors?.postal_code, onChange: (e) => handleGeneralUserInput('postalCode', e.target.value), onBlur: (e) => inputBlurHandle('postal_code', e.target.value, setEnteredInputIsInvalid) },
             { name: 'Location', id: 'location', type: typeLocation, stateError: errors?.state_id, cityError: errors?.city_id, stateId: Number(enteredInput?.state_id), cityId: Number(enteredInput?.city_id),
-                onChangeState: e => handleGeneralUserInput('state_id', e), onChangeCityId: e => handleGeneralUserInput('city_id', e), onChangeCity: e => handleGeneralUserInput('city', e)},
+                onChangeState: e => handleGeneralUserInput('state', e),onChangeStateId: e => handleGeneralUserInput('state_id', e), onChangeCityId: e => handleGeneralUserInput('city_id', e), onChangeCity: e => handleGeneralUserInput('city', e)},
             ]
     }
 

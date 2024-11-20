@@ -301,10 +301,11 @@ export const PaymentPage = () => {
 
     const payOrderHandler = async (event) => {
         event.preventDefault()
-        console.log("EnteredInputPayment", event)
+        // console.log("EnteredInputPayment", event)
 
         userAddressHandler(event)
-        return
+        // return
+
         const mollieOrder = JSON.parse(localStorage.getItem(addressStorageName))       
         const checkInvalidInput = findAndUpdateInvalidList(mollieOrder, setEnteredInputIsInvalid)         
         console.log({whatEntered: checkInvalidInput, enteredInput})
@@ -349,7 +350,7 @@ export const PaymentPage = () => {
             amount: amount,
             order_id: orderNumber.toString(),
             redirectUrl: 'http://localhost:5173/dashboard', // set user dashbpoard {id}
-            webhookUrl: 'https://9fed-95-96-151-55.ngrok-free.app',
+            webhookUrl: 'https://3abe-95-96-151-55.ngrok-free.app',
             billingAddress: billingAddress,
             shippingAddress: billingAddress,
             metadata: { order_id : orderNumber.toString()},
@@ -436,7 +437,7 @@ export const PaymentPage = () => {
     const userAddressHandler = async (event) => {
         event.preventDefault()
 
-        console.log("get request payment", event)
+        // console.log("get request payment", event)
         console.log("get request enteredInput", enteredInput)
 
         if(findInvalidInput(enteredAddress))
@@ -493,14 +494,12 @@ export const PaymentPage = () => {
 
         if(identifier === 'state')
             {
-                const state = stateList.find((state) => state.id == Number(event)); //here you will get full state object.
-                updateEnteredInputState('state_id', state.id)       
-                updateEnteredInputState(identifier, state.name)
-                GetCity(countryid, state.id).then((result) => {
+                updateEnteredInputState(identifier, event)
+                GetCity(countryid, event).then((result) => {
                     setCityList(result)
                 })
                 setInvalidTypeStatus(identifier, false)
-                return
+                // set no return so both city and city_id will be handled by default / last method
             }
             
         if(identifier === 'city')

@@ -4,7 +4,7 @@ import CalendarInterface from '../components/interface/CalendarInterface.jsx'
 
 import CalendarModal from '../components/modal/CalendarModal.jsx'
 import { dataProvider } from '../dataProvider/main/DataProvider.jsx'
-import { useGetIdentity } from 'react-admin'
+import { Title, useGetIdentity } from 'react-admin'
 import { useNotify } from 'react-admin'
 import { useAuthenticated } from 'react-admin'
 import { Box } from '@mui/material'
@@ -60,7 +60,7 @@ export default function CalendarPage(){
             setShowInModal(() => ({
                     id: event.id,
                     title: event.title,
-                    description: event.description,
+                    description: event.resource,
                     day: extractDay,
                     start: startTimeEvent,
                     end: endTimeEvent,
@@ -85,6 +85,7 @@ export default function CalendarPage(){
 
     return(
         <>
+            <Title title="Calendar" />
             <Box 
                 display="flex"
                 flexDirection="column"

@@ -15,7 +15,7 @@ import { useGetIdentity } from 'react-admin'
 // import { LocationState, LocationCity } from '../../../store'
 // import { GetState, GetCity } from 'react-country-state-city/dist/cjs'
 
-const LocationInput = ({errorMessage: error, stateId, cityId, onChangeState, onChangeCityId, onChangeCity, stateError, cityError}) => { // id,
+const LocationInput = ({errorMessage: error, stateId, cityId, onChangeStateId, onChangeState, onChangeCityId, onChangeCity, stateError, cityError}) => { // id,
 
     const [enteredInput, setEnteredInput] = useState({state_id: '', city_id: ''})
     const [stateList, setStateList] = useState([])
@@ -63,7 +63,8 @@ const LocationInput = ({errorMessage: error, stateId, cityId, onChangeState, onC
         handleGeneralUserInput('state_id', id)
         const state = stateList.find((state) => state.id === id )
         console.log("Got State Location", state)
-        onChangeState(state?.id)
+        onChangeStateId(state?.id)
+        onChangeState(state?.name)
     }
     
     const selectCityHandler = id => {

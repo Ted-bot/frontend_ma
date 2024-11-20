@@ -1,7 +1,10 @@
+import { jwtDecode } from "jwt-decode"
+
 const inMemoryJwtManager = () => {
     let logoutEventName = 'ra-logout'
     let refreshEndpoint = '/api/token/refresh'
     let inMemoryJwt = null
+    let inMemoryRoles = null
     let refreshTimeOutId
     let isRefreshing = null
     let inMemoryJwtRefresh = null
@@ -82,6 +85,8 @@ const inMemoryJwtManager = () => {
                 if (token) {
                     setRefreshToken(refreshToken)
                     setToken(token)
+                    const getTokenData = jwtDecode(token)
+                    setRoles(getTokenData.roles)
                     return token
                 }
                 ereaseToken()
@@ -92,6 +97,8 @@ const inMemoryJwtManager = () => {
     }
 
     const getToken = () => inMemoryJwt
+
+    const getRoles = () => inMemoryRoles
     
     const getValidSubscription = () => inMemoryCheckValidSubscription
 
@@ -102,6 +109,11 @@ const inMemoryJwtManager = () => {
 
     const setToken = (token) => {
         inMemoryJwt = token
+        return true
+    }
+    
+    const setRoles = (roles) => {
+        inMemoryRoles = [...roles]
         return true
     }
 
@@ -138,11 +150,13 @@ const inMemoryJwtManager = () => {
     return {
         ereaseToken,
         getToken,
+        getRoles,
         setLogoutEventName,
         getRefreshedToken,
         setRefreshTokenEndpoint,
         setRefreshToken,
         setToken,
+        setRoles,
         refreshToken,
         abordRefreshToken,
         waitForTokenRefresh,

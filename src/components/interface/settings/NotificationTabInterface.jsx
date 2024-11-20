@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { dataProvider } from "../../../dataProvider/main/DataProvider"
-import { useGetIdentity } from 'react-admin'
+import { useGetIdentity, Title } from 'react-admin'
 import { useNotify } from 'react-admin'
 import Box from "@mui/material/Box"
 import { DataGrid, gridClasses,useGridApiEventHandler} from '@mui/x-data-grid'
@@ -65,6 +65,7 @@ export const NotificationTabInterface = () => {
 
     return(
         <>
+            <Title title="Notifications" />
             <Box sx={{ height: 400, width:{ xs:'85vw', md:'100%'} }} >
                 <Typography
                     variant='h5'

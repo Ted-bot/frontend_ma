@@ -1,11 +1,15 @@
 import { AdminGuesser,
     hydraSchemaAnalyzer,
     ResourceGuesser,
+    CreateGuesser,
+    EditGuesser,
+    ShowGuesser,
+    ListGuesser
 } from '@api-platform/admin'
-import { Layout, CustomRoutes, useAuthenticated, defaultTheme, defaultDarkTheme, defaultLightTheme} from 'react-admin'
+import { Layout, CustomRoutes, useAuthenticated, defaultLightTheme} from 'react-admin'
 import { Route } from 'react-router-dom'
 
-import MyMenu from '../components/navigations/DashboardNavigation.jsx'
+import {MyMenu} from '../components/navigations/DashboardNavigation.jsx'
 import ProfileList from '../dataProvider/Profile/ProfileList.jsx'
 import UserCreate from '../dataProvider/User/UserCreate.jsx'
 import LoginDashboardLoader from '../loader/LoginDashboardLoader.jsx'
@@ -16,35 +20,11 @@ import { authProvider } from '../dataProvider/main/AuthProvider.jsx'
 import { ProfileSettingsInterface } from '../components/interface/ProfileSettingsInterface'
 import CalendarPage from './CalendarPage'
 import SignUpPage from './SignUpPage.jsx'
-import { useTabsContext } from '../store/tabs-context.jsx'
 import { NotificationTabInterface } from '../components/interface/settings/NotificationTabInterface.jsx'
 import {PaymentPage} from './client/PaymentPage.jsx'
-import { deepmerge } from '@mui/utils'
-import merge from "lodash/merge"
-import createPalette from '@mui/material/styles/createPalette.js'
+import inMemoryJwt from '../js/util/inMemoryJwt.js'
+import { getLocalStorageItem } from '../js/util/getUtil.js'
 
-// const palette = createPalette(
-//     merge({}, defaultTheme.palette, {
-//       primary: {
-//         main: "#ff0266", // Not far from red
-//       },
-//       secondary: {
-//         main: "#00ba00", // Not far from green
-//       },
-//     })
-//   )
-
-// const typography = {
-//     fontFamilySecondary: "'Poppins', sans-serif",
-//     fontFamily: '"Comic Neue", cursive',
-//     fontSize: 16, // Should be a number in pixels
-//     fontStyle: "normal",
-//     fontWeightLight: 400,
-//     fontWeightRegular: 500,
-//     fontWeightMedium: 600,
-//     fontWeightBold: 700,
-//     color: palette.text.primary,
-// }
 
 const myTheme = {
         ...defaultLightTheme,
@@ -87,11 +67,31 @@ const myTheme = {
                     }
                 }
             },
+            RaShow: {
+                styleOverrides: {
+                    root: {
+                        color: '#ab0926',
+                        margin: '15px 5px 35px 10px',
+                        paddingBottom: "4rem",
+                        background: '#F6E6E9',
+                        boxShadow: '-2px 3px 8px 1px #ab0926',
+                        borderLeft: '2px solid #E5B5BD',
+                        borderTopLeftRadius: '15px 15px',
+                        borderTopRightRadius: '15px 15px',
+                        borderBottomLeftRadius: '15px 15px',
+                        borderBottomRightRadius: '15px 15px',
+                        borderBottom: '2px solid #ab0926',
+                    }
+                }
+            },
             MuiPaper : {
                 styleOverrides: {
                     root: {
                         background: 'transparent',
                         boxShadow: 'none',
+                        '& .MuiPaper-root .css-g826q3-RaSimpleShowLayout-root' :{
+                            backgroundColor: 'green'
+                        }
                     }
                 }
             },
@@ -245,13 +245,15 @@ const myTheme = {
     }
 }
 
-
 export default function DashboardPage() {
     useAuthenticated()
     
     const schemaAnalyzer = hydraSchemaAnalyzer()
     const MyLogin = () => (<LoginDashboardLoader />)
-    const MyLayout = props => <Layout {...props} menu={MyMenu}/> //appBar={MyAppBar} 
+    const MyLayout = props => <Layout {...props} menu={MyMenu}/> 
+
+    const roles = getLocalStorageItem("roles")
+    const adminRole = roles?.find(role => role === "ROLE_USER_SIFU") ?? false
 
     return (
         <>
@@ -266,6 +268,10 @@ export default function DashboardPage() {
                 loginPage={MyLogin}
                 authProvider={authProvider}
             >
+                <ResourceGuesser name={"users"} list={adminRole && ListGuesser} show={adminRole && ShowGuesser} create={adminRole && UserCreate} edit={adminRole && EditGuesser} />
+                <ResourceGuesser name={"classes"} list={adminRole && ListGuesser} show={adminRole && ShowGuesser} create={adminRole && CreateGuesser} edit={adminRole && EditGuesser} />
+                <ResourceGuesser name={"trainingsessions"} list={adminRole && ListGuesser} show={adminRole && ShowGuesser} create={adminRole && CreateGuesser} edit={adminRole && EditGuesser} />
+                <ResourceGuesser name={"profiles"} list={adminRole && ProfileList} show={adminRole && ShowGuesser} create={adminRole && CreateGuesser} edit={adminRole && EditGuesser} />    
                 
                 <CustomRoutes>
                     <Route path="/Settings" element={<ProfileSettingsInterface />} />
@@ -278,15 +284,11 @@ export default function DashboardPage() {
                 </CustomRoutes>
                 <CustomRoutes noLayout> {/* //noLayout */}
                     <Route path="/payment" element={<PaymentPage/>} />
-                </CustomRoutes>
-                <ResourceGuesser name={"users"} create={UserCreate} />
-                <ResourceGuesser name={"classes"} />
-                <ResourceGuesser name={"trainingsessions"} />
-                <ResourceGuesser name={"profiles"} list={ProfileList} />
+                </CustomRoutes>                
                 <CustomRoutes>
                     <Route path="/Notifications" element={<NotificationTabInterface />} />
                 </CustomRoutes>
-            </AdminGuesser>            
+            </AdminGuesser>       
         </>
     )
 }

@@ -24,6 +24,7 @@ export default function LabelNameInput({
     onChangeState,
     onChangeCity,
     onChangeCityId,
+    onChangeStateId,
     onBlur,
     checked
 }) {
@@ -155,6 +156,7 @@ export default function LabelNameInput({
                                     onChangeCity={onChangeCity}
                                     onChangeCityId={onChangeCityId}
                                     onChangeState={onChangeState}
+                                    onChangeStateId={onChangeStateId}
                                     cityError={cityError}
                                     stateError={stateError}
                                 />

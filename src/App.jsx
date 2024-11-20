@@ -12,7 +12,6 @@ import DashboardPage from './pages/DashboardPage.jsx'
 import PublicCalendarPage from './pages/PublicCalendarPage.jsx'
 import OrderPage from './pages/OrderPage.jsx'
 import {PaymentPage} from './pages/client/PaymentPage.jsx'
-import { PaymentLoader } from './loader/PaymentLoader.jsx'
 import { CalendarLoader } from './loader/CalendarLoader.jsx'
 
 import {tokenLoader} from './js/util/auth.js'
@@ -20,14 +19,11 @@ import ContactPage from './pages/ContactPage.jsx'
 import ErrorPage from './pages/ErrorPage.jsx'
 import { ReactQueryClientProvider } from './dataProvider/main/ReactQueryClientProvider.jsx'
 import { SignUpLoader } from './loader/SignUpLoader.jsx'
-// import { Provider } from 'react-redux'
-// import { store } from './store/index.js'
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { TabsProvider } from './store/tabs-context'
-import LoginDashboardLoader from './loader/LoginDashboardLoader.jsx'
 import { StoreProvider } from './hooks/store/StoreProvider.jsx'
-import { createTheme, ThemeProvider, styled } from '@mui/material/styles'
+import { ThemeProvider } from '@mui/material/styles'
 import { unstable_createMuiStrictModeTheme } from '@mui/material/styles'
 import { ErrorBoundary } from 'react-error-boundary'
 
@@ -41,19 +37,6 @@ function App() {
       element: <Root />,
       // errorElement: <ErrorPage />,
       id: 'root',
-      // loader: () => {
-      //   let logoutEventName = 'ra-logout'
-      //   window.addEventListener('storage', (event) => {
-      //     console.log("GotLogoutTOken", event)
-      //     if (event.key === logoutEventName) {
-      //         console.log("GotLogoutTOken", logoutEventName)
-      //         setLoggedIn(false)
-      //         return
-      //     }
-      //     console.log("GotLogoutTOken", logoutEventName)
-      //     setLoggedIn(true)
-      // })
-      // },
       children: [
         { path: '/', element: <HomePage /> },
         { path: '/sign-up', element: <SignUpPage />, loader: SignUpLoader },
@@ -68,7 +51,6 @@ function App() {
   ])
 
   return (
-    // <Provider store={store}>
     <StoreProvider>
         <TabsProvider>
             <ReactQueryClientProvider>
@@ -80,7 +62,6 @@ function App() {
           </ReactQueryClientProvider>
         </TabsProvider>
     </StoreProvider>
-    // </Provider>
   )
 }
 

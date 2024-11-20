@@ -36,10 +36,12 @@ export const authProvider = {
         const refreshToken = response.refreshToken
         const getTokenData = jwtDecode(token)
         console.log({crack_token: getTokenData})
+        setLocalStorageItem('roles', getTokenData.roles)        
 
         // AppDispatch(userLoggedIn({payload: getTokenData.username }))
         if(getLocalStorageItem('loggedIn') === false) setLocalStorageItem('loggedIn', true)
         inMemoryJwt.setToken(token)
+        inMemoryJwt.setRoles(getTokenData.roles)
         inMemoryJwt.setRefreshToken(refreshToken)
         setLocalStorageItem('email', getTokenData.username)        
         setLocalStorageItem('userId', getTokenData.id)        
@@ -49,6 +51,14 @@ export const authProvider = {
     },
     logout: async () => {
         deleteLocalStorageItem('email')        
+        deleteLocalStorageItem('user_address')        
+        deleteLocalStorageItem('lines')        
+        deleteLocalStorageItem('user_id')        
+        deleteLocalStorageItem('roles')        
+        deleteLocalStorageItem('order_number')        
+        deleteLocalStorageItem('amount')        
+        deleteLocalStorageItem('selected_subscription_0')        
+        deleteLocalStorageItem('error')        
         
         
         if(!getLocalStorageItem('loggedIn')) return
@@ -96,6 +106,8 @@ export const authProvider = {
             const validSubscription = getResults?.subscriptions?.length !== 0
             inMemoryJwt.setValidSubscription(validSubscription)
 
+            setLocalStorageItem("roles",getResults["roles"])
+
             const username = getResults["firstName"] + ' ' + getResults["lastName"]
 
             return Promise.resolve({...getResults, fullName: username ?? '...' })
@@ -106,7 +118,16 @@ export const authProvider = {
     getPermissions: () => {
         // return inMemoryJwt.getToken() ?  Promise.resolve() : Promise.reject()
         return inMemoryJwt.waitForTokenRefresh().then(() => {
-            return inMemoryJwt.getToken() ? Promise.resolve() : Promise.reject();
+            // console.log("permission time", inMemoryJwt.getRoles())
+            return inMemoryJwt.getToken() ? inMemoryJwt.getRoles() : Promise.reject()
+            // return inMemoryJwt.getToken() ? Promise.resolve() : Promise.reject();
         })
-    }
+    },
+    // canAccess: ({resource}) => {
+    //     // return inMemoryJwt.getToken() ?  Promise.resolve() : Promise.reject()
+    //     return inMemoryJwt.waitForTokenRefresh().then(() => {
+    //         return resource
+    //         // return inMemoryJwt.getRoles().find(role => role === resource) ?? false
+    //     })
+    // }
 }    

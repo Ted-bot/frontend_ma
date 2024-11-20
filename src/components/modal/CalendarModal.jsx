@@ -44,6 +44,8 @@ import { ActionUserSelectedEventButton } from '../ui/button/ActionUserSelectedEv
         return setTypeEvent
     }
 
+    console.log("got description", description)
+
     return createPortal(
         <dialog ref={dialog} className="result-modal">
             <section>
@@ -52,7 +54,7 @@ import { ActionUserSelectedEventButton } from '../ui/button/ActionUserSelectedEv
                 </form>
                 <h1 className={`text-center underline underline-offset-4 pb-4 text-2xl ${typeEvent(title)}`}>{title}</h1>
             </section>
-            <section className='w-full text-center text-slate-300'>
+            <section className='w-full text-center text-sm text-slate-300 mt-4 mb-6'>
                 {description}
             </section>
 

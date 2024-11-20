@@ -18,6 +18,7 @@ export default function LabelUserInfoFieldInput({
     onChangeState,
     onChangeCity,
     onChangeCityId,
+    onChangeStateId,
     stateError,
     cityError,
     handleKeyDown,
@@ -71,6 +72,7 @@ export default function LabelUserInfoFieldInput({
                         onChangeCity={onChangeCity}
                         onChangeCityId={onChangeCityId}
                         onChangeState={onChangeState}
+                        onChangeStateId={onChangeStateId}
                         cityError={cityError}
                         stateError={stateError}
                     />
