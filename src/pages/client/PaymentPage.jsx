@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback, useRef, createRef } from 'react'
-import inMemoryJwt from '../../js/util/inMemoryJwt.js'
-import {  GetCity } from "react-country-state-city"
+import { HttpError, useAuthenticated } from 'react-admin'
+import { Form } from 'react-router-dom'
+import { useErrorBoundary } from "react-error-boundary"
+import {  GetState, GetCity } from "react-country-state-city"
 
 import { 
     ApiFetchPostOptions,
@@ -18,12 +20,12 @@ import {
     getUserInfoObjOrStorageData,
 } from "../../js/util/getUtil.js"
 
-import UserSelectPaymentMethodForm from '../../components/forms/client/UserSelectPaymentMethodForm'
 import { countryid, inputPaymentValidList } from '../../js/util/auth.js'
+import inMemoryJwt from '../../js/util/inMemoryJwt.js'
 
-import { useLoaderData, Form, useNavigate } from 'react-router-dom'
 
-import UserDataModal from '../../components/modal/UserDataModal'
+import UserSelectPaymentMethodForm from '../../components/forms/client/UserSelectPaymentMethodForm'
+import {UserDataModal} from '../../components/modal/UserDataModal'
 import UserChoosePaymentModal from '../../components/modal/UserChoosePaymentModal'
 import UserOrderInfoForm from "../../components/forms/client/UserOrderInfoForm"
 import SelectedOrderForPaymentInterface from '../../components/interface/SelectedOrderForPaymentInterface'
@@ -32,17 +34,17 @@ import { validateAndSetStatus } from '../../components/ui/input/ValidateIBAN.jsx
 import { handleKeyDown } from '../../js/keyBoardUtil.js'
 import { paymentInputBlurHandle } from '../../components/class/userData/PaymentFormHelper.jsx'
 import useStore from '../../hooks/store/useStore.jsx'
-import { dataProvider } from '../../dataProvider/main/DataProvider.jsx'
 import MainNavigation from '../../components/navigations/MainNavigation.jsx'
-import { useAuthenticated } from 'react-admin'
 import { OrderContext } from '../../store/shop-order-context.js'
+import { errorHandlerPaymentUserAddressRequest } from '../../components/class/userData/FormHelper.jsx'
 
-const PaymentPage = () => {
+import { useUserAddressData } from '../../hooks/query/usePaymentQuery.jsx'
+
+export const PaymentPage = () => {
     useAuthenticated()
-    
+    const {userAddressData, status} = useUserAddressData()
+    const {showBoundary} = useErrorBoundary()
     const addressStorageName = 'user_address'
-    const navigate = useNavigate()
-    const regexSearchInt = /^\d+$/
     const [error, setError] = useStore('error')
     const [message, setMessage] = useStore('message')
     
@@ -52,7 +54,6 @@ const PaymentPage = () => {
         pay_pal : false,
     })    
 
-    // console.log("got User Payment Data", data)
     const [enteredInputIsInvalid, setEnteredInputIsInvalid] = useState(inputPaymentValidList)
 
     const [stateList, setStateList] = useState([]) 
@@ -78,6 +79,7 @@ const PaymentPage = () => {
     })
     const [errors, setErrors] = useState({
         userAddress: {},
+        paymentIssue: {}
     })
     
     const paymentCurrency = getLocalStorageItem(currencyType)
@@ -91,10 +93,13 @@ const PaymentPage = () => {
         )
     )}
     
-    function updateErrors(identifier, value){
+    function updateUserAddressErrors(identifier, value){
         setErrors((prevState) => ({
-            ...prevState,
-            [identifier]: value
+                ...prevState,
+                userAddress: {
+                    ...prevState.userAddress,
+                    [identifier]: value
+                }
             }
         )
     )}
@@ -106,11 +111,12 @@ const PaymentPage = () => {
     , [countryid])
     
     const getCity = useCallback(
-        () => GetCity(countryid, Number(userData?.userAddress.reactStateNr)).then((result) => {
+        () => GetCity(countryid, Number(enteredInput?.city_id)).then((result) => {
+            console.log("Payment page cityList", result)
             setCityList(result)
         }) 
-    ,[countryid, userData?.userAddress.reactStateNr])
-
+    ,[countryid, enteredInput?.city_id])
+    console.log("got CityID", userData?.userAddress)
     function updateEnteredInputState(identifier, value){
         setEnteredInput((prevValues) => {
             return {
@@ -121,64 +127,55 @@ const PaymentPage = () => {
     }
 
     useEffect(() => {
-        dataProvider.getUserDataForPayment('/api/v1/order/payment')
-        .then((response) => {
-            console.log("shit",response)
-            ApiData(response)
-
+        if(userAddressData?.user){
+            Object.entries(userAddressData?.user).map(([k,v]) => updateEnteredInputState(k, v))
             updateEnteredInputState('country', 'NL')
-            // updateEnteredInputState('country', 'NL')
+            ApiDataToStorage(userAddressData) // response
 
-            if(response.user){
-                Object.entries(response.user).map(([k,v]) => updateEnteredInputState(k, v))
+            if(userAddressData?.address){
+                if(userAddressData?.address.length != 0){ // check if not a empty array
+                    Object.entries(userAddressData?.address).map(([k,v]) => updateEnteredInputState(k, v))
+                }
             }
+            
+            getState()
+            getCity()
+        }
 
-            if(response?.address.length != 0){
-                getState()
-                getCity()
-            }
-            //     const { id, firstAndLastName, email, unitNumber, reactStateNr, reactCityNr, ...deconstructLoadedUserData} = response?.address 
+        //     const { id, firstAndLastName, email, unitNumber, state_id, ciiy_id, ...deconstructLoadedUserData} = response?.address 
+            
+        //     for (const [key, value] of Object.entries(deconstructLoadedUserData)) {
                 
-            //     for (const [key, value] of Object.entries(deconstructLoadedUserData)) {
-                    
-            //         if(key === 'addressLine'){                    
-            //             value === "" && setInvalidTypeStatus(key, true)
-            //             continue
-            //         }
-    
-            //         if(key === 'streetNumber'){            
-            //             // console.log({strNmber: key, value})        
-            //             !regexSearchInt.test(value) && setInvalidTypeStatus(key, true)
-            //             continue
-            //         }
-    
-            //         if(!value){
-            //             setInvalidTypeStatus(key, true)
-            //         }
-            //     }
-            // }
-        }).catch(error => {
-            // setLocalStorageItem('message',"We couldn't verify you if you still here, please try loggin again")
-            // setLocalStorageItem('error',true)
-            console.log("shit",error)
-            // inMemoryJwt.ereaseToken()
-            // if(error.code === 401 && error.message === 'Invalid JWT Token'){
-            //     setMessage("We couldn't verify you if you still here, please try loggin again")
-            //     setError(true)
-            //     navigate('/')
-            // }
-        })
-        
-        
+        //         if(key === 'addressLine'){                    
+        //             value === "" && setInvalidTypeStatus(key, true)
+        //             continue
+        //         }
 
+        //         if(key === 'streetNumber'){            
+        //             // console.log({strNmber: key, value})        
+        //             !regexSearchInt.test(value) && setInvalidTypeStatus(key, true)
+        //             continue
+        //         }
+
+        //         if(!value){
+        //             setInvalidTypeStatus(key, true)
+        //         }
+        //     }
+        // }
         
-        
-    }, [userData?.userAddress.reactStateNr])
+    }, [userAddressData?.user?.email])
+
+    console.log("userAddressData", userAddressData)
 
     useEffect(() => {
         setLocalStorageItem(addressStorageName,enteredInput)
     }
     ,[enteredInput])
+
+    useEffect(() => {
+        setLocalStorageItem(addressStorageName,userData.userAddress)
+    }
+    ,[userData])
 
     const scrollSmoothHandler = (invalidKey) => {
         console.log({invalidKeyPayment: invalidKey})
@@ -249,9 +246,8 @@ const PaymentPage = () => {
         ]
     }
     
-    const ApiData = useCallback(
+    const ApiDataToStorage = useCallback(
          (response) => {
-            // const response = data
             console.log("got data", response)
             if(!response?.lines){
                 console.log({ apiResponseError : response})
@@ -262,17 +258,19 @@ const PaymentPage = () => {
 
             setStorageUserSelectedSubscription(jsonToObj)
 
+            // useffect will load remain data
             updateUserData('userInfo', {...response?.user})
+            console.log("userData Address", response?.address)
             updateUserData('userAddress', {...response?.address}) //organizationName' : 'none' ,
             updateUserData('userOrder', 
                 {
-                    // orderId: response?.orderId,
                     currency: response?.currency,
                     lines: response?.lines,
                     orderTaxPrice: response?.orderTaxPrice,
                     orderTotalAmount: response?.amount.value,
                     orderTotalProductPrice: response?.orderTotalProductPrice,
                 })
+
 
             setLocalStorageItem('amount',response?.amount)
             setLocalStorageItem('locale',response?.locale)
@@ -290,7 +288,6 @@ const PaymentPage = () => {
     const closeUserAddressModalHandler = () =>  { 
             console.log({ButtonHit: 'close'})
             setDialogOpen(false)
-            // dialogUserAddress.current.open()
         }
 
     const userPaymentMethodModalHandler = () =>  { 
@@ -300,20 +297,18 @@ const PaymentPage = () => {
     const closeUserPaymentMethodModalHandler = () =>  { 
         console.log({ButtonHit: 'close'})
         setDialogOpenPaymentMethod(false)
-        // dialogUserAddress.current.open()
-    }
-
-    const paymentMethodModalHandler = () => {
-        setDialogOpenPaymentMethod(true)
     }
 
     const payOrderHandler = async (event) => {
         event.preventDefault()
-        
-        const mollieOrder = JSON.parse(localStorage.getItem(addressStorageName))
-        // const checkInvalidInput = findInvalidOrErrorInput(enteredInputIsInvalid, errors.userAddress)         
+        console.log("EnteredInputPayment", event)
+
+        userAddressHandler(event)
+        return
+        const mollieOrder = JSON.parse(localStorage.getItem(addressStorageName))       
         const checkInvalidInput = findAndUpdateInvalidList(mollieOrder, setEnteredInputIsInvalid)         
         console.log({whatEntered: checkInvalidInput, enteredInput})
+        console.log({mollieOrder: mollieOrder})
 
         if(checkInvalidInput.bool){
             console.log({whyNot: checkInvalidInput})
@@ -326,10 +321,10 @@ const PaymentPage = () => {
         const orderNumber = JSON.parse(localStorage.getItem('order_number'))
         const locale = JSON.parse(localStorage.getItem('locale'))
         const description = JSON.parse(localStorage.getItem('description'))
-        let splitFullName = mollieOrder.firstAndLastName
+        let splitFullName = enteredInput.firstAndLastName
         const userNameArray = splitFullName.split(" ")
-        const streetAndNumber = mollieOrder.addressLine + ' ' + mollieOrder.streetNumber
-        const addintionalNumber = mollieOrder.unitNumber
+        const streetAndNumber = enteredInput.addressLine + ' ' + enteredInput.streetNumber
+        const addintionalNumber = enteredInput.unitNumber
         const subscription = lines.find((line) => line.productDetails.subscriptionDetails.subscriptionTimeUnit === "month")
         const { productDetails } = subscription
         const { subscriptionDetails } = productDetails
@@ -341,12 +336,12 @@ const PaymentPage = () => {
             organizationName: '', // set gender check
             streetAndNumber : streetAndNumber.trim(),
             streetAdditional : addintionalNumber,
-            postalCode : mollieOrder.postalCode,
-            email : mollieOrder.email,
-            phone : mollieOrder.phoneNumber,
-            city : mollieOrder.city,
-            region : mollieOrder.state,
-            country : mollieOrder.country,
+            postalCode : enteredInput.postalCode,
+            email : enteredInput.email,
+            phone : enteredInput.phoneNumber,
+            city : enteredInput.city,
+            region : enteredInput.state ?? null,
+            country : enteredInput.country,
         }
 
         const confirmUserOrder = {
@@ -354,19 +349,19 @@ const PaymentPage = () => {
             amount: amount,
             order_id: orderNumber.toString(),
             redirectUrl: 'http://localhost:5173/dashboard', // set user dashbpoard {id}
-            webhookUrl: 'https://5b4d-95-96-151-55.ngrok-free.app',
+            webhookUrl: 'https://9fed-95-96-151-55.ngrok-free.app',
             billingAddress: billingAddress,
             shippingAddress: billingAddress,
             metadata: { order_id : orderNumber.toString()},
             locale: locale,
-            method: mollieOrder.paymentMethodId,
+            method: enteredInput.paymentMethodId,
             lines: lines.map((line) => {
                 delete line.productDetails
                 return line
             }) ,
             subscriptionDetail: subscriptionDetails,
             sequenceType: '',
-            iban: mollieOrder.iban
+            iban: enteredInput.iban ?? null
         }
 
         const paymentOption = { url: '/api/v1/payment', method: 'POST'}
@@ -378,7 +373,6 @@ const PaymentPage = () => {
         
             if(!payResponse?.ok)
             {   //if(response?.status >= 400 && response?.status <= 600)
-                // const errorJson = await response?.json()
                 throw {message: 'Api error send order address error!', errors: getPayResults}
             }
 
@@ -386,8 +380,55 @@ const PaymentPage = () => {
             window.location.replace(redirectIDeal) // external website
 
         } catch (error) {
-            
             console.log({API_payOrder:error})
+            for (const [key, value] of Object.entries(error.errors.errors)){
+
+                if(key === "errors") return
+
+                let keyError = String(key)
+                if(keyError.includes(".")){
+                    const splitKey = keyError.split(".")
+                    keyError = splitKey[1]
+                    console.log("got Property Error Key", keyError)
+                }
+
+                if(keyError.includes("givenName") || keyError.includes("familyName")){
+                    keyError = "firstAndLastName"
+                }
+                
+                if(keyError.includes("city")) {
+                    keyError = "reactCityNr"
+                }
+                
+                if(keyError.includes("streetAndNumber")) {
+                    keyError = "address_line"
+                }
+
+                if(keyError.includes("phone")) {
+                    keyError = "phoneNumber"
+                }
+
+                if(keyError.includes("region")){
+                    keyError = "reactStateNr"
+                }
+
+                if(keyError.includes("method")) {
+                    keyError = "paymentMethodId"
+                    setErrors(prevValues => ({
+                        ...prevValues,
+                        [keyError]: value
+                    }))
+                    continue
+                }
+
+                setErrors(prevValues => ({
+                    ...prevValues,
+                    userAddress: {
+                        ...prevValues.userAddress,
+                        [keyError]: value
+                    }
+                }))
+            }
 
         }
     }
@@ -406,64 +447,42 @@ const PaymentPage = () => {
 
         let userAddressInfo = prepareInputForRequest(enteredInput, setEnteredInputIsInvalid, enteredInput.cityId, ctxValue.availableCities, enteredInput.stateId, ctxValue.availableStates)
         
-        userAddressInfo = { ...userAddressInfo, ['location']: enteredInput.city}
-        userAddressInfo = { ...userAddressInfo, ['region']: enteredInput.state}
-        userAddressInfo = { ...userAddressInfo, ['reactStateNr']: ctxValue.currentUserState.toString()}
-        userAddressInfo = { ...userAddressInfo, ['reactCityNr']: ctxValue.currentUserCity.toString()}
+        userAddressInfo = { ...userAddressInfo, 
+            ['city']: enteredInput.city, 
+            ['region']: enteredInput.state ?? "",
+            ['unitNumber']: enteredInput.unitNumber ?? null,
+            ['reactStateNr']: String(enteredInput.state_id), 
+            ['reactCityNr']: String(enteredInput.city_id),
+            ['streetNumber']:  Number(enteredInput.streetNumber)
+        }
         
         const options = { url: '/api/v1/order/address', method: 'POST'}
         const ApiUserAddressOptions = ApiFetchPostOptions(options, userAddressInfo, {'X-Authorization': token})            
-        
+        console.log(":hallo")
         try {
             const response = await ApiFetch(ApiUserAddressOptions)
-            const getResults = await response?.json()
-            
+            const getResults = await response.json()
+
             if(!response?.ok)
-            {   //if(response?.status >= 400 && response?.status <= 600)
-                // const errorJson = await response?.json()
-                throw {message: 'Api error send order address error!', errors: getResults.errors}                
+            { 
+                const errorResponse = Object.keys(getResults.errors).map((key) => [key, getResults.errors[key]])
+
+                if(errorResponse.length > 0){
+                    throw {body: {...getResults.errors }}
+                }
+                throw new HttpError("error handling failed", response.status)             
             }
+            
+            setErrors({userAddress: {}})
 
         } catch (error) {
-            
-            if(Array.isArray(error.errors) && (error.errors.length > 1))
-            {
-                let collectErrors = [];
-
-                error.errors.map((error) => {
-                    collectErrors[error.property] = error.message
-                })
-
-                updateErrors('userAddress', collectErrors)
-
-            } else if(Array.isArray(error.errors) && (error.errors.length == 1) ){
-
-                let arrayProperties = error.errors[0].property
-
-                if (Array.isArray(arrayProperties)) arrayProperties = arrayProperties[0]
-
-                const messageError = error.errors[0].message
-                
-                updateErrors('userAddress', {[arrayProperties]: messageError})
-
-            } else {
-                
-                if(error.errors?.property instanceof Array){
-                    let arrayProperties = error.errors.property
-                    
-                    if (Array.isArray(arrayProperties)) arrayProperties = arrayProperties[0]
-                    
-                    const messageError = error.errors.message
-                    
-                    updateErrors('userAddress', {[arrayProperties]: messageError})
-                }
-
-        //         console.log({unHandledError: error})
-            }
+            console.log({"got invalid auth":error})
+            const errorHandled = errorHandlerPaymentUserAddressRequest(error, updateUserAddressErrors)
+            if(!errorHandled) showBoundary(error)                   
         }
     }
   
-
+    console.log("got new Errors", errors)
     const handleUserSelectLocation = (identifier, event) => {
 
         console.log({ errorsLength: errors.userAddress.length, errors: errors.userAddress})
@@ -486,14 +505,18 @@ const PaymentPage = () => {
             
         if(identifier === 'city')
             {
-                const city = cityList.find((city) => city.id == Number(event))
-                updateEnteredInputState('city_id', city.id)
-                updateEnteredInputState(identifier, city.name)
+                updateEnteredInputState('city', event)
+                // set no return so both city and city_id will be handled by default / last method
+            }
+
+        if(identifier === 'city_id')
+            {
+                updateEnteredInputState('city_id', event)
                 checkLocationStatus('location')
                 
                 setInvalidTypeStatus(identifier, false)
                 setInvalidTypeStatus('city_id', false)
-                return
+                // set no return so both city and city_id will be handled by default / last method
             }
     
         if(identifier === 'streetNumber')
@@ -541,31 +564,28 @@ const PaymentPage = () => {
     }
 
     const ctxValue = {
-    //     availableStates: stateList,
-    //     availableCities: cityList,
-        currentUserState: enteredInput.state_id,
-        currentUserCity: enteredInput.city_id,
+        currentUserState: enteredInput.state_id, // leave to check if there is undefined in LabelUserInfoField componenet, there is a check inside for this
+        currentUserCity: enteredInput.city_id, // leave to check if there is undefined in LabelUserInfoField componenet, there is a check inside for this
         updateUserInput: handleUserSelectLocation,
         onBlur: inputBlurHandle,
     }
 
-    console.log({dialogState:dialogOpen})
-    // console.log({enteredInputIsInvalid, enteredInput, got_user: userData?.userInfo})
-    return (
+    console.log("error payment",errors)
+
+    return(
         <>     
             <MainNavigation />
-            <OrderContext.Provider value={ctxValue}>
+            <OrderContext.Provider value={ctxValue}>                    
+               
                 <UserDataModal 
-                    // ref={dialogOpen} 
                     dialog={dialogOpen}
                     closeDialog={closeUserAddressModalHandler} 
-                    // ref={dialogUserAddress} 
+                    errors={errors.userAddress} 
                     enteredInput={enteredInput} 
                     formSubmit={userAddressHandler} 
                     handleKeyDown={handleKeyDown}
                     enteredInputIsInvalid={enteredInputIsInvalid}
-                    errors={errors.userAddress}
-                />
+                />                 
 
                 <UserChoosePaymentModal dialog={dialogOpenPaymentMethod} closeDialog={closeUserPaymentMethodModalHandler} paymentMethodOptions={paymentMethodOptions} />
 
@@ -583,7 +603,7 @@ const PaymentPage = () => {
 
                     <h1 ref={pushRef} className={`pt-3 pb-6 mt-8 text-2xl text-center`} >Choose Payment Method</h1>
                     <UserSelectPaymentMethodForm
-                        errorClass={`${!enteredInput.paymentMethodId && 'border-red-300'}`}
+                        errorClass={`${!enteredInput.paymentMethodId && 'border-red-300'} ${errors.method && 'border-red-300'}`}
                         symbol={enteredInput.paymentMethodId}
                         paymentMethodModalHandler={userPaymentMethodModalHandler}
                         selectedType={enteredInput.paymentMethodName}
@@ -624,5 +644,3 @@ const PaymentPage = () => {
         </>
     )
 }
-
-export default PaymentPage

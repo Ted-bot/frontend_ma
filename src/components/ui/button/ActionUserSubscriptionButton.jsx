@@ -25,11 +25,7 @@ const ActionUserSubscriptionButton = ({params, rowId, setRowId}) => {
         })
     }
 
-    // useEffect(() => {
-    //     params.id === rowId && alert(`If you want to cancell ${params.row.col1} \n proceed with the cancel button`)
-    // }, [rowId])
-
-    // console.log({params: params, rowId:rowId})
+    console.log({params: params, rowId:rowId})
     return(
         <Box
             sx={{ m:1, position: 'relative' }}

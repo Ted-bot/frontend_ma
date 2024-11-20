@@ -27,7 +27,8 @@ export default function LabelNameInput({
     onChange,
     onBlur,
     onChangeState,
-    onChangeCity
+    onChangeCity,
+    onChangeCityId,
 }) {
     let checkBox = 0    
     const lowerCaseName = camelCaseToLoWithSpace(name)
@@ -53,7 +54,7 @@ export default function LabelNameInput({
                 <label className={`w-full tracking-wide text-gray-700 text-xs font-bold mb-2`}>
                     <section className='mt-5'>
                     {
-                        (type === 'text' || type === 'password' ) ?  //&& type != 'location'
+                        (type === 'text' || type === 'password' || type === 'number' ) ?  //&& type != 'location'
                             <section >
                                 {/* ${error && 'border-red-500'}  */}
                             <TextField
@@ -122,6 +123,7 @@ export default function LabelNameInput({
                                     errorMessage={error} 
                                     onChangeState={onChangeState}
                                     onChangeCity={onChangeCity}
+                                    onChangeCityId={onChangeCityId}
                                     cityError={cityError}
                                     stateError={stateError}
                                 />

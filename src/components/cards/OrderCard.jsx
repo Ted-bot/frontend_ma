@@ -49,7 +49,7 @@ export default function OrderCard({
                 setMessage(messageError)
                 setError(true)
 
-                navigate("/sign-up", {replace: true}) 
+                // navigate("/sign-up", {replace: true}) 
                 
                 // setErrors((prevValues) => {
                 //     return {

@@ -1,5 +1,6 @@
 import { GetState } from "react-country-state-city/dist/cjs"
 import { countryid } from "../../../js/util/auth"
+import { isObject } from "@mui/x-data-grid/internals"
 
 export const getStates = async () => {return await GetState(countryid)}
 
@@ -104,7 +105,7 @@ export function errorPayloadHandler(error, showErrors){
 
 export function errorHandlerPostRequest(error, showErrors){
     const ifArrayErrors = error?.body
-    console.log("Got error body", ifArrayErrors)
+    console.log("Got error body", error)
     if(Array.isArray(ifArrayErrors) && (ifArrayErrors.length > 1))
     {
         console.log('{cameIn: 1}', ifArrayErrors)
@@ -140,5 +141,48 @@ export function errorHandlerPostRequest(error, showErrors){
             console.error('UnHandled Error', error)
             return false
         }
+    }
+}
+
+export function errorHandlerPaymentUserAddressRequest(error, showErrors){
+    const ifArrayErrors = error?.body ?? error?.errors
+    console.log("what you got", error, !isObject(ifArrayErrors))
+
+    if(!isObject(ifArrayErrors) === true && !Array.isArray(ifArrayErrors)) return false
+
+    const countErrors = Object.keys(ifArrayErrors).map((key) => [key, ifArrayErrors[key]])
+    // console.log("Got error body", error)
+    console.log("Got error body", countErrors.length)
+    if(isObject(ifArrayErrors))
+        {
+            console.log('{cameIn: 0}', ifArrayErrors)
+    
+            for (const [key, value] of Object.entries(ifArrayErrors)){
+                // console.log("Got data kankerzooi", {key,value})
+                showErrors(key,value)
+            }
+            return true
+            
+    } else if(Array.isArray(ifArrayErrors) && (countErrors.length > 1))
+    {
+        console.log('{cameIn: 1}', ifArrayErrors)
+
+        for (const [key, value] of Object.entries(ifArrayErrors)){
+            // console.log("Got data kankerzooi", {key,value})
+            showErrors(key,value)
+        }
+        return true
+        
+    } else if(countErrors?.length === 1){
+
+        console.log('{cameIn: 2}', ifArrayErrors)
+
+        for (const [key, value] of Object.entries(ifArrayErrors)){
+            showErrors(key,value) 
+        }
+        return true
+    } else {     
+        console.error('UnHandled Error', error)
+        return false
     }
 }

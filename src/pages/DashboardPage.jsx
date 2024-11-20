@@ -18,33 +18,33 @@ import CalendarPage from './CalendarPage'
 import SignUpPage from './SignUpPage.jsx'
 import { useTabsContext } from '../store/tabs-context.jsx'
 import { NotificationTabInterface } from '../components/interface/settings/NotificationTabInterface.jsx'
-import PaymentPage from './client/PaymentPage.jsx'
+import {PaymentPage} from './client/PaymentPage.jsx'
 import { deepmerge } from '@mui/utils'
 import merge from "lodash/merge"
 import createPalette from '@mui/material/styles/createPalette.js'
 
-const palette = createPalette(
-    merge({}, defaultTheme.palette, {
-      primary: {
-        main: "#ff0266", // Not far from red
-      },
-      secondary: {
-        main: "#00ba00", // Not far from green
-      },
-    })
-  )
+// const palette = createPalette(
+//     merge({}, defaultTheme.palette, {
+//       primary: {
+//         main: "#ff0266", // Not far from red
+//       },
+//       secondary: {
+//         main: "#00ba00", // Not far from green
+//       },
+//     })
+//   )
 
-const typography = {
-    fontFamilySecondary: "'Poppins', sans-serif",
-    fontFamily: '"Comic Neue", cursive',
-    fontSize: 16, // Should be a number in pixels
-    fontStyle: "normal",
-    fontWeightLight: 400,
-    fontWeightRegular: 500,
-    fontWeightMedium: 600,
-    fontWeightBold: 700,
-    color: palette.text.primary,
-}
+// const typography = {
+//     fontFamilySecondary: "'Poppins', sans-serif",
+//     fontFamily: '"Comic Neue", cursive',
+//     fontSize: 16, // Should be a number in pixels
+//     fontStyle: "normal",
+//     fontWeightLight: 400,
+//     fontWeightRegular: 500,
+//     fontWeightMedium: 600,
+//     fontWeightBold: 700,
+//     color: palette.text.primary,
+// }
 
 const myTheme = {
         ...defaultLightTheme,
@@ -128,7 +128,7 @@ const myTheme = {
             MuiButtonBase : {
                 styleOverrides: {
                     root: {
-                        color: 'white',
+                        // color: 'white', // note: logout button will be effected
                         '&[aria-selected=true]' : {
                             backgroundColor: '#ff9958',
                             color: '#ffd400',
@@ -147,6 +147,13 @@ const myTheme = {
                     },
                 },
             }, //
+            MuiList : {
+                styleOverrides: {
+                    root: {
+                        // background: 'linear-gradient(160deg, #E50000, #ab0926 )',
+                    }
+                }
+            },
             RaMenuItemLink: {
                 styleOverrides: {
                     root: {
@@ -170,6 +177,20 @@ const myTheme = {
                         },
                     },
                 },
+            },
+            MuiMenu: {
+                styleOverrides: {
+                    root: {
+                        color: 'black',
+                        '& .css-gkufyl-MuiPaper-root-MuiPopover-paper-MuiMenu-paper' : {
+                            background: '#fafafb',
+                        },
+                        '& .css-19zhhkc-MuiButtonBase-root-MuiMenuItem-root' : {
+                            color: 'black'
+                            
+                        }
+                    }
+                }
             },
             MuiTableBody: {
                 styleOverrides: {

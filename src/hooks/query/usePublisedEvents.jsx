@@ -55,7 +55,7 @@ export const fetchPublicCalendar = async () => {
 
     console.log('pulicEventsCalendar', response)
 
-    const blackDragonEvents = response['hydra:member'].map((response) => ({
+    const publicBlackDragonEvents = response['hydra:member'].map((response) => ({
         id: response.id,
         title: response.title,
         start: new Date(response.startDate),
@@ -63,7 +63,7 @@ export const fetchPublicCalendar = async () => {
         resource: response.description,
     }))
 
-    return {blackDragonEvents: blackDragonEvents}
+    return {publicCalendar: publicBlackDragonEvents}
 }
 
 export const usePublicCalendar = () => {

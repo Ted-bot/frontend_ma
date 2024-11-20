@@ -30,6 +30,8 @@ export async function ApiFetch(data){
     const url = data.url
     delete data.url
     const res = await fetch(url, data)
+    
+    // if(!res.ok) throw new Error("Not able to get your request, please try refresh")
 
     return res
 }
@@ -215,28 +217,11 @@ export function prepareInputForRequest(enteredInput, setEnteredInputIsInvalid, c
     let newObj = {}
     for (const [key, value] of Object.entries(enteredInput))
     {
-        let newValue = value
-        
-        if(key === 'location'){
-            const city = availableCities.find((city) => city.id == Number(cityId) )
-            //if city not found ?? set invalid input field
-            if(value == '' || value == undefined){
-                setEnteredInputIsInvalid((prevValues) => ({
-                    ...prevValues,
-                    [key] : true})
-                )
-                return
-            }
-    
-            cityName = city.name
-            newValue = cityName
-        }
-
-        const avoid_keys = ["id","country", "country", "countryId", "paymentMethodId", "state_id", "state", "unitNumber", "city_id", "paymentMethodName"]
+        const avoid_keys = ["id", "country", "countryId", "paymentMethodId", "state_id", "state", "city_id", "paymentMethodName"]
 
         if(avoid_keys.includes(key)) continue
 
-        newObj = { ...newObj, [key]: newValue}
+        newObj = { ...newObj, [key]: value}
     }    
 
     return newObj

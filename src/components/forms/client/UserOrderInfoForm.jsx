@@ -13,7 +13,7 @@ const UserOrderInfoForm = ({userAddressModalHandler, enteredInput, user, errorCl
                     <section className="grow-0 px-6 content-center"><IconUserLocation /></section>
                     <section className="grow flex-col">
                         <section className="text-clip overflow-hidden">{enteredInput.addressLine ?? address?.addressLine} {enteredInput.streetNumber ?? address?.streetNumber} {enteredInput.unitNumber ?? address?.unitNumber}</section>
-                        <section>{enteredInput.postalCode ?? address?.postalCode} {user.city}</section>
+                        <section>{enteredInput.postalCode ?? address?.postalCode} {enteredInput?.city ?? (address.city ? user.city : "")}</section>
                         <section>{enteredInput.firstAndLastName ?? user.firstAndLastName}</section>
                         <section>{enteredInput.phoneNumber ?? user.phoneNumber}</section>
                     </section>

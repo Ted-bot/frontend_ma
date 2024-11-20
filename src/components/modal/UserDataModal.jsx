@@ -4,21 +4,40 @@ import { Form } from 'react-router-dom'
 
 import Divider from '@mui/material/Divider'
 import { alpha } from "@mui/material"
+import Dialog from '@mui/material/Dialog'
+
 import {OrderContext} from '../../store/shop-order-context.js'
 import UserOrderInfoInterface from '../interface/UserOrderInfoInterface'
-import Dialog from '@mui/material/Dialog'
+
 import './CalendarModal.css'
 
-const UserDataModal = function UserDataModal({ closeDialog,handleKeyDown,errors, enteredInput, enteredInputIsInvalid, formSubmit, dialog}){
+import { styled} from '@mui/system'
+
+const DialogComponent = styled('div',{
+  name: 'CustomDialog',
+  slot: 'Root',
+  overridesResolver: (props, styles) => [
+    styles.root,
+    props.color === 'primary' && styles.primary,
+    props.color === 'secondary' && styles.secondary,
+  ],
+})(({ theme }) => ({
+  display: "flex",
+  color: 'white',
+  background: 'rgba(0 0 0 / 0.5)',
+  borderRadius: '5px',
+}))
+
+
+export const UserDataModal = ({updateUserAddressEnteredInputState,  closeDialog, handleKeyDown, errors, enteredInput, enteredInputIsInvalid, formSubmit, dialog}) => {
     
     const {updateUserInput, onBlur} = useContext(OrderContext)
     const typeLocation = 'location'
     const typeText = 'text'
     const typeFirstAndLastName = 'firstAndLastName'
-    const typeMixed = 'mixed'    
-
+    const typeMixed = 'mixed'      
     
-    
+    console.log("ModalEnteredInput", enteredInput)
     
     const userForm = {
         name: 'Personal Information',
@@ -30,7 +49,7 @@ const UserDataModal = function UserDataModal({ closeDialog,handleKeyDown,errors,
                 placeholder: 'type first and last name', 
                 value: enteredInput?.firstAndLastName,
                 invalid: enteredInputIsInvalid.firstAndLastName, 
-                error: errors?.first_and_last_name, 
+                error: errors?.firstAndLastName, 
                 required : true, 
                 onChange: (e) => updateUserInput('firstAndLastName', e), 
                 onBlur: (e) => onBlur('firstAndLastName', e, typeFirstAndLastName)
@@ -51,19 +70,20 @@ const UserDataModal = function UserDataModal({ closeDialog,handleKeyDown,errors,
             {
                 name: 'Phone Number', 
                 id: 'phoneNumber', 
-                type: 'tel', 
+                type: 'tel',
                 placeholder: 'type in phone number', 
                 value: enteredInput?.phoneNumber,
                 invalid: enteredInputIsInvalid.phoneNumber, 
-                error: errors?.phone_number, 
+                error: errors?.phoneNumber, 
                 required : true, 
                 onChange: (e) => updateUserInput('phoneNumber', e), 
                 onBlur: (e) => onBlur('phoneNumber', e, 'tel')
             },
         ],
     }
+
     
-    console.log("work with", enteredInput)
+    console.log("Got fucking Number", errors?.streetNumber,)
     const addressForm = {
         name: 'Address',
         fields : [
@@ -74,7 +94,7 @@ const UserDataModal = function UserDataModal({ closeDialog,handleKeyDown,errors,
                 placeholder: 'unit number',
                 value: enteredInput?.unitNumber,
                 invalid: enteredInputIsInvalid.unitNumber,
-                error: errors?.unit_number,
+                error: errors?.unitNumber,
                 onChange: (e) => updateUserInput('unitNumber', e),
                 onBlur: (e) => onBlur('unitNumber', e, typeText)},
             {
@@ -85,7 +105,7 @@ const UserDataModal = function UserDataModal({ closeDialog,handleKeyDown,errors,
                 min: 0, 
                 value: enteredInput?.streetNumber,
                 invalid: enteredInputIsInvalid.streetNumber,
-                error: errors?.street_number,
+                error: errors?.streetNumber,
                 required : true,
                 onChange: (e) => updateUserInput('streetNumber', e),
                 onBlur: (e) => onBlur('streetNumber', e, 'number')},
@@ -116,16 +136,17 @@ const UserDataModal = function UserDataModal({ closeDialog,handleKeyDown,errors,
                 name: 'Location',
                 id: typeLocation,
                 error: errors?.location,
-                cityId: enteredInput.city_id,
-                stateId: enteredInput.state_id,
+                cityId: enteredInput?.city_id,
+                stateId: enteredInput?.state_id,
                 errorRegion: errors?.region,
-                stateError: errors?.state_id, 
-                cityError: errors?.city_id,
+                stateError: errors?.reactStateNr, 
+                cityError: errors?.reactCityNr,
                 type: typeLocation, 
                 invalid: enteredInputIsInvalid.city,
                 required: true,
                 onChangeState: e => updateUserInput('state_id',e),
-                onChangeCity: e => updateUserInput('city_id',e),
+                onChangeCityId: e => updateUserInput('city_id',e),
+                onChangeCity: e => updateUserInput('city',e),
                 // onChange: (e) => updateUserInput('city', e),
                 onBlur : (e) => onBlur('city_id', e, typeLocation)
             },
@@ -143,21 +164,21 @@ const UserDataModal = function UserDataModal({ closeDialog,handleKeyDown,errors,
             sx={{ backdropFilter: "blur(5px) sepia(5%)", }} 
             PaperProps={{ sx: { borderRadius: "20px" } }}
         > 
-            <section className='rounded-md'>
-                <section className='max-w-prose mb-4'>
-                    <form
-                        method="dialog" 
-                        className="flex w-4 m-6 float-right justify-end z-10"
-                    >
-                        <button onClick={submitHandler} className='px-2 rounded-md hover:border-2 hover:border-rose-500 hover:bg-rose-300'>X</button>
-                    </form>
-                </section>
-                <br />
+            <DialogComponent>
+                
                 <Form
                     onSubmit={(e) => formSubmit(e)}
                     name='address'
                     id='address'
+                    className='w-full'
                 >
+                     <section className='flex float-end translate-y-4 z-10'>
+                        <form  method="dialog" 
+                            className="flex w-4 m-6 float-right justify-end"
+                        >
+                            <button onClick={submitHandler} className='px-2 rounded-md hover:border-2 hover:border-rose-500 hover:bg-rose-300'>X</button>
+                        </form>
+                    </section>
                     <section className='mt-4'>
                         <h1 className={`flex w-full justify-center pt-3 pb-6 text-2xl`}>{userForm?.name}</h1>
                         {userForm && <UserOrderInfoInterface array={userForm.fields} handleKeyDown={handleKeyDown} />}
@@ -175,9 +196,8 @@ const UserDataModal = function UserDataModal({ closeDialog,handleKeyDown,errors,
                         </button>
                     </section>
                 </Form>
-            </section>
+               
+            </DialogComponent>
         </Dialog>
     )
 }
-
-export default UserDataModal

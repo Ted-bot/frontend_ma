@@ -1,8 +1,7 @@
+import React from "react"
 export const FallBackRender = ({error, resetErrorBoundary}) => {
 
-    console.log({caughtErrorboundray: error})
-
-    function messagebasedOneStatus(status){
+    const messagebasedOneStatus = (status) => {
         if(status >= 500) return "Our apology seems like something went wrong from our side! Please try reloading the Page"
         if(status < 500) return "Oeps! seems like we cant handle your request! Please try reloading the Page"
         return "We have an issue that occured, please try and refresh!"
@@ -10,7 +9,7 @@ export const FallBackRender = ({error, resetErrorBoundary}) => {
 
     const messageToUser = messagebasedOneStatus(error.status)
 
-    console.log({doIgetREsponse: messageToUser})
+    console.log({doIgetREsponse: messageToUser, message: error.message, status: error.status})
     return (
         <>
             <section className="min-h-screen flex items-center justify-center">

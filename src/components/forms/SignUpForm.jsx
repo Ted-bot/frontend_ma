@@ -28,7 +28,7 @@ const typeDate = 'date'
 const typeCheckBox = 'checkbox'
 const typeLocation = 'location'
 
-// ps mace@email.com pw:7k_b3N&8@@*!
+// ps mace@email.com pw: 7k_b3N&8@@*!
 // ps reset pw:84N@^7ad8sh
 // ps reset pw:TNrh5vrZ4N201n2
 // ps reset pw:GivjJD4guFwQhzv
@@ -38,8 +38,6 @@ export default function SignUpForm({storageNameNewUser, userStoredFormData}) {
     const navigate = useNavigate()
     const navigation = useNavigation()
     const {showBoundary} = useErrorBoundary()
-    
-    // const {state, dispatch} = useUserFormContext()
     
     let isSubmitting = navigation.state === 'submitting'
     
@@ -100,7 +98,7 @@ export default function SignUpForm({storageNameNewUser, userStoredFormData}) {
             { name: 'PhoneNumber', id: 'phone_number', type: typePhone, placeholder: 'phone number', value: enteredInput?.phone_number, error: errors.phone_number, invalid: enteredInputIsInvalid.phone_number, required:true, onChange: (value) => handleGeneralUserInput('phone_number', value), onBlur : (e) => inputBlurHandle('phone_number', e.target.value, setEnteredInputIsInvalid)},
             { name: 'Password', id: 'password', type: typePassword, placeholder: 'passord', error: errors.password, invalid: enteredInputIsInvalid.password,autoComplete: 'current-password', required: true, onBlur : (e) => inputBlurHandle('password', e.target.value, setEnteredInputIsInvalid)}, // , onChange: (e) => handleUserPassword('password', e.target.value)
             { name: 'Location', id: 'location', type: typeLocation, cityId: enteredInput?.city_id, stateId: enteredInput?.state_id, stateError: errors?.state_id, cityError: errors?.city_id ?? errors?.location, invalid: enteredInputIsInvalid.city,
-                required:true , onChangeState: (e) => handleUserLocationInput('state', e),onChangeCity: (e) => handleUserLocationInput('city', e), onBlur : (e) => inputBlurHandle('city', e.target.value, setEnteredInputIsInvalid)},
+                required:true , onChangeState: (e) => handleUserLocationInput('state', e),onChangeCity: (e) => handleUserLocationInput('city', e),onChangeCityId: (e) => handleUserLocationInput('city_id', e), onBlur : (e) => inputBlurHandle('city', e.target.value, setEnteredInputIsInvalid)},
         ] // onChangeState: (e) => handleStatelUserInput('state', e.target.value), 
     }
 
@@ -147,7 +145,9 @@ export default function SignUpForm({storageNameNewUser, userStoredFormData}) {
             password: e?.target[14].value,
             phone_number: e?.target[12].value,
             state_id: e?.target[16].value,
+            // state_id: enteredInput.state_id,
             city_id: e?.target[18].value,
+            // city_id: enteredInput.city_id,
             location: enteredInput.city,
             conversion: e?.target[20].value,
             date_of_birth: dayjs(enteredInput.date_of_birth).format('YYYY-MM-DD')

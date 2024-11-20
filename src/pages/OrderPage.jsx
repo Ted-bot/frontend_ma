@@ -17,6 +17,8 @@ export default function OrderPage(){
         console.log({responseAvailableProducts: response.collection})
         
         setProducts(response.collection)
+        localStorage.removeItem("lines")
+        localStorage.removeItem("user_address")
         // const storeData = {
         //   id: response.id,
         //   firstName: response.firstName,

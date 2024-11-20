@@ -37,7 +37,7 @@ export const BillingTabInterface = () => {
     
         // The `subscribeEvent` method will automatically unsubscribe in the cleanup function of the `useEffect`.
         return apiRef.current.subscribeEvent('rowClick', handleRowClick)
-      }, [apiRef])
+    }, [apiRef])
 
     const columns = useMemo(() => [
         { field: 'name', headerName: 'name', flex: 1.2 },
@@ -75,13 +75,17 @@ export const BillingTabInterface = () => {
 
     return(
         <>
-            <Box sx={{ height: 400, width:{ xs:'85vw', md:'100%'} }} >
+            <Box sx={{ display:'flex-col', height: 400, width:{ xs:'85vw', md:'100%'} }} >
                 <Typography
                     variant='h5'
                     component='h5'
                     sx={{ textAlign:'center', mt:3 , mb:3}}
                 >
                     Manage subscriptions
+                    <br />
+                <span className="text-xs">
+                    ( to unlock the cancell button select the row  )
+                </span>
                 </Typography>
 
                 <DataGrid 

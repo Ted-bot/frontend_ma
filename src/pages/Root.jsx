@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState, useContext, useRef } from 'react'
 import { 
   Outlet,
@@ -5,8 +7,8 @@ import {
   matchPath
  } from 'react-router-dom'
 import MainNavigation from '../components/navigations/MainNavigation.jsx'
-import { ErrorBoundaryContext, ErrorBoundary } from 'react-error-boundary'
-import { FallBackRender } from '../components/errors/ErrorBoundrayComponent.jsx'
+import { ErrorBoundary } from 'react-error-boundary'
+import { FallBackRender } from '../components/errors/FallBackRender.jsx'
 import { useTabsContext } from '../store/tabs-context.jsx'
 import useStore from '../hooks/store/useStore.jsx'
 import classes from './Root.module.css'
@@ -24,7 +26,7 @@ const dashboardPatterns = [
   "/dashboard/payment",
 ]
 
-export default function Root(){
+export const Root = () => {
   const NavbarComponent = <MainNavigation />
   const { pathname } = useLocation()
   const proxyDashboardLogin = pathname === '/dashboard/login' ? '/login' : pathname
@@ -65,13 +67,18 @@ export default function Root(){
   console.log("success state", success)
   console.log("message state", message)
 
+  const errorLogService = (error, errorInfo) => {
+    console.log("ErrorBoundray", error)
+    console.log("ErrorBoundray: info", errorInfo)
+  }
+
   return (
   <>
     {match !== true && NavbarComponent}
     {/* {dashboardMatch !== true && NavbarComponent} */}
     <main className={!match ? "flex flex-col items-center pt-12" : ''}>
       <section className={!match ? "min-w-[360px] w-full ml-2 mr-2 sm:w-full md:min-w-[601px] lg:w-full lg:min-w-[1024px] lg:max-w-[1920px]" : ''}>
-      <ErrorBoundary FallbackComponent={FallBackRender} onError={(error) => console.log({message: `Error (bubbeled up) caught ${error.message}`})}>
+      <ErrorBoundary  FallbackComponent={FallBackRender} onError={(error, errorInfo) => errorLogService(error, errorInfo)}>
     
           <section
             className={`${classes.displayMessage}

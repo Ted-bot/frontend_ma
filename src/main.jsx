@@ -1,5 +1,6 @@
 import React from 'react'
-import {  ErrorBoundary } from 'react-error-boundary'
+// import { ErrorBoundary } from 'react-error-boundary'
+// import { FallBackRender } from './components/errors/FallBackRender.jsx'
 import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import './index.css'
@@ -8,7 +9,9 @@ import { ReactQueryClientProvider } from './dataProvider/main/ReactQueryClientPr
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>    
+    {/* <ErrorBoundary FallbackComponent={FallBackRender} onError={(error) => console.log("Error Boundray:",error)}> */}
         <App />   
+    {/* </ErrorBoundary>   */}
   </React.StrictMode>
 )
 
