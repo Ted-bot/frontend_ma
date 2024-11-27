@@ -13,10 +13,18 @@ const getAuthHeaders = () => {
     const token = inMemoryJwt.getToken()
     const headers = new Headers()
     if(token){ 
+        headers.set("Content-Type", "application/json")
         headers.set("X-Authorization", token)
     } else {
-        inMemoryJwt.getRefreshedToken()
-        if(inMemoryJwt.getToken()) headers.set('X-Authorization', `${inMemoryJwt.getToken()}`)
+        if(inMemoryJwt.checkAvailableRefreshToken()){
+            inMemoryJwt.getRefreshedToken()
+            inMemoryJwt.waitForTokenRefresh().then(() => {
+                headers.set("Content-Type", "application/json")
+                inMemoryJwt.getToken() && headers.set('X-Authorization', `${inMemoryJwt.getToken()}`)
+            })
+        } else {
+            headers.set("Content-Type", "application/json")
+        }
     }    
     return headers;
 };
@@ -26,7 +34,10 @@ const getHydraWithHeaders = (url, options = {}) =>
         console.log({urlSet: url})
         return fetchHydra(url, {
             ...options,
-            headers: inMemoryJwt.getToken() ? getAuthHeaders() : options.headers,
+            // mode: "no-cors",
+            withCredentials: true, // https://stackoverflow.com/questions/60339505/react-request-is-being-sent-without-an-authorization-header
+            // credentials: 'include', //
+            headers: getAuthHeaders(),
         })
     }
     

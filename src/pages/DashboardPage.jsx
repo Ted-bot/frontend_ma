@@ -253,7 +253,7 @@ export default function DashboardPage() {
     const MyLayout = props => <Layout {...props} menu={MyMenu}/> 
 
     const roles = getLocalStorageItem("roles")
-    const adminRole = roles?.find(role => role === "ROLE_USER_SIFU") ?? false
+    const adminRole = roles?.find(role => role === "ROLE_USER_STUDENT") ?? false
 
     return (
         <>
