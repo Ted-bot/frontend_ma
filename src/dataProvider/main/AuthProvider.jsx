@@ -35,17 +35,17 @@ export const authProvider = {
         const token = response.token
         const refreshToken = response.refreshToken
         const getTokenData = jwtDecode(token)
-        console.log({crack_token: getTokenData})
-        setLocalStorageItem('roles', getTokenData.roles)        
-
+        
+        
         // AppDispatch(userLoggedIn({payload: getTokenData.username }))
         if(getLocalStorageItem('loggedIn') === false) setLocalStorageItem('loggedIn', true)
         inMemoryJwt.setToken(token)
-        inMemoryJwt.setRoles(getTokenData.roles)
+        // inMemoryJwt.setRoles(getTokenData.roles)
         inMemoryJwt.setRefreshToken(refreshToken)
         setLocalStorageItem('email', getTokenData.username)        
         setLocalStorageItem('userId', getTokenData.id)        
-                    
+        setLocalStorageItem('roles', JSON.stringify(getTokenData.roles))        
+        console.log({crack_token: getTokenData, roles: inMemoryJwt.getRoles()})
         // return Promise.resolve({redirectTo: '/dashboard',})
         return Promise.resolve(authenticateClient)            
     },
@@ -54,7 +54,7 @@ export const authProvider = {
         deleteLocalStorageItem('user_address')        
         deleteLocalStorageItem('lines')        
         deleteLocalStorageItem('user_id')        
-        deleteLocalStorageItem('roles')        
+        // deleteLocalStorageItem('roles')        
         deleteLocalStorageItem('order_number')        
         deleteLocalStorageItem('amount')        
         deleteLocalStorageItem('selected_subscription_0')        
@@ -105,8 +105,6 @@ export const authProvider = {
             
             const validSubscription = getResults?.subscriptions?.length !== 0
             inMemoryJwt.setValidSubscription(validSubscription)
-
-            setLocalStorageItem("roles",getResults["roles"])
 
             const username = getResults["firstName"] + ' ' + getResults["lastName"]
 

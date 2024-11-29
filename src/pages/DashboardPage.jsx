@@ -1,12 +1,14 @@
 import { AdminGuesser,
     hydraSchemaAnalyzer,
     ResourceGuesser,
+    InputGuesser,
     CreateGuesser,
     EditGuesser,
     ShowGuesser,
-    ListGuesser
+    ListGuesser,
+    FieldGuesser,
 } from '@api-platform/admin'
-import { Layout, CustomRoutes, useAuthenticated, defaultLightTheme} from 'react-admin'
+import { Layout, CustomRoutes, useAuthenticated, defaultLightTheme, SearchInput, required, List, TextInput} from 'react-admin'
 import { Route } from 'react-router-dom'
 
 import {MyMenu} from '../components/navigations/DashboardNavigation.jsx'
@@ -252,8 +254,50 @@ export default function DashboardPage() {
     const MyLogin = () => (<LoginDashboardLoader />)
     const MyLayout = props => <Layout {...props} menu={MyMenu}/> 
 
-    const roles = getLocalStorageItem("roles")
-    const adminRole = roles?.find(role => role === "ROLE_USER_STUDENT") ?? false
+    // const roles = inMemoryJwt.getRoles()
+    const roles = JSON.parse(getLocalStorageItem("roles"))
+    console.log({rolesParsed: roles})
+    const adminRole = roles?.find(role => role === "ROLE_USER_SIFU") ?? false
+
+    const userFilters = [
+            <SearchInput source="q" alwaysOn/>,
+            <InputGuesser label="firstName" source={"firstName"} />,
+            <InputGuesser label="lastName" source={"lastName"}/>,
+            <InputGuesser label="email" source={"email"} />,
+            <InputGuesser label="role" source={"roles"} />,
+            <InputGuesser label="location" source={"location"} />,
+            <InputGuesser label="created" source={"createdAt"} />,
+            <InputGuesser label="" source={"conversion"} />,
+            <InputGuesser label="phone" source={"phoneNumber"} />,
+            <InputGuesser label="birthday" source={"dateOfBirth"} />,
+            <InputGuesser label="gender" source={"gender"} />,
+            <InputGuesser label="profile" source={"userProfile"} />,
+            <InputGuesser label="" source={"products"} />,
+            <InputGuesser label="" source={"userAddress"} />,
+            <InputGuesser label="" source={"shopOrders"}  />,
+            <InputGuesser label="" source={"subscriptions"} />,
+    ]
+
+    const userList = () => (
+        <ListGuesser filters={userFilters}>
+            {/* <FieldGuesser source={"firstName"} validate={[required()]}/>
+            <FieldGuesser source={"lastName"} validate={[required()]}/>
+            <FieldGuesser source={"email"} validate={[required()]}/>
+            <FieldGuesser source={"roles"} validate={[required()]}/>
+            <FieldGuesser source={"location"} validate={[required()]}/>
+            <FieldGuesser source={"createdAt"} validate={[required()]}/>
+            <FieldGuesser source={"conversion"} validate={[required()]}/>
+            <FieldGuesser source={"phoneNumber"} validate={[required()]}/>
+            <FieldGuesser source={"dateOfBirth"} validate={[required()]}/>
+            <FieldGuesser source={"gender"} validate={[required()]}/>
+            <FieldGuesser source={"userProfile"} />
+            <FieldGuesser source={"products"} />
+            <FieldGuesser source={"userAddress"} />
+            <FieldGuesser source={"shopOrders"} />
+            <FieldGuesser source={"subscriptions"} /> */}
+        </ListGuesser>
+    )
+    
 
     return (
         <>
@@ -268,7 +312,7 @@ export default function DashboardPage() {
                 loginPage={MyLogin}
                 authProvider={authProvider}
             >
-                <ResourceGuesser name={"users"} list={adminRole && ListGuesser} show={adminRole && ShowGuesser} create={adminRole && UserCreate} edit={adminRole && EditGuesser} />
+                <ResourceGuesser name={"users"} list={adminRole && userList} show={adminRole && ShowGuesser} create={adminRole && UserCreate} edit={adminRole && EditGuesser} />
                 <ResourceGuesser name={"classes"} list={adminRole && ListGuesser} show={adminRole && ShowGuesser} create={adminRole && CreateGuesser} edit={adminRole && EditGuesser} />
                 <ResourceGuesser name={"trainingsessions"} list={adminRole && ListGuesser} show={adminRole && ShowGuesser} create={adminRole && CreateGuesser} edit={adminRole && EditGuesser} />
                 <ResourceGuesser name={"profiles"} list={adminRole && ProfileList} show={adminRole && ShowGuesser} create={adminRole && CreateGuesser} edit={adminRole && EditGuesser} />    

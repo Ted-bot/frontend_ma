@@ -11,22 +11,20 @@ import { HttpError } from 'react-admin'
 
 const getAuthHeaders = () => {
     const token = inMemoryJwt.getToken()
-    const headers = new Headers()
+    const headers = new Headers({"Content-Type": "application/json"})
+    
     if(token){ 
-        headers.set("Content-Type", "application/json")
         headers.set("X-Authorization", token)
     } else {
         if(inMemoryJwt.checkAvailableRefreshToken()){
             inMemoryJwt.getRefreshedToken()
             inMemoryJwt.waitForTokenRefresh().then(() => {
-                headers.set("Content-Type", "application/json")
-                inMemoryJwt.getToken() && headers.set('X-Authorization', `${inMemoryJwt.getToken()}`)
+                // headers.set("Content-Type", "application/json")
+                headers.set('X-Authorization', `${inMemoryJwt.getToken()}`)
             })
-        } else {
-            headers.set("Content-Type", "application/json")
         }
     }    
-    return headers;
+    return headers
 };
 
 const getHydraWithHeaders = (url, options = {}) =>
@@ -35,6 +33,8 @@ const getHydraWithHeaders = (url, options = {}) =>
         return fetchHydra(url, {
             ...options,
             // mode: "no-cors",
+            // method: 'GET',
+            // crossDomain: true,
             withCredentials: true, // https://stackoverflow.com/questions/60339505/react-request-is-being-sent-without-an-authorization-header
             // credentials: 'include', //
             headers: getAuthHeaders(),
@@ -46,6 +46,7 @@ const apiDocumentationParser = async () => {
     try {
         // setRedirectToLogin(false)    
         return await parseHydraDocumentation("/api", {
+            method: 'GET',
             headers: getAuthHeaders(),
         })
     } catch (result) {
@@ -105,7 +106,10 @@ export const dataProvider = ({
         // const email = getLocalStorageItem('email')
         // const token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE3Mjk4MDMyMDksImV4cCI6MTcyOTgzOTIwOSwicm9sZXMiOlsiUk9MRV9VU0VSX1NUVURFTlQiXSwidXNlcm5hbWUiOiJ0a2JvdGNoQGdtYWlsLmNvbSJ9.a2ycLWwQnjVBdDmmtUaLp5LRUjlCHuE7o5oEtlUs8Zho9EntKW02U3L_DB6z6anCTYnm0j5y4s0zr4k36xVH9MOU0xWl6zE5-NEkwCSH6ks-ienn0dFzeQK4UYBq_EUQtn17jUWHiJLipTHMe2CcD1W9IsnDOjETNrzWPh38Z7UT442CasV5KlEbIBu_QbjL6QBRgYpWv4Thz6j3jOcZEsoGRdqZgVa6a1F7nRY_yDIP3fpGldQUVDXpezwxZdTmrlszrXmq7DZ3k0mKLNl_0tX1qeyIDPGRfhQnV5qCKTBnE2uZokjHBocZpTm2qfv_4jkdY6aRuFJhoRHPsx6NZw'
         const token = inMemoryJwt.getToken()
-        const ApiOptions = ApiFetchGetOptions(`/api/${resource}/${email}/events`,{'X-Authorization': token})
+        const ApiOptions = ApiFetchGetOptions(`/api/${resource}/${email}/events`,{
+            'X-Authorization': token,
+            "Content-Type": "application/json"
+        })
         const request = await ApiFetch(ApiOptions)
         const response = await request.json()   
         
@@ -219,7 +223,10 @@ export const dataProvider = ({
 
         const token = inMemoryJwt.getToken()
         // const ApiOptions = ApiFetchGetOptions('/api/v1/order/payment',{'X-Authorization': token})
-        const ApiOptions = ApiFetchGetOptions(resource,{'X-Authorization': token})
+        const ApiOptions = ApiFetchGetOptions(resource,{
+            'X-Authorization': token,
+            "Content-Type": "application/json"
+        })
         const response = await ApiFetch(ApiOptions)
         const getResults = await response.json()       
 
