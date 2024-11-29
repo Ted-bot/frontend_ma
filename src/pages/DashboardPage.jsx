@@ -92,9 +92,6 @@ const myTheme = {
                     root: {
                         background: 'transparent',
                         boxShadow: 'none',
-                        '& .MuiPaper-root .css-g826q3-RaSimpleShowLayout-root' :{
-                            backgroundColor: 'green'
-                        }
                     }
                 }
             },
@@ -199,6 +196,15 @@ const myTheme = {
                     },
                 },
             },
+            MuiTooltip: {
+                styleOverrides: {
+                  tooltip: {
+                    backgroundColor: 'E50000',
+                    color: 'white',
+                    border: '1px solid #dadde9',
+                  },
+                },
+            },
             MuiMenu: {
                 styleOverrides: {
                     root: {
@@ -215,7 +221,7 @@ const myTheme = {
             MuiTableBody: { // main resource list background
                 styleOverrides: {
                     root: { 
-                        background: '#9c9b9b', //#ffd086 #F8F8F8 #C45267,                         
+                        background: '#c9c9c9', //#ffd086 #F8F8F8 #C45267,                         
                     }
                 }
             },

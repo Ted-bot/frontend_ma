@@ -16,14 +16,14 @@
 
 .MuiTableCell-root.MuiTableCell-head.MuiTableCell-sizeSmall.RaDatagrid-headerCell {
     color: white;
-    background-color: #ab0926;
+    background-color: #cd1335;
 }
 
 /* dashbaord page: Api resource List  text */
 .MuiTypography-root.MuiTypography-body2.css-e784if-MuiTypography-root {
-    color: aliceblue
+    color: #a52d2d
 }
 
 .MuiChip-root.MuiChip-filled.MuiChip-sizeMedium.MuiChip-colorDefault.MuiChip-filledDefault.RaChipField-chip {
-    color:cyan;
+    color: #cd1335;
 }
