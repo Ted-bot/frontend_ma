@@ -26,6 +26,7 @@ import { NotificationTabInterface } from '../components/interface/settings/Notif
 import {PaymentPage} from './client/PaymentPage.jsx'
 import inMemoryJwt from '../js/util/inMemoryJwt.js'
 import { getLocalStorageItem } from '../js/util/getUtil.js'
+import './Dashboard.css'
 
 
 const myTheme = {
@@ -149,10 +150,28 @@ const myTheme = {
                     },
                 },
             }, //
+            MuiSvgIcon :{
+                styleOverrides : {
+                    fontSizeSmall: {
+                        // color: 'white',
+                        '&.MuiSvgIcon-root .MuiSvgIcon-fontSizeSmall .css-18ctxsx-MuiSvgIcon-root': {
+                            color: 'white'
+                        }
+                    }
+                }
+            },
             MuiList : {
                 styleOverrides: {
                     root: {
-                        // background: 'linear-gradient(160deg, #E50000, #ab0926 )',
+                        background: 'linear-gradient(160deg, #E50000, #ab0926 )', //RaMenu-open
+                        color: 'white'
+                    }
+                }
+            },
+            RaMenu: {
+                styleOverrides: {
+                    root: {
+                        background: 'transparent'
                     }
                 }
             },
@@ -188,8 +207,7 @@ const myTheme = {
                             background: '#fafafb',
                         },
                         '& .css-19zhhkc-MuiButtonBase-root-MuiMenuItem-root' : {
-                            color: 'black'
-                            
+                            color: 'black'                            
                         }
                     }
                 }
@@ -267,15 +285,10 @@ export default function DashboardPage() {
             <InputGuesser label="role" source={"roles"} />,
             <InputGuesser label="location" source={"location"} />,
             <InputGuesser label="created" source={"createdAt"} />,
-            <InputGuesser label="" source={"conversion"} />,
             <InputGuesser label="phone" source={"phoneNumber"} />,
             <InputGuesser label="birthday" source={"dateOfBirth"} />,
             <InputGuesser label="gender" source={"gender"} />,
-            <InputGuesser label="profile" source={"userProfile"} />,
-            <InputGuesser label="" source={"products"} />,
-            <InputGuesser label="" source={"userAddress"} />,
-            <InputGuesser label="" source={"shopOrders"}  />,
-            <InputGuesser label="" source={"subscriptions"} />,
+            <InputGuesser label="profile" source={"userProfile"} />
     ]
 
     const userList = () => (
