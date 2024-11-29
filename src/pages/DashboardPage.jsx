@@ -212,10 +212,10 @@ const myTheme = {
                     }
                 }
             },
-            MuiTableBody: {
+            MuiTableBody: { // main resource list background
                 styleOverrides: {
                     root: { 
-                        background: '#F8F8F8', //#ffd086, #C45267                        
+                        background: '#9c9b9b', //#ffd086 #F8F8F8 #C45267,                         
                     }
                 }
             },
