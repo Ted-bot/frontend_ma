@@ -38,6 +38,8 @@ export function ApiFetchGetOptions(url,headerOptions = null) {
     return {
         url: url, 
         method: 'GET',
+        withCredentials: true,
+        // crossDomain: true,
         headers: {
             "Content-Type":"application/json",
             ...headerOptions

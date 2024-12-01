@@ -14,13 +14,15 @@ const getAuthHeaders = () => {
     const headers = new Headers({"Content-Type": "application/json"})
     
     if(token){ 
-        headers.set("X-Authorization", token)
+        // headers.set("Authorization", `Bearer ${token}`)
+        headers.set("X-Authorization", `Bearer ${token}`)
     } else {
         if(inMemoryJwt.checkAvailableRefreshToken()){
             inMemoryJwt.getRefreshedToken()
             inMemoryJwt.waitForTokenRefresh().then(() => {
                 // headers.set("Content-Type", "application/json")
-                headers.set('X-Authorization', `${inMemoryJwt.getToken()}`)
+                // headers.set('X-Authorization', `Bearer ${inMemoryJwt.getToken()}`)
+                headers.set('X-Authorization', `Bearer ${inMemoryJwt.getToken()}`)
             })
         }
     }    
@@ -72,17 +74,100 @@ export const dataProvider = ({
         useEmbedded: true,
         apiDocumentationParser: apiDocumentationParser
     }),
+    getList: async (resource,params) => {
+        let query = undefined
+        let setupQuery = undefined 
+        let changePagination = undefined 
+        let setQuery = ""
+        const token = inMemoryJwt.getToken()
+        const options = {headers: null}
+        options.headers = new Headers({'X-Authorization': `bearer ${token}`})
+
+        if(params){
+            const filter = params?.filter
+            const operators = { '_gte': '>=', '_lte': '<=', '_neq': '!=' }
+    
+            const filters = Object.keys(filter).map(key => {
+                const operator = operators[key.slice(-4)]
+                return operator
+                    ? { field: key.slice(0, -4), operator, value: filter[key] }
+                    : { field: key, operator: '=', value: filter[key] };
+            })
+
+            changePagination = params?.pagination?.page
+    
+            setQuery = !!changePagination ? `page=${changePagination}` : ""
+            // setupQuery = {
+            //     pagination: params.pagination,
+            //     sort: params.sort,
+            //     filter: filters,
+            // }
+
+            // console.log({paramsAdded: params, filter: filters, query:JSON.stringify(setupQuery), params_filer: params.filter })
+            
+            for (const item of filters){
+                setQuery += `${!!setQuery ? '&' : ''}${item.field}=${item.value}`
+            }
+            query = filters.length !== 0 ? setQuery : undefined
+        }           
+        const addParams = typeof query == "string" ? query : ""
+        
+        // console.log({newQuery:query})
+        const response = await fetchUtils.fetchJson(`/api/${resource}${!!addParams ? '?' : ''}${addParams}`,options )
+        
+        const configurePagination = (response) => {
+            // console.log({gotDataResponse: response["hydra:view"]["hydra:next"]})
+            const currentPage = response["hydra:view"]["@id"]
+            const firstPage = response["hydra:view"]["hydra:first"]
+            const lastPage = response["hydra:view"]["hydra:last"]
+            let nextPage = undefined
+
+            for(const [key, value] of Object.entries(response["hydra:view"])){
+                if(key === "hydra:next"){
+                    nextPage = response["hydra:view"]["hydra:next"]
+                }
+            }            
+
+            const currentPageNr = currentPage.charAt(currentPage.length - 1)
+            const firstPageNr = firstPage.charAt(firstPage.length - 1)
+            const lastPageNr = lastPage.charAt(lastPage.length - 1)
+            const nextPageNr = !!nextPage && nextPage.charAt(nextPage.length - 1)
+
+            const nextPageAvailable = Number(currentPageNr) < Number(lastPageNr)
+            const previousPageAvailable = Number(currentPageNr) > Number(firstPageNr)
+
+            console.log({pagination: {
+                hasPreviousPage: previousPageAvailable,
+                hasNextPage:nextPageAvailable
+            }})
+
+            return {hasPreviousPage: previousPageAvailable, hasNextPage:nextPageAvailable}
+        }
+        console.log({checkhydraView: response.json["hydra:view"], response: response})
+
+        const pagination = Object.keys(response.json["hydra:view"]).find(key => key === 'hydra:first') && configurePagination(response.json)
+       
+
+        return {
+            data: response.json["hydra:member"], 
+            total: response.json["hydra:totalItems"], 
+            pageInfo:{
+                hasPreviousPage: !!pagination && pagination.hasPreviousPage,
+                hasNextPage: !!pagination && pagination.hasNextPage
+            }
+        }
+    },
     getUserRegisteredEvents: async (resource, params) => {
         const token = inMemoryJwt.getToken()
         const options = {headers: null}
-        options.headers = new Headers({'X-Authorization': token})
+        options.headers = new Headers({'X-Authorization': `bearer ${token}`})
         const response = await fetchUtils.fetchJson(`/api/user/${params}/${resource}/`,options )
         return response.json
     },
     getOneSubscription: async (resource, params) => {
         const GetUrl = `/api/${resource}/${params}/dashboard/valid`
         const token = inMemoryJwt.getToken()
-        const requestOptions = ApiFetchGetOptions(GetUrl, {'X-Authorization': token})
+        const requestOptions = ApiFetchGetOptions(GetUrl, {'X-Authorization': `bearer ${token}`})
 
         const request = await ApiFetch(requestOptions)
         const response = await request.json()      
@@ -93,7 +178,7 @@ export const dataProvider = ({
     getAllSubscriptions: async (resource, params) => {
         const GetUrl = `/api/${resource}/${params}/dashboard`
         const token = inMemoryJwt.getToken()
-        const requestOptions = ApiFetchGetOptions(GetUrl, {'X-Authorization': token})        
+        const requestOptions = ApiFetchGetOptions(GetUrl, {'X-Authorization': `bearer ${token}`})        
         const request = await ApiFetch(requestOptions)
         const response = await request.json()      
 
@@ -104,10 +189,9 @@ export const dataProvider = ({
     },
     allBlackDragonEvents: async (resource, email) => {
         // const email = getLocalStorageItem('email')
-        // const token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE3Mjk4MDMyMDksImV4cCI6MTcyOTgzOTIwOSwicm9sZXMiOlsiUk9MRV9VU0VSX1NUVURFTlQiXSwidXNlcm5hbWUiOiJ0a2JvdGNoQGdtYWlsLmNvbSJ9.a2ycLWwQnjVBdDmmtUaLp5LRUjlCHuE7o5oEtlUs8Zho9EntKW02U3L_DB6z6anCTYnm0j5y4s0zr4k36xVH9MOU0xWl6zE5-NEkwCSH6ks-ienn0dFzeQK4UYBq_EUQtn17jUWHiJLipTHMe2CcD1W9IsnDOjETNrzWPh38Z7UT442CasV5KlEbIBu_QbjL6QBRgYpWv4Thz6j3jOcZEsoGRdqZgVa6a1F7nRY_yDIP3fpGldQUVDXpezwxZdTmrlszrXmq7DZ3k0mKLNl_0tX1qeyIDPGRfhQnV5qCKTBnE2uZokjHBocZpTm2qfv_4jkdY6aRuFJhoRHPsx6NZw'
         const token = inMemoryJwt.getToken()
         const ApiOptions = ApiFetchGetOptions(`/api/${resource}/${email}/events`,{
-            'X-Authorization': token,
+            'X-Authorization': `bearer ${token}`,
             "Content-Type": "application/json"
         })
         const request = await ApiFetch(ApiOptions)
@@ -150,7 +234,7 @@ export const dataProvider = ({
             method:'POST',
             headers: {
                 "Content-Type":"application/json",
-                'X-Authorization': token
+                'X-Authorization': `bearer ${token}`
             },
             body: JSON.stringify({event_id: payload.event_id, select: payload.select})}
         )
@@ -168,7 +252,7 @@ export const dataProvider = ({
         const token = inMemoryJwt.getToken()
         delete payload.name
         const requestOptions = ApiFetchPostOptions({url: GetUrl, method:'POST'}, payload,{
-            'X-Authorization': token, 
+            'X-Authorization': `bearer ${token}`, 
             'Content-Type': 'application/json'
         })
         
@@ -184,7 +268,7 @@ export const dataProvider = ({
         const GetUrl = `/api/${resource}/${params}/email`
         const token = inMemoryJwt.getToken()
         const requestOptions = ApiFetchPostOptions({url: GetUrl, method:'PATCH'}, payload,{
-            'X-Authorization': token, 
+            'X-Authorization': `bearer ${token}`, 
             'Content-Type': 'application/merge-patch+json'
         })
         
@@ -202,7 +286,7 @@ export const dataProvider = ({
         const GetUrl = `/api/${resource}/${params.email}/id/${params.id}`
         const token = inMemoryJwt.getToken()
         const requestOptions = ApiFetchPostOptions({url: GetUrl, method:'POST'}, payload,{
-            'X-Authorization': token, 
+            'X-Authorization': `bearer ${token}`, 
             'Content-Type': 'application/json'
         })
 
@@ -222,9 +306,9 @@ export const dataProvider = ({
         })
 
         const token = inMemoryJwt.getToken()
-        // const ApiOptions = ApiFetchGetOptions('/api/v1/order/payment',{'X-Authorization': token})
+        // const ApiOptions = ApiFetchGetOptions('/api/v1/order/payment',{'X-Authorization': `bearer ${token}`})
         const ApiOptions = ApiFetchGetOptions(resource,{
-            'X-Authorization': token,
+            'X-Authorization': `bearer ${token}`,
             "Content-Type": "application/json"
         })
         const response = await ApiFetch(ApiOptions)

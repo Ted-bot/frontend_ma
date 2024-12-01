@@ -93,7 +93,10 @@ export const authProvider = {
         const token = inMemoryJwt.getToken()
 
         if(identifier && token){
-            const prepareQueryObj = ApiFetchGetOptions(`/api/user_by_email/${identifier}/email`,{ 'X-Authorization': token})
+            const prepareQueryObj = ApiFetchGetOptions(`/api/user_by_email/${identifier}/email`,{
+                // 'Authorization': `Bearer ${token}`,
+                'X-Authorization': `Bearer ${token}`,
+            })
             const authenticateClient = await ApiFetch(prepareQueryObj)
             const getResults = await authenticateClient.json()
 

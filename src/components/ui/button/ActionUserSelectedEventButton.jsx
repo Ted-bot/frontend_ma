@@ -21,7 +21,7 @@ export const ActionUserSelectedEventButton = forwardRef(function ActionUserSelec
                 method:'POST',
                 headers: {
                     "Content-Type":"application/json",
-                    'X-Authorization': token
+                    'X-Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify({event_id: id, select: select})}
             )

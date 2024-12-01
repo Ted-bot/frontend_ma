@@ -366,7 +366,7 @@ export const PaymentPage = () => {
         }
 
         const paymentOption = { url: '/api/v1/payment', method: 'POST'}
-        const ApiPayOptions = ApiFetchPostOptions(paymentOption, confirmUserOrder, {'X-Authorization': token})
+        const ApiPayOptions = ApiFetchPostOptions(paymentOption, confirmUserOrder, {'X-Authorization': `Bearer ${token}`})
 
         try {
             const payResponse = await ApiFetch(ApiPayOptions)
@@ -458,7 +458,7 @@ export const PaymentPage = () => {
         }
         
         const options = { url: '/api/v1/order/address', method: 'POST'}
-        const ApiUserAddressOptions = ApiFetchPostOptions(options, userAddressInfo, {'X-Authorization': token})            
+        const ApiUserAddressOptions = ApiFetchPostOptions(options, userAddressInfo, {'X-Authorization': `Bearer ${token}`})            
         console.log(":hallo")
         try {
             const response = await ApiFetch(ApiUserAddressOptions)

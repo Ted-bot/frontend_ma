@@ -7,7 +7,7 @@ import { dataProvider } from "../../dataProvider/main/DataProvider.jsx"
 
 export const fetchUserOrderAddress = async () => {
     const token = inMemoryJwt.getToken()
-    const ApiOptions = ApiFetchGetOptions(`/api/v1/order/payment`,{'X-Authorization': token})    
+    const ApiOptions = ApiFetchGetOptions(`/api/v1/order/payment`,{'X-Authorization': `Bearer ${token}`})    
     const request = await ApiFetch(ApiOptions)
     const userAddressData = await request.json()    
 

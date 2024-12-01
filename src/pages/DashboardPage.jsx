@@ -8,7 +8,7 @@ import { AdminGuesser,
     ListGuesser,
     FieldGuesser,
 } from '@api-platform/admin'
-import { Layout, CustomRoutes, useAuthenticated, defaultLightTheme, SearchInput, required, List, TextInput} from 'react-admin'
+import { Admin, Layout, CustomRoutes, Datagrid, Resource, BulkDeleteButton, BulkUpdateButton,useAuthenticated, defaultLightTheme, SearchInput, TextField, TextInput,Filter, List} from 'react-admin'
 import { Route } from 'react-router-dom'
 
 import {MyMenu} from '../components/navigations/DashboardNavigation.jsx'
@@ -221,7 +221,7 @@ const myTheme = {
             MuiTableBody: { // main resource list background
                 styleOverrides: {
                     root: { 
-                        background: '#c9c9c9', //#ffd086 #F8F8F8 #C45267,                         
+                        background: '#e6ddcf', //#ffd086 #F8F8F8 #C45267,                         
                     }
                 }
             },
@@ -284,43 +284,64 @@ export default function DashboardPage() {
     const adminRole = roles?.find(role => role === "ROLE_USER_SIFU") ?? false
 
     const userFilters = [
-            <SearchInput source="q" alwaysOn/>,
-            <InputGuesser label="firstName" source={"firstName"} />,
-            <InputGuesser label="lastName" source={"lastName"}/>,
-            <InputGuesser label="email" source={"email"} />,
-            <InputGuesser label="role" source={"roles"} />,
-            <InputGuesser label="location" source={"location"} />,
-            <InputGuesser label="created" source={"createdAt"} />,
-            <InputGuesser label="phone" source={"phoneNumber"} />,
-            <InputGuesser label="birthday" source={"dateOfBirth"} />,
-            <InputGuesser label="gender" source={"gender"} />,
-            <InputGuesser label="profile" source={"userProfile"} />
+        <SearchInput source="q" alwaysOn/>, //resettable={false} 
+        <TextInput label="firstName" source={"firstName"} />,
+        <TextInput label="lastName" source={"lastName"}/>,
+        <TextInput label="email" source={"email"} />,
+        <TextInput label="role" source={"roles"} />,
+        <TextInput label="location" source={"location"} />,
+        <TextInput label="created" source={"createdAt"} />,
+        <TextInput label="phone" source={"phoneNumber"} />,
+        <TextInput label="birthday" source={"dateOfBirth"} />,
+        <TextInput label="gender" source={"gender"} />,
+        <TextInput label="profile" source={"userProfile"} />
     ]
+    // const userFilters = (props) => {
+    //     // <Filter {...props}>
+    //         <SearchInput source="q" alwaysOn/>,
+    //         <TextInput label="firstName" source={"firstName"} />,
+    //         <TextInput label="lastName" source={"lastName"}/>,
+    //         <TextInput label="email" source={"email"} />,
+    //         <TextInput label="role" source={"roles"} />,
+    //         <TextInput label="location" source={"location"} />,
+    //         <TextInput label="phone" source={"phoneNumber"} />,
+    //         <TextInput label="birthday" source={"dateOfBirth"} />,
+    //         <TextInput label="gender" source={"gender"} />,
+    //         <TextInput label="profile" source={"userProfile"} />
+    //         {/* <TextField label="created" source={"createdAt"} />, */}
+    //     // </Filter>
+    // }
 
     const userList = () => (
-        <ListGuesser filters={userFilters}>
-            {/* <FieldGuesser source={"firstName"} validate={[required()]}/>
-            <FieldGuesser source={"lastName"} validate={[required()]}/>
-            <FieldGuesser source={"email"} validate={[required()]}/>
-            <FieldGuesser source={"roles"} validate={[required()]}/>
-            <FieldGuesser source={"location"} validate={[required()]}/>
-            <FieldGuesser source={"createdAt"} validate={[required()]}/>
-            <FieldGuesser source={"conversion"} validate={[required()]}/>
-            <FieldGuesser source={"phoneNumber"} validate={[required()]}/>
-            <FieldGuesser source={"dateOfBirth"} validate={[required()]}/>
-            <FieldGuesser source={"gender"} validate={[required()]}/>
-            <FieldGuesser source={"userProfile"} />
-            <FieldGuesser source={"products"} />
+        <List filters={userFilters}>
+            <Datagrid
+                // rowClick="show"
+            >
+                <TextField source={"firstName"} />
+                <TextField source={"lastName"} />
+                <TextField source={"email"} />
+                <TextField source={"roles"} />
+                <TextField source={"location"} />
+                {/* <FieldGuesser source={"createdAt"} /> */}
+                {/* <FieldGuesser source={"conversion"} /> */}
+                <TextField source={"phoneNumber"} />
+                <TextField source={"dateOfBirth"} />
+                <TextField source={"gender"} />
+                <TextField source={"userProfile"} />
+            </Datagrid>
+        </List>
+    )
+            {/* <FieldGuesser source={"products"} />
             <FieldGuesser source={"userAddress"} />
             <FieldGuesser source={"shopOrders"} />
-            <FieldGuesser source={"subscriptions"} /> */}
-        </ListGuesser>
-    )
-    
+            <FieldGuesser source={"subscriptions"} /> */
+            // </List>
+        }
+    console.log({dataProvider_data: dataProvider})
 
     return (
         <>
-            <AdminGuesser
+            <Admin
                 defaultTheme='light'
                 theme={myTheme}
                 basename='/dashboard'
@@ -331,10 +352,10 @@ export default function DashboardPage() {
                 loginPage={MyLogin}
                 authProvider={authProvider}
             >
-                <ResourceGuesser name={"users"} list={adminRole && userList} show={adminRole && ShowGuesser} create={adminRole && UserCreate} edit={adminRole && EditGuesser} />
-                <ResourceGuesser name={"classes"} list={adminRole && ListGuesser} show={adminRole && ShowGuesser} create={adminRole && CreateGuesser} edit={adminRole && EditGuesser} />
+                <Resource name={"users"} list={adminRole && userList} show={adminRole && ShowGuesser} create={adminRole && UserCreate} edit={adminRole && EditGuesser} />
+                {/* <ResourceGuesser name={"classes"} list={adminRole && ListGuesser} show={adminRole && ShowGuesser} create={adminRole && CreateGuesser} edit={adminRole && EditGuesser} />
                 <ResourceGuesser name={"trainingsessions"} list={adminRole && ListGuesser} show={adminRole && ShowGuesser} create={adminRole && CreateGuesser} edit={adminRole && EditGuesser} />
-                <ResourceGuesser name={"profiles"} list={adminRole && ProfileList} show={adminRole && ShowGuesser} create={adminRole && CreateGuesser} edit={adminRole && EditGuesser} />    
+                <ResourceGuesser name={"profiles"} list={adminRole && ProfileList} show={adminRole && ShowGuesser} create={adminRole && CreateGuesser} edit={adminRole && EditGuesser} />     */}
                 
                 <CustomRoutes>
                     <Route path="/Settings" element={<ProfileSettingsInterface />} />
@@ -351,7 +372,7 @@ export default function DashboardPage() {
                 <CustomRoutes>
                     <Route path="/Notifications" element={<NotificationTabInterface />} />
                 </CustomRoutes>
-            </AdminGuesser>       
+            </Admin>       
         </>
     )
 }
