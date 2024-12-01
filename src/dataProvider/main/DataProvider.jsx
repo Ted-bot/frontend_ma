@@ -4,7 +4,7 @@ import {
 } from '@api-platform/admin'
 import { fetchUtils } from 'react-admin'
 import { ApiFetch, ApiFetchPostOptions } from '../../js/util/postUtil'
-import { ApiFetchGetOptions, deleteLocalStorageItem} from '../../js/util/getUtil'
+import { ApiFetchGetOptions, deleteLocalStorageItem, getLocalStorageItem, setLocalStorageItem} from '../../js/util/getUtil'
 import { parseHydraDocumentation } from "@api-platform/api-doc-parser"
 import inMemoryJwt from '../../js/util/inMemoryJwt.js'
 import { HttpError } from 'react-admin'
@@ -83,6 +83,7 @@ export const dataProvider = ({
         const options = {headers: null}
         options.headers = new Headers({'X-Authorization': `bearer ${token}`})
 
+        console.log({resource,params})
         if(params){
             const filter = params?.filter
             const operators = { '_gte': '>=', '_lte': '<=', '_neq': '!=' }
@@ -97,26 +98,18 @@ export const dataProvider = ({
             changePagination = params?.pagination?.page
     
             setQuery = !!changePagination ? `page=${changePagination}` : ""
-            // setupQuery = {
-            //     pagination: params.pagination,
-            //     sort: params.sort,
-            //     filter: filters,
-            // }
 
-            // console.log({paramsAdded: params, filter: filters, query:JSON.stringify(setupQuery), params_filer: params.filter })
-            
             for (const item of filters){
                 setQuery += `${!!setQuery ? '&' : ''}${item.field}=${item.value}`
             }
-            query = filters.length !== 0 ? setQuery : undefined
+
+            query = filters.length !== 0 || !!setQuery ? setQuery : undefined
         }           
-        const addParams = typeof query == "string" ? query : ""
-        
-        // console.log({newQuery:query})
+
+        const addParams = typeof query == "string" ? query : ""        
         const response = await fetchUtils.fetchJson(`/api/${resource}${!!addParams ? '?' : ''}${addParams}`,options )
         
         const configurePagination = (response) => {
-            // console.log({gotDataResponse: response["hydra:view"]["hydra:next"]})
             const currentPage = response["hydra:view"]["@id"]
             const firstPage = response["hydra:view"]["hydra:first"]
             const lastPage = response["hydra:view"]["hydra:last"]
@@ -132,24 +125,19 @@ export const dataProvider = ({
             const firstPageNr = firstPage.charAt(firstPage.length - 1)
             const lastPageNr = lastPage.charAt(lastPage.length - 1)
             const nextPageNr = !!nextPage && nextPage.charAt(nextPage.length - 1)
-
             const nextPageAvailable = Number(currentPageNr) < Number(lastPageNr)
             const previousPageAvailable = Number(currentPageNr) > Number(firstPageNr)
 
-            console.log({pagination: {
-                hasPreviousPage: previousPageAvailable,
-                hasNextPage:nextPageAvailable
-            }})
-
             return {hasPreviousPage: previousPageAvailable, hasNextPage:nextPageAvailable}
         }
-        console.log({checkhydraView: response.json["hydra:view"], response: response})
-
+        const data = response.json["hydra:member"]
         const pagination = Object.keys(response.json["hydra:view"]).find(key => key === 'hydra:first') && configurePagination(response.json)
-       
+        const storeUsersData = data.map(user => ({id: user.id, email: user.email}))
+
+        setLocalStorageItem(resource, storeUsersData)
 
         return {
-            data: response.json["hydra:member"], 
+            data: data, 
             total: response.json["hydra:totalItems"], 
             pageInfo:{
                 hasPreviousPage: !!pagination && pagination.hasPreviousPage,
@@ -157,10 +145,130 @@ export const dataProvider = ({
             }
         }
     },
+    create: async (resource, params) => {
+        const token = inMemoryJwt.getToken()
+        console.log({createNewUser: resource, params})
+
+        const postUserSelectedEvent = await fetch(`/api/${resource}`,{
+            method:'POST',
+            headers: {
+                "Content-Type":"application/json",
+                'X-Authorization': `bearer ${token}`
+            },
+            body: JSON.stringify(params.data)}
+        )
+
+        if(!postUserSelectedEvent.ok) return Promise.reject()  // show error with notify
+
+        const response = await postUserSelectedEvent.json()
+
+        return Promise.resolve({data: response})
+    },
+    update: async (resource, params) => {
+        const token = inMemoryJwt.getToken()
+        console.log({getUser: resource, params: params})
+        let query = resource
+        let addParam = undefined
+        let identifier = undefined
+        let getUser = undefined
+
+        if(!params.data?.password) {
+            delete params.data?.password
+        }
+
+        const options = {
+            body: JSON.stringify(params.data),
+            method: 'PATCH',
+            headers: null
+        }
+        options.headers = new Headers({
+            'X-Authorization': `bearer ${token}`,
+            'Content-Type': 'application/merge-patch+json'
+        })
+
+        if(resource === 'users') {
+            addParam = 'email'
+            getUser = getLocalStorageItem("users")?.find(user => user?.id === Number(params?.id))
+            identifier = getUser?.email
+            query = `${'user_by_email'}/${identifier}/email`
+        }
+
+        const response = await fetchUtils.fetchJson(`/api/${query}`,options )
+        const {headers, status, body, statusText} = response
+
+        console.log({message: response})
+
+        if( 200 < response.status || response.status > 300) {
+            throw Promise.reject(new HttpError(response?.json || statusText, status, response.json))
+        }
+
+        return Promise.resolve({data: response.json})
+    },
+    delete: async (resource, params) => {
+        const token = inMemoryJwt.getToken()
+        console.log({getUser: resource, params: params})
+        let query = resource
+        let addParam = undefined
+        let identifier = undefined
+        let getUser = undefined
+        const options = {
+            // body: JSON.stringify(params.data),
+            method: 'DELETE',
+            headers: null
+        }
+        options.headers = new Headers({
+            'X-Authorization': `bearer ${token}`,
+            'Content-Type': 'application/ld+json'
+        })
+
+        if(resource === 'users') {
+            addParam = 'email'
+            getUser = getLocalStorageItem("users")?.find(user => user?.id === Number(params?.id))
+            identifier = getUser?.email
+            query = `${'user_by_email'}/${identifier}/email`
+        }
+
+        const response = await fetchUtils.fetchJson(`/api/${query}`,options )
+        const {headers, status, body, statusText} = response
+
+        console.log({message: response})
+
+        if( 200 < response.status || response.status > 300) {
+            throw Promise.reject(new HttpError(response?.json || statusText, status, response.json))
+        }
+
+        return Promise.resolve({data: response.json})
+    },
+    getOne: async (resource, params) => {
+        const token = inMemoryJwt.getToken()
+        console.log({getUser: resource, params: params?.id})
+        let query = resource
+        let addParam = undefined
+        let identifier = undefined
+        let getUser = undefined
+        const options = {headers: null}
+        options.headers = new Headers({'X-Authorization': `bearer ${token}`})
+
+        if(resource === 'users') {
+            addParam = 'email'
+            getUser = getLocalStorageItem("users")?.find(user => user?.id === Number(params?.id))
+            identifier = getUser?.email
+            query = `${'user_by_email'}/${identifier}/email`
+        }
+
+        const response = await fetchUtils.fetchJson(`/api/${query}`,options )
+
+        if(response.status > 399) return Promise.reject()
+
+        return Promise.resolve({data: response.json})
+    },
     getUserRegisteredEvents: async (resource, params) => {
         const token = inMemoryJwt.getToken()
         const options = {headers: null}
-        options.headers = new Headers({'X-Authorization': `bearer ${token}`})
+        options.headers = new Headers({
+            'X-Authorization': `bearer ${token}`,
+            "Content-Type":"application/jsonld",
+        })
         const response = await fetchUtils.fetchJson(`/api/user/${params}/${resource}/`,options )
         return response.json
     },

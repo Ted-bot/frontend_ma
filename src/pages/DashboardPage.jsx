@@ -8,12 +8,15 @@ import { AdminGuesser,
     ListGuesser,
     FieldGuesser,
 } from '@api-platform/admin'
-import { Admin, Layout, CustomRoutes, Datagrid, Resource, BulkDeleteButton, BulkUpdateButton,useAuthenticated, defaultLightTheme, SearchInput, TextField, TextInput,Filter, List} from 'react-admin'
+import { Admin, Layout, CustomRoutes, Datagrid, DateField,Resource, Show, SimpleShowLayout, RichTextField,BulkDeleteButton, BulkUpdateButton,useAuthenticated, defaultLightTheme, SearchInput, TextField, TextInput,Filter, List} from 'react-admin'
 import { Route } from 'react-router-dom'
 
 import {MyMenu} from '../components/navigations/DashboardNavigation.jsx'
 import ProfileList from '../dataProvider/Profile/ProfileList.jsx'
 import UserCreate from '../dataProvider/User/UserCreate.jsx'
+import UserList from '../dataProvider/User/UserList.jsx'
+import UserEdit from '../dataProvider/User/UserEdit.jsx'
+import UserShow from '../dataProvider/User/UserShow.jsx'
 import LoginDashboardLoader from '../loader/LoginDashboardLoader.jsx'
 
 import UserProfilePage from './client/UserProfilePage'
@@ -283,60 +286,7 @@ export default function DashboardPage() {
     console.log({rolesParsed: roles})
     const adminRole = roles?.find(role => role === "ROLE_USER_SIFU") ?? false
 
-    const userFilters = [
-        <SearchInput source="q" alwaysOn/>, //resettable={false} 
-        <TextInput label="firstName" source={"firstName"} />,
-        <TextInput label="lastName" source={"lastName"}/>,
-        <TextInput label="email" source={"email"} />,
-        <TextInput label="role" source={"roles"} />,
-        <TextInput label="location" source={"location"} />,
-        <TextInput label="created" source={"createdAt"} />,
-        <TextInput label="phone" source={"phoneNumber"} />,
-        <TextInput label="birthday" source={"dateOfBirth"} />,
-        <TextInput label="gender" source={"gender"} />,
-        <TextInput label="profile" source={"userProfile"} />
-    ]
-    // const userFilters = (props) => {
-    //     // <Filter {...props}>
-    //         <SearchInput source="q" alwaysOn/>,
-    //         <TextInput label="firstName" source={"firstName"} />,
-    //         <TextInput label="lastName" source={"lastName"}/>,
-    //         <TextInput label="email" source={"email"} />,
-    //         <TextInput label="role" source={"roles"} />,
-    //         <TextInput label="location" source={"location"} />,
-    //         <TextInput label="phone" source={"phoneNumber"} />,
-    //         <TextInput label="birthday" source={"dateOfBirth"} />,
-    //         <TextInput label="gender" source={"gender"} />,
-    //         <TextInput label="profile" source={"userProfile"} />
-    //         {/* <TextField label="created" source={"createdAt"} />, */}
-    //     // </Filter>
-    // }
 
-    const userList = () => (
-        <List filters={userFilters}>
-            <Datagrid
-                // rowClick="show"
-            >
-                <TextField source={"firstName"} />
-                <TextField source={"lastName"} />
-                <TextField source={"email"} />
-                <TextField source={"roles"} />
-                <TextField source={"location"} />
-                {/* <FieldGuesser source={"createdAt"} /> */}
-                {/* <FieldGuesser source={"conversion"} /> */}
-                <TextField source={"phoneNumber"} />
-                <TextField source={"dateOfBirth"} />
-                <TextField source={"gender"} />
-                <TextField source={"userProfile"} />
-            </Datagrid>
-        </List>
-    )
-            {/* <FieldGuesser source={"products"} />
-            <FieldGuesser source={"userAddress"} />
-            <FieldGuesser source={"shopOrders"} />
-            <FieldGuesser source={"subscriptions"} /> */
-            // </List>
-        }
     console.log({dataProvider_data: dataProvider})
 
     return (
@@ -352,7 +302,7 @@ export default function DashboardPage() {
                 loginPage={MyLogin}
                 authProvider={authProvider}
             >
-                <Resource name={"users"} list={adminRole && userList} show={adminRole && ShowGuesser} create={adminRole && UserCreate} edit={adminRole && EditGuesser} />
+                <Resource name={"users"} list={adminRole && UserList} show={adminRole && UserShow} create={adminRole && UserCreate} edit={adminRole && UserEdit} />
                 {/* <ResourceGuesser name={"classes"} list={adminRole && ListGuesser} show={adminRole && ShowGuesser} create={adminRole && CreateGuesser} edit={adminRole && EditGuesser} />
                 <ResourceGuesser name={"trainingsessions"} list={adminRole && ListGuesser} show={adminRole && ShowGuesser} create={adminRole && CreateGuesser} edit={adminRole && EditGuesser} />
                 <ResourceGuesser name={"profiles"} list={adminRole && ProfileList} show={adminRole && ShowGuesser} create={adminRole && CreateGuesser} edit={adminRole && EditGuesser} />     */}

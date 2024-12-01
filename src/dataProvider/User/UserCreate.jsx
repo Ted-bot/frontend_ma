@@ -1,23 +1,19 @@
-import { 
-    CreateGuesser,
-    InputGuesser
-} from '@api-platform/admin'
-
-import { required } from 'react-admin'
+import { required, Create, TextInput, SimpleForm } from 'react-admin'
 
 const UserCreate = props => (
-    <CreateGuesser {...props}>
-        <InputGuesser source={"firstName"} validate={[required()]} fullWidth />
-        <InputGuesser source={"lastName"} validate={[required()]} fullWidth />
-        <InputGuesser source={"email"} validate={[required()]} fullWidth />
-        {/* <InputGuesser source={"roles"} validate={[required()]} fullWidth /> */}
-        <InputGuesser source={"password"} validate={[required()]} fullWidth />
-        <InputGuesser source={"phoneNumber"} validate={[required()]} fullWidth />
-        <InputGuesser source={"dateOfBirth"} validate={[required()]} fullWidth />
-        <InputGuesser source={"gender"} validate={[required()]} fullWidth />
-        <InputGuesser source={"location"} validate={[required()]} fullWidth />
-        <InputGuesser source={"conversion"} validate={[required()]} fullWidth />
-    </CreateGuesser>
+    <Create resource="users" {...props}>
+        <SimpleForm>
+            <TextInput source={"firstName"} validate={[required()]} fullWidth />
+            <TextInput source={"lastName"} validate={[required()]} fullWidth />
+            <TextInput source={"email"} validate={[required()]} fullWidth />
+            <TextInput source={"password"} validate={[required()]} fullWidth />
+            <TextInput source={"phoneNumber"} validate={[required()]} fullWidth />
+            <TextInput source={"dateOfBirth"} validate={[required()]} fullWidth />
+            <TextInput source={"gender"} validate={[required()]} fullWidth />
+            <TextInput source={"location"} validate={[required()]} fullWidth />
+            <TextInput multiline source={"conversion"} validate={[required()]} fullWidth />
+        </SimpleForm>
+    </Create>
 )
 
 export default UserCreate
