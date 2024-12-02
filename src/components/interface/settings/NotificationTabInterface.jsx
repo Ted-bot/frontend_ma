@@ -32,7 +32,7 @@ export const NotificationTabInterface = () => {
 
     useEffect(() => {        
         if(eventsData.status === 'success' && eventsData?.events) {
-            const getData = eventsData?.events['hydra:member']
+            const getData = eventsData?.events['member']
             console.log("got data", getData)
             getData.map(registeredEvent => ({
                 id: registeredEvent.id, 

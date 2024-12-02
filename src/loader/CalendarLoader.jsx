@@ -20,7 +20,7 @@ export async function CalendarLoader()
 
     console.log('pulicEventsCalendar', blackDragonEvents)
 
-    const response = blackDragonEvents['hydra:member'].map((response) => ({
+    const response = blackDragonEvents['member'].map((response) => ({
         id: response.id,
         title: response.title,
         start: new Date(response.startDate),

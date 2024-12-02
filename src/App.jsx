@@ -18,6 +18,7 @@ import {tokenLoader} from './js/util/auth.js'
 import ContactPage from './pages/ContactPage.jsx'
 import ErrorPage from './pages/ErrorPage.jsx'
 import { ReactQueryClientProvider } from './dataProvider/main/ReactQueryClientProvider.jsx'
+import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query'
 import { SignUpLoader } from './loader/SignUpLoader.jsx'
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
@@ -26,10 +27,12 @@ import { StoreProvider } from './hooks/store/StoreProvider.jsx'
 import { ThemeProvider } from '@mui/material/styles'
 import { unstable_createMuiStrictModeTheme } from '@mui/material/styles'
 import { ErrorBoundary } from 'react-error-boundary'
+// import { useQuery } from 'react-query';
 
 const theme = unstable_createMuiStrictModeTheme();
 
 function App() {
+  const queryClient = new QueryClient()
 
   const router = createBrowserRouter([
     { 
@@ -53,13 +56,15 @@ function App() {
   return (
     <StoreProvider>
         <TabsProvider>
-            <ReactQueryClientProvider>
+            {/* <ReactQueryClientProvider> */}
+            <QueryClientProvider client={queryClient} contextSharing={true}>
               <ThemeProvider theme={theme}>
                   <LocalizationProvider dateAdapter={AdapterDayjs}>
                       <RouterProvider router={router} ></RouterProvider>
                   </LocalizationProvider>        
               </ThemeProvider>
-          </ReactQueryClientProvider>
+            </QueryClientProvider>
+          {/* </ReactQueryClientProvider> */}
         </TabsProvider>
     </StoreProvider>
   )

@@ -16,7 +16,10 @@ const UserEdit = props => {
 
     return (
         <Edit resource="users" mutationOptions={{ onError }} {...props}>
+            <section id="edit-page">
             <SimpleForm>
+
+                
                 <TextInput source={"firstName"} validate={[required()]} fullWidth />
                 <TextInput source={"lastName"} validate={[required()]} fullWidth />
                 <TextInput source={"email"} validate={[required()]} fullWidth />
@@ -36,6 +39,7 @@ const UserEdit = props => {
                 <TextInput source={"userAddresses"} disabled fullWidth />
                 <TextInput multiline source={"conversion"} validate={[required()]} fullWidth />
             </SimpleForm>
+            </section>
         </Edit>
     )
 }

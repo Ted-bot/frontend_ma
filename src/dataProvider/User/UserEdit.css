@@ -1,8 +1,8 @@
-.MuiSvgIcon-root.MuiSvgIcon-fontSizeSmall {
+#edit-page .MuiSvgIcon-root.MuiSvgIcon-fontSizeSmall {
     fill: #cd1335 !important;
 }
 
-.css-78ba8u-MuiSvgIcon-root {
+#edit-page .css-78ba8u-MuiSvgIcon-root {
     font-size: 2.5rem;
     margin: 1rem;
 }

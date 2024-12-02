@@ -8,15 +8,21 @@ import { AdminGuesser,
     ListGuesser,
     FieldGuesser,
 } from '@api-platform/admin'
-import { Admin, Layout, CustomRoutes, Datagrid, DateField,Resource, Show, SimpleShowLayout, RichTextField,BulkDeleteButton, BulkUpdateButton,useAuthenticated, defaultLightTheme, SearchInput, TextField, TextInput,Filter, List} from 'react-admin'
+import { Admin, Layout, CustomRoutes, houseDarkTheme, ToggleThemeButton, AppBar, Datagrid, DateField,Resource, Show, SimpleShowLayout, RichTextField,BulkDeleteButton, BulkUpdateButton,useAuthenticated, defaultLightTheme, SearchInput, TextField, TextInput,Filter, List} from 'react-admin'
 import { Route } from 'react-router-dom'
 
 import {MyMenu} from '../components/navigations/DashboardNavigation.jsx'
+
 import ProfileList from '../dataProvider/Profile/ProfileList.jsx'
+import ProfileShow from '../dataProvider/Profile/ProfileShow.jsx'
+
 import UserCreate from '../dataProvider/User/UserCreate.jsx'
 import UserList from '../dataProvider/User/UserList.jsx'
 import UserEdit from '../dataProvider/User/UserEdit.jsx'
 import UserShow from '../dataProvider/User/UserShow.jsx'
+
+import TrainingSessionList from '../dataProvider/TrainingSessions/TrainingSessionList.jsx'
+
 import LoginDashboardLoader from '../loader/LoginDashboardLoader.jsx'
 
 import UserProfilePage from './client/UserProfilePage'
@@ -30,7 +36,25 @@ import {PaymentPage} from './client/PaymentPage.jsx'
 import inMemoryJwt from '../js/util/inMemoryJwt.js'
 import { getLocalStorageItem } from '../js/util/getUtil.js'
 import './Dashboard.css'
+import { components } from 'react-select'
 
+const MyAppBar = () => (
+    <AppBar toolbar={<ToggleThemeButton />} />
+)
+
+const myDarkTheme = {
+    ...houseDarkTheme,
+    components: { 
+        MuiScopedCssBaseline: { //MuiFormLabel-root
+            styleOverrides: { // label text input
+                root: {
+                    color: 'black' 
+                },
+            },
+        }
+    }
+    
+}
 
 const myTheme = {
         ...defaultLightTheme,
@@ -116,6 +140,13 @@ const myTheme = {
                     }
                 }
             },
+            // MuiTableRow: {
+            //     styleOverrides: {
+            //         root: {
+            //             borderBottom: '3px solid gray'
+            //         }
+            //     }
+            // },
             MuiCard : {
                 styleOverrides: {
                     root: {
@@ -279,13 +310,12 @@ export default function DashboardPage() {
     
     const schemaAnalyzer = hydraSchemaAnalyzer()
     const MyLogin = () => (<LoginDashboardLoader />)
-    const MyLayout = props => <Layout {...props} menu={MyMenu}/> 
+    const MyLayout = props => <Layout {...props} appBar={MyAppBar} menu={MyMenu}/> 
 
     // const roles = inMemoryJwt.getRoles()
     const roles = JSON.parse(getLocalStorageItem("roles"))
     console.log({rolesParsed: roles})
     const adminRole = roles?.find(role => role === "ROLE_USER_SIFU") ?? false
-
 
     console.log({dataProvider_data: dataProvider})
 
@@ -294,6 +324,7 @@ export default function DashboardPage() {
             <Admin
                 defaultTheme='light'
                 theme={myTheme}
+                darkTheme={myDarkTheme}
                 basename='/dashboard'
                 dashboard={UserProfilePage}
                 layout={MyLayout}
@@ -303,6 +334,8 @@ export default function DashboardPage() {
                 authProvider={authProvider}
             >
                 <Resource name={"users"} list={adminRole && UserList} show={adminRole && UserShow} create={adminRole && UserCreate} edit={adminRole && UserEdit} />
+                <Resource name={"trainingsessions"} list={adminRole && TrainingSessionList}/>
+                <Resource name={"profiles"} list={adminRole && ProfileList}  show={adminRole && ProfileShow}/>
                 {/* <ResourceGuesser name={"classes"} list={adminRole && ListGuesser} show={adminRole && ShowGuesser} create={adminRole && CreateGuesser} edit={adminRole && EditGuesser} />
                 <ResourceGuesser name={"trainingsessions"} list={adminRole && ListGuesser} show={adminRole && ShowGuesser} create={adminRole && CreateGuesser} edit={adminRole && EditGuesser} />
                 <ResourceGuesser name={"profiles"} list={adminRole && ProfileList} show={adminRole && ShowGuesser} create={adminRole && CreateGuesser} edit={adminRole && EditGuesser} />     */}

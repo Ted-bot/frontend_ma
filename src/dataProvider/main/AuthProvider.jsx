@@ -26,30 +26,33 @@ export const authProvider = {
         if(!authenticateClient.ok)
             { 
                 console.log({Login_Failed: response.message})
-                throw new HttpError(response.message, authenticateClient.status, response)  
-                // throw new HttpError('Api Login error', authenticateClient.status, response)  
-                // return Promise.reject() //response
+                const {headers, status, body, message, detail} = response
+                // throw new HttpError(response.message, authenticateClient.status, response)  
+                return Promise.reject(new HttpError(message || detail, authenticateClient.status, response) ) 
             }
 
-        console.log({headerLoginJWT:authenticateClient.headers.getSetCookie(), headers:authenticateClient.headers,response: response})
+        // console.log({headerLoginJWT:authenticateClient.headers.getSetCookie(), headers:authenticateClient.headers,response: response})
         const token = response.token
         const refreshToken = response.refreshToken
         const getTokenData = jwtDecode(token)
-        
-        
+
+        // console.log({tokenData: getTokenData})
+
         // AppDispatch(userLoggedIn({payload: getTokenData.username }))
         if(getLocalStorageItem('loggedIn') === false) setLocalStorageItem('loggedIn', true)
         inMemoryJwt.setToken(token)
         // inMemoryJwt.setRoles(getTokenData.roles)
         inMemoryJwt.setRefreshToken(refreshToken)
+
+        setLocalStorageItem('exp', getTokenData.exp)
         setLocalStorageItem('email', getTokenData.username)        
         setLocalStorageItem('userId', getTokenData.id)        
         setLocalStorageItem('roles', JSON.stringify(getTokenData.roles))        
-        console.log({crack_token: getTokenData, roles: inMemoryJwt.getRoles()})
         // return Promise.resolve({redirectTo: '/dashboard',})
         return Promise.resolve(authenticateClient)            
     },
     logout: async () => {
+        deleteLocalStorageItem('exp')        
         deleteLocalStorageItem('email')        
         deleteLocalStorageItem('user_address')        
         deleteLocalStorageItem('lines')        

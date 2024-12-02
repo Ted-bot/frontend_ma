@@ -2,7 +2,7 @@ import {
     fetchHydra,
     hydraDataProvider,
 } from '@api-platform/admin'
-import { fetchUtils } from 'react-admin'
+import { fetchUtils, addRefreshAuthToDataProvider } from 'react-admin'
 import { ApiFetch, ApiFetchPostOptions } from '../../js/util/postUtil'
 import { ApiFetchGetOptions, deleteLocalStorageItem, getLocalStorageItem, setLocalStorageItem} from '../../js/util/getUtil'
 import { parseHydraDocumentation } from "@api-platform/api-doc-parser"
@@ -12,20 +12,21 @@ import { HttpError } from 'react-admin'
 const getAuthHeaders = () => {
     const token = inMemoryJwt.getToken()
     const headers = new Headers({"Content-Type": "application/json"})
+    headers.set("X-Authorization", `Bearer ${token}`)
     
-    if(token){ 
-        // headers.set("Authorization", `Bearer ${token}`)
-        headers.set("X-Authorization", `Bearer ${token}`)
-    } else {
-        if(inMemoryJwt.checkAvailableRefreshToken()){
-            inMemoryJwt.getRefreshedToken()
-            inMemoryJwt.waitForTokenRefresh().then(() => {
-                // headers.set("Content-Type", "application/json")
-                // headers.set('X-Authorization', `Bearer ${inMemoryJwt.getToken()}`)
-                headers.set('X-Authorization', `Bearer ${inMemoryJwt.getToken()}`)
-            })
-        }
-    }    
+    // if(token){ 
+    //     // headers.set("Authorization", `Bearer ${token}`)
+    //     headers.set("X-Authorization", `Bearer ${token}`)
+    // } else {
+    //     if(inMemoryJwt.checkAvailableRefreshToken()){
+    //         inMemoryJwt.getRefreshedToken()
+    //         inMemoryJwt.waitForTokenRefresh().then(() => {
+    //             // headers.set("Content-Type", "application/json")
+    //             // headers.set('X-Authorization', `Bearer ${inMemoryJwt.getToken()}`)
+    //             headers.set('X-Authorization', `Bearer ${inMemoryJwt.getToken()}`)
+    //         })
+    //     }
+    // }    
     return headers
 };
 
@@ -42,7 +43,20 @@ const getHydraWithHeaders = (url, options = {}) =>
             headers: getAuthHeaders(),
         })
     }
-    
+
+const refreshAuth = () => {
+    // const { accessToken, refreshToken } = getAuthTokensFromLocalStorage();
+    const accessToken = getLocalStorageItem('exp')
+    if (accessToken < new Date(Date.now()).getTime() / 1000) {
+        // This function will fetch the new tokens from the authentication service and update them in localStorage
+        // return refreshAuthTokens(refreshToken);
+        if(inMemoryJwt.checkAvailableRefreshToken()){
+            inMemoryJwt.getRefreshedToken()
+            return inMemoryJwt.waitForTokenRefresh()
+        }
+    }
+    return Promise.resolve();
+}
 
 const apiDocumentationParser = async () => {
     try {
@@ -67,7 +81,7 @@ const apiDocumentationParser = async () => {
     }
 }
 
-export const dataProvider = ({
+export const baseDataProvider = ({
     ...hydraDataProvider({
         entrypoint: '/api',
         httpClient: getHydraWithHeaders,
@@ -79,11 +93,12 @@ export const dataProvider = ({
         let setupQuery = undefined 
         let changePagination = undefined 
         let setQuery = ""
+        let storeUsersData = undefined
         const token = inMemoryJwt.getToken()
         const options = {headers: null}
         options.headers = new Headers({'X-Authorization': `bearer ${token}`})
 
-        console.log({resource,params})
+        console.log({GetListResourse: resource,params})
         if(params){
             const filter = params?.filter
             const operators = { '_gte': '>=', '_lte': '<=', '_neq': '!=' }
@@ -110,14 +125,14 @@ export const dataProvider = ({
         const response = await fetchUtils.fetchJson(`/api/${resource}${!!addParams ? '?' : ''}${addParams}`,options )
         
         const configurePagination = (response) => {
-            const currentPage = response["hydra:view"]["@id"]
-            const firstPage = response["hydra:view"]["hydra:first"]
-            const lastPage = response["hydra:view"]["hydra:last"]
+            const currentPage = response["view"]["@id"]
+            const firstPage = response["view"]["first"]
+            const lastPage = response["view"]["last"]
             let nextPage = undefined
 
-            for(const [key, value] of Object.entries(response["hydra:view"])){
-                if(key === "hydra:next"){
-                    nextPage = response["hydra:view"]["hydra:next"]
+            for(const [key, value] of Object.entries(response["view"])){
+                if(key === "next"){
+                    nextPage = response["view"]["next"]
                 }
             }            
 
@@ -130,15 +145,19 @@ export const dataProvider = ({
 
             return {hasPreviousPage: previousPageAvailable, hasNextPage:nextPageAvailable}
         }
-        const data = response.json["hydra:member"]
-        const pagination = Object.keys(response.json["hydra:view"]).find(key => key === 'hydra:first') && configurePagination(response.json)
-        const storeUsersData = data.map(user => ({id: user.id, email: user.email}))
+        const data = response.json["member"]
+        const pagination = Object.keys(response.json["view"]).find(key => key === 'first') && configurePagination(response.json)
+        
+
+        if(resource === "users") storeUsersData = data.map(user => ({id: user.id, email: user.email}))        
+        
+        if(resource === "profiles")  storeUsersData = data.map(profile => ({id: profile.id, username: profile.username, userId: profile.userUniq?.id}))
 
         setLocalStorageItem(resource, storeUsersData)
 
         return {
             data: data, 
-            total: response.json["hydra:totalItems"], 
+            total: response.json["totalItems"], 
             pageInfo:{
                 hasPreviousPage: !!pagination && pagination.hasPreviousPage,
                 hasNextPage: !!pagination && pagination.hasNextPage
@@ -194,12 +213,12 @@ export const dataProvider = ({
         }
 
         const response = await fetchUtils.fetchJson(`/api/${query}`,options )
-        const {headers, status, body, statusText} = response
+        const {headers, status, body, detail} = response
 
         console.log({message: response})
 
         if( 200 < response.status || response.status > 300) {
-            throw Promise.reject(new HttpError(response?.json || statusText, status, response.json))
+            throw Promise.reject(new HttpError(response?.json || detail, status, response.json))
         }
 
         return Promise.resolve({data: response.json})
@@ -242,7 +261,7 @@ export const dataProvider = ({
     getOne: async (resource, params) => {
         const token = inMemoryJwt.getToken()
         console.log({getUser: resource, params: params?.id})
-        let query = resource
+        let query = `${resource}/${params?.id}`
         let addParam = undefined
         let identifier = undefined
         let getUser = undefined
@@ -260,7 +279,75 @@ export const dataProvider = ({
 
         if(response.status > 399) return Promise.reject()
 
-        return Promise.resolve({data: response.json})
+            console.log({allDataGetOne: response.json})
+
+        return Promise.resolve({data: {...response.json, id:response.json.id}})
+    },
+    getManyReference: async (resource, params) => {
+        let query = undefined
+        let setupQuery = undefined 
+        let changePagination = undefined 
+        let setQuery = ""
+        const token = inMemoryJwt.getToken()
+        const options = {headers: null}
+        options.headers = new Headers({'X-Authorization': `bearer ${token}`})
+
+        
+        if(params){
+            const target = params?.target
+
+            changePagination = params?.pagination?.page
+    
+            setQuery = !!changePagination ? `page=${changePagination}` : ""
+
+            // for (const item of filters){
+                setQuery += `${!!setQuery ? '&' : ''}${target}=${params.id}`
+            // }
+
+            query = target ? setQuery : undefined
+        }           
+        console.log({getManyReference:query,resource,params})
+
+        const addParams = typeof query == "string" ? query : ""        
+        const response = await fetchUtils.fetchJson(`/api/${resource}${!!addParams ? '?' : ''}${addParams}`,options )
+        
+        console.log({getManyReferenceResponse:response.json})
+
+        const configurePagination = (response) => {
+            const currentPage = response["view"]["@id"]
+            const firstPage = response["view"]["first"]
+            const lastPage = response["view"]["last"]
+            let nextPage = undefined
+
+            for(const [key, value] of Object.entries(response["view"])){
+                if(key === "next"){
+                    nextPage = response["view"]["next"]
+                }
+            }            
+
+            const currentPageNr = currentPage.charAt(currentPage.length - 1)
+            const firstPageNr = firstPage.charAt(firstPage.length - 1)
+            const lastPageNr = lastPage.charAt(lastPage.length - 1)
+            const nextPageNr = !!nextPage && nextPage.charAt(nextPage.length - 1)
+            const nextPageAvailable = Number(currentPageNr) < Number(lastPageNr)
+            const previousPageAvailable = Number(currentPageNr) > Number(firstPageNr)
+
+            return {hasPreviousPage: previousPageAvailable, hasNextPage:nextPageAvailable}
+        }
+        const data = response.json["member"]
+        const pagination = Object.keys(response.json["view"]).find(key => key === 'first') && configurePagination(response.json)
+        const storeUsersData = data.map(user => ({id: user.id, email: user.email}))
+
+        // setLocalStorageItem(resource, storeUsersData)
+
+        return {
+            data: data, 
+            total: response.json["totalItems"], 
+            pageInfo:{
+                hasPreviousPage: !!pagination && pagination.hasPreviousPage,
+                hasNextPage: !!pagination && pagination.hasNextPage
+            }
+        }
     },
     getUserRegisteredEvents: async (resource, params) => {
         const token = inMemoryJwt.getToken()
@@ -311,7 +398,7 @@ export const dataProvider = ({
             throw new HttpError('Shit, Black Dragon Events Not Found!', 404, response)              
         }   
 
-        const events = response['hydra:member'].map((response) => ({
+        const events = response['member'].map((response) => ({
             id: response.id,
             title: response.title,
             start: new Date(response.startDate),
@@ -319,13 +406,13 @@ export const dataProvider = ({
             resource: response.description,
         }))
 
-        const checkIfUserHasSelectedEvent = response['hydra:member'].find((selectedEvent) => selectedEvent?.selectedEvent !== 0)
+        const checkIfUserHasSelectedEvent = response['member'].find((selectedEvent) => selectedEvent?.selectedEvent !== 0)
 
         if(!checkIfUserHasSelectedEvent){
             return {events: events, userSelectedEvents: null}
         }
 
-        const filterSelectedEventByUser = response['hydra:member'].filter((response) => (
+        const filterSelectedEventByUser = response['member'].filter((response) => (
             response.selectedEvent !== 0
         ))
 
@@ -438,3 +525,6 @@ export const dataProvider = ({
         return getResults
     }
 })
+
+
+export const dataProvider = addRefreshAuthToDataProvider( baseDataProvider, refreshAuth)

@@ -19,7 +19,7 @@ export const fetchUserCalendar = async () => {
         throw new HttpError('Excuse us, Black Dragon Events Not Found!', 404, response)          
     }   
 
-    const events = response['hydra:member'].map((response) => ({
+    const events = response['member'].map((response) => ({
         id: response.id,
         title: response.title,
         start: new Date(response.startDate),
@@ -27,13 +27,13 @@ export const fetchUserCalendar = async () => {
         resource: response.description,
     }))
 
-    const checkIfUserHasSelectedEvent = response['hydra:member'].find((selectedEvent) => selectedEvent?.selectedEvent !== 0)
+    const checkIfUserHasSelectedEvent = response['member'].find((selectedEvent) => selectedEvent?.selectedEvent !== 0)
 
     if(!checkIfUserHasSelectedEvent){
         return {events: events, userSelectedEvents: null}
     }
 
-    const filterSelectedEventByUser = response['hydra:member'].filter((response) => (
+    const filterSelectedEventByUser = response['member'].filter((response) => (
         response.selectedEvent !== 0
     ))
 
@@ -55,7 +55,7 @@ export const fetchPublicCalendar = async () => {
 
     console.log('pulicEventsCalendar', response)
 
-    const publicBlackDragonEvents = response['hydra:member'].map((response) => ({
+    const publicBlackDragonEvents = response['member'].map((response) => ({
         id: response.id,
         title: response.title,
         start: new Date(response.startDate),

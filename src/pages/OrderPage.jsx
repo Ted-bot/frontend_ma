@@ -63,7 +63,7 @@ export default function OrderPage(){
 
           console.log({responseAvailableProducts: response.collection})
     
-          return { collection: getResults['hydra:member'] }
+          return { collection: getResults['member'] }
         
         } catch (error) {
     

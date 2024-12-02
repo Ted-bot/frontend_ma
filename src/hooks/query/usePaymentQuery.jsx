@@ -30,7 +30,7 @@ export const fetchPublicCalendar = async () => {
 
     console.log('pulicEventsCalendar', response)
 
-    const publicBlackDragonEvents = response['hydra:member'].map((response) => ({
+    const publicBlackDragonEvents = response['member'].map((response) => ({
         id: response.id,
         title: response.title,
         start: new Date(response.startDate),
