@@ -63,8 +63,8 @@ export default function OrderCard({
 
     function handleSubmit(event) {
         event.preventDefault()       
-        const sku = event.target.subscription.value
-        console.log({sku})
+        const sku = event.target[1].value //event.target.subscription.value
+        console.log({product: sku})
         // const requestData = reconstructPostInput(enteredInput, pw)
         // findAndUpdateInvalidList(enteredInputIsInvalid)
         postRequest({sku})

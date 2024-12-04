@@ -5,9 +5,9 @@ export default function LoginPage() {
 
     return (
         <>
-        <FormWrap>
-            <LoginForm />
-        </FormWrap>
+            <FormWrap>
+                <LoginForm />
+            </FormWrap>
         </>
     )
 }

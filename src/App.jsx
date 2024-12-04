@@ -56,15 +56,15 @@ function App() {
   return (
     <StoreProvider>
         <TabsProvider>
-            {/* <ReactQueryClientProvider> */}
-            <QueryClientProvider client={queryClient} contextSharing={true}>
-              <ThemeProvider theme={theme}>
-                  <LocalizationProvider dateAdapter={AdapterDayjs}>
-                      <RouterProvider router={router} ></RouterProvider>
-                  </LocalizationProvider>        
-              </ThemeProvider>
+            <ReactQueryClientProvider>
+              <QueryClientProvider client={queryClient} contextSharing={true}>
+                <ThemeProvider theme={theme}>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <RouterProvider router={router} ></RouterProvider>
+                    </LocalizationProvider>        
+                </ThemeProvider>
             </QueryClientProvider>
-          {/* </ReactQueryClientProvider> */}
+          </ReactQueryClientProvider>
         </TabsProvider>
     </StoreProvider>
   )

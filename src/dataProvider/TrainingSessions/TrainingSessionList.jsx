@@ -32,10 +32,7 @@ const TrainingSessionList = () => (
                 <TextField label="createdAt" source={"createdAt"} />,
                 <TextField label="start" source={"startDate"} />,
                 <TextField label="end" source={"endDate"} />,
-                {/* <BooleanField label="isPublished" source={"isPublished"}/>, */}
-                {/* <TextField label="test" source={"subscribedTo"}/>, */}
-                {/* <TextField label="entries" source={"subscribedTo"} />, */}
-                <ArrayField source="subscribedTo">
+                <ArrayField source="subscribedTo" label="students">
                     <SubscribedTo />
                 </ArrayField>
                 {/* <ReferenceArrayField
