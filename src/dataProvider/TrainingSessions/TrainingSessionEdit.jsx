@@ -35,7 +35,7 @@ const TrainingSessionEdit = props => {
                 dataProvider.update('trainingsessions', { id: transformedValues.id, data: transformedValues });
             }}>
                 <TextInput label="title" source={"title"} validate={[required()]} />
-                <ReferenceInput source={"relatedUser.id"} reference="profiles">
+                <ReferenceInput source={"relatedUser.id"} reference="profiles" perPage={50}>
                     <AutocompleteInput  
                         label="trainer"
                         source={"relatedUser.id"} 

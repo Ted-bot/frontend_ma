@@ -100,25 +100,30 @@ export const baseDataProvider = ({
         const options = {headers: null}
         options.headers = new Headers({'X-Authorization': `bearer ${token}`})
 
-        console.log({GetListResourse: resource,params})
+        // console.log({GetListResourse: resource,params})
+
         if(params?.pagination?.page || params?.filter){
             const filter = params?.filter
-            const operators = { '_gte': '>=', '_lte': '<=', '_neq': '!=' }
-    
+            const operators = { '_gte': 'after', '_lte': 'before', '_neq': '!=' }
+            // const operators = { '_gte': '>=', '_lte': '<=', '_neq': '!=' }
+            const setItemsPerPage = params?.pagination?.perPage
             const filters = Object.keys(filter).map(key => {
                 const operator = operators[key.slice(-4)]
+                console.log({ListOperator: operator,key: key, sliceKey: key.slice(-4), filter: filter})
                 return operator
                     ? { field: key.slice(0, -4), operator, value: filter[key] }
                     : { field: key, operator: '=', value: filter[key] }
             })
 
             changePagination = params?.pagination?.page
+            
+            // console.log({filterList: filters})
     
-            setQuery = !!changePagination ? `page=${changePagination}` : ""
+            setQuery = !!changePagination && setItemsPerPage ? `pagination=true&page=${changePagination}&itemsPerPage=${setItemsPerPage}` : ""
 
             for (const item of filters){
                 if(!item.field && !item.value) continue
-                setQuery += `${!!setQuery ? '&' : ''}${item.field}=${item.value}`
+                setQuery += `${!!setQuery ? '&' : ''}${item.field}${item.operator != '=' ? `[${item.operator}]` : ''}=${item.value}` //item.operator
             }
 
             query = filters.length !== 0 || !!setQuery ? setQuery : undefined
@@ -149,8 +154,12 @@ export const baseDataProvider = ({
             return {hasPreviousPage: previousPageAvailable, hasNextPage:nextPageAvailable}
         }
         const data = response.json.member
-        const pagination = Object.keys(response.json.view).find(key => key === 'first') && configurePagination(response.json)
         
+        let pagination = false
+        
+        if(!!response.json?.view){
+            pagination = Object.keys(response.json.view).find(key => key === 'first') && configurePagination(response.json)
+        }
 
         if(resource === "users") storeUsersData = data.map(user => ({id: user.id, email: user.email}))        
         

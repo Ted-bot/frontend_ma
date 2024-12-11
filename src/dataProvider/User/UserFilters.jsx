@@ -1,4 +1,4 @@
-import { SearchInput,TextInput} from 'react-admin'
+import { SearchInput,TextInput, DateInput} from 'react-admin'
 
 const UserFilters = [
     <SearchInput source="q" alwaysOn/>, //resettable={false} 
@@ -8,7 +8,7 @@ const UserFilters = [
     <TextInput label="role" source={"roles"} />,
     <TextInput label="location" source={"location"} />,
     <TextInput label="phone" source={"phoneNumber"} />,
-    <TextInput label="birthday" source={"dateOfBirth"} />,
+    <DateInput label="birthday" source={"dateOfBirth"} />,
     <TextInput label="gender" source={"gender"} />,
 ]
 

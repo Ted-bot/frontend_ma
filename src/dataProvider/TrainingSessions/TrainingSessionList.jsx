@@ -4,10 +4,12 @@ import { NavLink } from 'react-router-dom'
 import './TrainingSessionList.css'
 import {SubscribedTo} from '../ListProvider/SubscribeTo.jsx'
 
-const TrainingSessionList = () => (
+const TrainingSessionList = (props) => (
 
     
-    <List filters={TrainingSessionFilters}>
+    <List {...props} 
+        filters={TrainingSessionFilters}
+    >
         <section id="trainingsessionlist">
             <Datagrid
                 rowClick="show"
@@ -17,7 +19,9 @@ const TrainingSessionList = () => (
                     <TextField source="username" defaultValue={"black dragon trainer"} />    
                 </ReferenceOneField> */}
                 <TextField label="trainer" source="relatedUser.username"/>
-                <DateField label="createdAt" source={"createdAt"} showTime={false} />
+                <DateField label="createdAt" source={"createdAt"} resource={"createdAt_filterDate_after"} showTime={false}
+                    // transform={value =>  new Date(value.substring(0,value.length -6))}
+                />
                 <DateField label="start" source={"startDate"} transform={value =>  new Date(value.substring(0,value.length -6))} showTime />
                 <DateField label="end" source={"endDate"} showDate={false} showTime={true} transform={value =>  new Date(value.substring(0,value.length -6))}/>
                 <BooleanField label="published" source={"isPublished"}/>
