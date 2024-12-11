@@ -1,3 +1,5 @@
+import { useState, useEffect } from 'react'
+
 import { AdminGuesser,
     hydraSchemaAnalyzer,
     ResourceGuesser,
@@ -8,8 +10,35 @@ import { AdminGuesser,
     ListGuesser,
     FieldGuesser,
 } from '@api-platform/admin'
-import { Admin, Layout, CustomRoutes, houseDarkTheme, ToggleThemeButton, AppBar, Datagrid, DateField,Resource, Show, SimpleShowLayout, RichTextField,BulkDeleteButton, BulkUpdateButton,useAuthenticated, defaultLightTheme, SearchInput, TextField, TextInput,Filter, List} from 'react-admin'
-import { Route } from 'react-router-dom'
+
+import { 
+    useAuthenticated, 
+    Authenticated,
+    Admin, 
+    Layout, 
+    CustomRoutes, 
+    houseDarkTheme, 
+    ToggleThemeButton, 
+    AppBar, 
+    useRefresh,
+    Datagrid, 
+    DateField,
+    Resource, 
+    Show, 
+    SimpleShowLayout,
+    RichTextField,
+    BulkDeleteButton, 
+    BulkUpdateButton, 
+    defaultLightTheme, 
+    SearchInput, 
+    TextField, 
+    TextInput,
+    Filter, 
+    List,
+    useAuthProvider
+} from 'react-admin'
+
+import { redirect, Route, useNavigation, useNavigate } from 'react-router-dom'
 
 import {MyMenu} from '../components/navigations/DashboardNavigation.jsx'
 
@@ -22,6 +51,9 @@ import UserEdit from '../dataProvider/User/UserEdit.jsx'
 import UserShow from '../dataProvider/User/UserShow.jsx'
 
 import TrainingSessionList from '../dataProvider/TrainingSessions/TrainingSessionList.jsx'
+import TrainingSessionCreate from '../dataProvider/TrainingSessions/TrainingSessionCreate.jsx'
+import TrainingSessionEdit from '../dataProvider/TrainingSessions/TrainingSessionEdit.jsx'
+import TrainingSessionShow from '../dataProvider/TrainingSessions/TrainingSessionShow.jsx'
 
 import LoginDashboardLoader from '../loader/LoginDashboardLoader.jsx'
 
@@ -37,9 +69,23 @@ import inMemoryJwt from '../js/util/inMemoryJwt.js'
 import { getLocalStorageItem } from '../js/util/getUtil.js'
 import './Dashboard.css'
 import { components } from 'react-select'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faRefresh } from '@fortawesome/free-solid-svg-icons'
+
+const RefreshButton = ({children}) => {
+    const refresh = useRefresh()
+    const handleClick = () => {
+        refresh()
+    }
+    return <button onClick={handleClick}>{children}</button>
+}
 
 const MyAppBar = () => (
-    <AppBar toolbar={<ToggleThemeButton />} />
+    <AppBar toolbar={<>
+        <RefreshButton children={<FontAwesomeIcon className='fa-xl mr-2' icon={faRefresh}/>} />
+        <ToggleThemeButton /> 
+    </>}>        
+    </AppBar>
 )
 
 const myDarkTheme = {
@@ -259,6 +305,13 @@ const myTheme = {
                     }
                 }
             },
+            MuiPopper: { // main resource list background
+                styleOverrides: {
+                    root: { 
+                        background: '#e6ddcf', //#ffd086 #F8F8F8 #C45267,                         
+                    }
+                }
+            },
             MuiCardContent: {
                 styleOverrides: {
                     root: { // main content inner component
@@ -307,14 +360,13 @@ const myTheme = {
 
 export default function DashboardPage() {
     useAuthenticated()
-    
+    // console.log({foundTOkenInDashboard: inMemoryJwt.getToken})
     const schemaAnalyzer = hydraSchemaAnalyzer()
     const MyLogin = () => (<LoginDashboardLoader />)
-    const MyLayout = props => <Layout {...props} appBar={MyAppBar} menu={MyMenu}/> 
+    const MyLayout = props => <Layout {...props} appBar={MyAppBar} menu={MyMenu}/>
 
     // const roles = inMemoryJwt.getRoles()
     const roles = JSON.parse(getLocalStorageItem("roles"))
-    console.log({rolesParsed: roles})
     const adminRole = roles?.find(role => role === "ROLE_USER_SIFU") ?? false
 
     console.log({dataProvider_data: dataProvider})
@@ -334,8 +386,8 @@ export default function DashboardPage() {
                 authProvider={authProvider}
             >
                 <Resource name={"users"} list={adminRole && UserList} show={adminRole && UserShow} create={adminRole && UserCreate} edit={adminRole && UserEdit} />
-                <Resource name={"trainingsessions"} list={adminRole && TrainingSessionList}/>
-                <Resource name={"profiles"} list={adminRole && ProfileList}  show={adminRole && ProfileShow}/>
+                <Resource name={"trainingsessions"} list={adminRole && TrainingSessionList} show={adminRole && TrainingSessionShow} create={adminRole && TrainingSessionCreate} edit={adminRole && TrainingSessionEdit}/>
+                <Resource name="profiles" recordRepresentation="username" list={adminRole && ProfileList} show={adminRole && ProfileShow} /> {/*  recordRepresentation={(record) => `${record.first_name} ${record.last_name}` */}
                 {/* <ResourceGuesser name={"classes"} list={adminRole && ListGuesser} show={adminRole && ShowGuesser} create={adminRole && CreateGuesser} edit={adminRole && EditGuesser} />
                 <ResourceGuesser name={"trainingsessions"} list={adminRole && ListGuesser} show={adminRole && ShowGuesser} create={adminRole && CreateGuesser} edit={adminRole && EditGuesser} />
                 <ResourceGuesser name={"profiles"} list={adminRole && ProfileList} show={adminRole && ShowGuesser} create={adminRole && CreateGuesser} edit={adminRole && EditGuesser} />     */}

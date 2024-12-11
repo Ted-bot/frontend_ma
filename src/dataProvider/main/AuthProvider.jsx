@@ -1,107 +1,161 @@
 import { redirect } from 'react-router-dom'
 import { jwtDecode } from "jwt-decode"
-import { HttpError } from 'react-admin'
+import { HttpError, addRefreshAuthToAuthProvider } from 'react-admin'
 
 import { ApiFetch, ApiFetchPostOptions } from '../../js/util/postUtil.js'
 import { ApiFetchGetOptions, getLocalStorageItem, setLocalStorageItem, deleteLocalStorageItem } from '../../js/util/getUtil.js'
 import { PostError } from '../../js/error/PostError.js'
 import inMemoryJwt from '../../js/util/inMemoryJwt.js'
 import useStore from '../../hooks/store/useStore.jsx'
+import { Mutex } from "async-mutex"
 
-export const stateUser = async () => {
-    const [loggedOutUser, setLoggedOutUser] = useStore("loggedOut")
 
-    return {loggedOutUser, setLoggedOutUser}
-}
+export const refreshAuth = () => {
+    const refreshMutex = new Mutex()
+    return refreshMutex.runExclusive(async () => {
+        const accessToken = getLocalStorageItem('exp')
+        console.log({ CheckRefreshNeeded :accessToken < new Date(Date.now()).getTime() / 1000, accessToken : accessToken , currentTime : new Date(Date.now()).getTime() / 1000 })
+        if(accessToken){
 
-export const authProvider = {
-    login: async ({ email, password }) => {
-        
-        // const dispatch = useDispatch()
-        const apiOptions = {url: '/api/login_check', method: 'POST'} // , withCredentials: true
-        const prepareQueryObj = ApiFetchPostOptions(apiOptions,{ username: email, password })
-        const authenticateClient = await ApiFetch(prepareQueryObj)
-        const response = await authenticateClient.json()
-        
-        if(!authenticateClient.ok)
-            { 
-                console.log({Login_Failed: response.message})
-                const {headers, status, body, message, detail} = response
-                // throw new HttpError(response.message, authenticateClient.status, response)  
-                return Promise.reject(new HttpError(message || detail, authenticateClient.status, response) ) 
+        } else if (accessToken < new Date(Date.now()).getTime() / 1000) {        // This function will fetch the new tokens from the authentication service and update them in localStorage
+            console.log({ refreshIsNeeded :accessToken < new Date(Date.now()).getTime() / 1000, accessToken : accessToken , currentTime : new Date(Date.now()).getTime() / 1000 })
+            
+            if(inMemoryJwt.checkAvailableRefreshToken())
+            {
+                return inMemoryJwt.getRefreshedToken()
             }
+        }
+        return Promise.resolve()    
+    }
+)}
 
-        // console.log({headerLoginJWT:authenticateClient.headers.getSetCookie(), headers:authenticateClient.headers,response: response})
-        const token = response.token
-        const refreshToken = response.refreshToken
-        const getTokenData = jwtDecode(token)
+export const myAuthProvider = {
+    login: async ({ email, password }) => {
+        // try {
+            if(!email || !password ){
+                console.log({missingCredentials: password, missingUsername: email})
+                throw new HttpError("missing credentials", 403)
+                // return
+            }
+            const apiOptions = {url: '/api/login_check', method: 'POST'} // , withCredentials: true
+            const prepareQueryObj = ApiFetchPostOptions(apiOptions,{ username: email, password })
+            const authenticateClient = await ApiFetch(prepareQueryObj)
+            const response = await authenticateClient.json()
+            
+            if(!authenticateClient.ok)
+                { 
+                    console.log({Login_Failed: response.message})
+                    const {headers, status, body, message, detail} = response
+                    // throw new HttpError(response.message, authenticateClient.status, response)  
+                    throw new HttpError(message || detail, authenticateClient.status, response) 
+                }
 
-        // console.log({tokenData: getTokenData})
+            // console.log({headerLoginJWT:authenticateClient.headers.getSetCookie(), headers:authenticateClient.headers,response: response})
+            const {token, refreshToken, refresh_token_expiration} = response
+            const getTokenData = jwtDecode(token)
 
-        // AppDispatch(userLoggedIn({payload: getTokenData.username }))
-        if(getLocalStorageItem('loggedIn') === false) setLocalStorageItem('loggedIn', true)
-        inMemoryJwt.setToken(token)
-        // inMemoryJwt.setRoles(getTokenData.roles)
-        inMemoryJwt.setRefreshToken(refreshToken)
+            console.log({tokenData: getTokenData})
 
-        setLocalStorageItem('exp', getTokenData.exp)
-        setLocalStorageItem('email', getTokenData.username)        
-        setLocalStorageItem('userId', getTokenData.id)        
-        setLocalStorageItem('roles', JSON.stringify(getTokenData.roles))        
-        // return Promise.resolve({redirectTo: '/dashboard',})
-        return Promise.resolve(authenticateClient)            
+            // AppDispatch(userLoggedIn({payload: getTokenData.username }))
+            if(getLocalStorageItem('loggedIn') === false) setLocalStorageItem('loggedIn', true)
+            inMemoryJwt.setToken(token)
+            inMemoryJwt.setRoles(getTokenData.roles)
+            inMemoryJwt.setRefreshToken(refreshToken)
+
+            console.log({ getTokenExp: getTokenData.exp, deconstructedToken: refresh_token_expiration , authenticateClient})
+
+            setLocalStorageItem('exp', refresh_token_expiration)
+            setLocalStorageItem('email', getTokenData.username)        
+            setLocalStorageItem('userId', getTokenData.id)        
+            setLocalStorageItem('roles', JSON.stringify(getTokenData.roles))        
+            console.log({loginResponse: response})
+            return Promise.resolve()  
+        // } catch (error) {
+        //     Promise.reject(error)
+        // }
     },
-    logout: async () => {
+    logout: () => {
+        console.log("loggin out")
+        deleteLocalStorageItem('users')        
+        deleteLocalStorageItem('profiles')     
+
         deleteLocalStorageItem('exp')        
         deleteLocalStorageItem('email')        
         deleteLocalStorageItem('user_address')        
         deleteLocalStorageItem('lines')        
         deleteLocalStorageItem('user_id')        
-        // deleteLocalStorageItem('roles')        
+        deleteLocalStorageItem('roles')        
         deleteLocalStorageItem('order_number')        
         deleteLocalStorageItem('amount')        
         deleteLocalStorageItem('selected_subscription_0')        
-        deleteLocalStorageItem('error')        
-        
+        deleteLocalStorageItem('error')                
         
         if(!getLocalStorageItem('loggedIn')) return
-        if(getLocalStorageItem('loggedIn') === false) return
+        // if(getLocalStorageItem('loggedIn') === false) return
         inMemoryJwt.ereaseToken()
         // setLocalStorageItem('loggedOut', true)
         setLocalStorageItem('loggedIn', false)
-        setLocalStorageItem('message', "successfully loged out!")
+        setLocalStorageItem('message', "successfully logged out!")
         setLocalStorageItem('success', true)
         
-        return '/'
+        return Promise.resolve('/')
+        // return '/'
     },
-    checkAuth: () => {
-        // inMemoryJwt.getToken() !== null ? Promise.resolve() : Promise.reject({ redirectTo: '/login', logoutUser: true })
-        return inMemoryJwt.waitForTokenRefresh().then(() => {
-            return inMemoryJwt.getToken() ? Promise.resolve() : Promise.reject()
-        })
+    checkAuth: params => {
+        // try {
+            if(!inMemoryJwt.getToken()){
+                console.log({auth_check: inMemoryJwt.getToken()})
+                // throw new Error("No Authorization givin")
+                const error = new Error("No Authorization givin", 403)
+                error.redirectTo = "/contact"
+                error.status = 401
+                // error.logoutUser = false
+                throw error
+                // console.error(error)
+                return Promise.reject()            
+            }
+
+            return Promise.resolve()
+
+        // } catch (error) {
+        //     return Promise.reject(error.message)            
+        // }
     },
     checkError: async (error) => {
-        console.log({'AuthProvider': error})
+        // console.log({authProvider_error_check: error})
         const status = error?.status;
         if (status === 401 || status === 403) {
-            inMemoryJwt.ereaseToken()
-            return Promise.reject()
+            // inMemoryJwt.ereaseToken()
+            const error = new Error()
+            error.redirectTo = "/dashboard/login"
+            error.logoutUser = false
+            throw error
         }
-        // other error code (404, 500, etc): no need to log out
         return Promise.resolve()
-        // return Promise.resolve({redirectTo: '/dashboard', logoutUser: false })
     },
     getIdentity: async () => {
-        const identifier = getLocalStorageItem('email')
-        const token = inMemoryJwt.getToken()
 
-        if(identifier && token){
+        try {
+            const identifier = getLocalStorageItem('email')
+            const token = inMemoryJwt.getToken()
+            console.log({token: token, email: identifier})
+            
+            if(!identifier || !token) throw new HttpError("No Authentication found",401)
+                
             const prepareQueryObj = ApiFetchGetOptions(`/api/user_by_email/${identifier}/email`,{
                 // 'Authorization': `Bearer ${token}`,
                 'X-Authorization': `Bearer ${token}`,
             })
             const authenticateClient = await ApiFetch(prepareQueryObj)
             const getResults = await authenticateClient.json()
+
+            if(!authenticateClient.ok)
+            { 
+                console.log({Login_Failed: response.message})
+                const {headers, status, body, message, detail} = response
+                // throw new HttpError(response.message, authenticateClient.status, response)  
+                throw new HttpError(message || detail, authenticateClient.status, response) 
+            }
 
             console.log("see user info",getResults)
 
@@ -115,23 +169,16 @@ export const authProvider = {
             const username = getResults["firstName"] + ' ' + getResults["lastName"]
 
             return Promise.resolve({...getResults, fullName: username ?? '...' })
+        } catch (error) {
+            console.error(error)
         }
-
-        return Promise.resolve()
     },
     getPermissions: () => {
-        // return inMemoryJwt.getToken() ?  Promise.resolve() : Promise.reject()
-        return inMemoryJwt.waitForTokenRefresh().then(() => {
-            // console.log("permission time", inMemoryJwt.getRoles())
-            return inMemoryJwt.getToken() ? inMemoryJwt.getRoles() : Promise.reject()
-            // return inMemoryJwt.getToken() ? Promise.resolve() : Promise.reject();
-        })
-    },
-    // canAccess: ({resource}) => {
-    //     // return inMemoryJwt.getToken() ?  Promise.resolve() : Promise.reject()
-    //     return inMemoryJwt.waitForTokenRefresh().then(() => {
-    //         return resource
-    //         // return inMemoryJwt.getRoles().find(role => role === resource) ?? false
-    //     })
-    // }
+        console.log({permissions_check: inMemoryJwt.getToken()})
+        if(inMemoryJwt.getToken()) return Promise.resolve(inMemoryJwt.getRoles())
+        else throw new HttpError('Permissions not found', 403)
+    }
 }    
+
+export const authProvider = addRefreshAuthToAuthProvider(myAuthProvider, refreshAuth)
+// export const authProvider = myAuthProvider

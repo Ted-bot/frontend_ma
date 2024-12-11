@@ -1,6 +1,5 @@
 import * as React from 'react'
-import { useNotify, useRefresh, useRedirect,  } from 'react-admin'
-import { required, Edit, PasswordInput,TextInput, SimpleForm, ArrayInput, SimpleFormIterator } from 'react-admin'
+import {useNotify, useRefresh, useRedirect, required, Edit, PasswordInput,TextInput, SimpleForm, ArrayInput, SimpleFormIterator } from 'react-admin'
 import './UserEdit.css'
 
 const UserEdit = props => {

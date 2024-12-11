@@ -42,6 +42,7 @@ const TitleComponent = styled('div',{
 
 const UserProfilePage = () => {  
   useAuthenticated()
+
   const [userLoggedIn, setUserLoggedIn] = useStore('loggedIn')
   const {data} = useGetIdentity()
 

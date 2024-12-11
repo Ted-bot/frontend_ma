@@ -64,8 +64,6 @@ export const Root = () => {
     }
   }, [success, error, message])
 
-  console.log("success state", success)
-  console.log("message state", message)
 
   const errorLogService = (error, errorInfo) => {
     console.log("ErrorBoundray", error)

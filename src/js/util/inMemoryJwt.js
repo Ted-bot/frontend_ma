@@ -6,6 +6,7 @@ const inMemoryJwtManager = () => {
     let inMemoryJwt = null
     let inMemoryRoles = null
     let refreshTimeOutId
+    let tokenCookie = null
     let isRefreshing = null
     let inMemoryJwtRefresh = null
     let inMemoryCheckValidSubscription = false
@@ -49,9 +50,20 @@ const inMemoryJwtManager = () => {
             const cookie = cookies[i]
             const searchName = cookie.includes("xxx")
             if(searchName) {
-                const tokenCookie = cookie.split("=")[1]
-                return tokenCookie
+                const refreshTokenCookie = cookie.split("=")[1]
+                return refreshTokenCookie
             }
+        }
+        return false
+    }
+
+    const checkAvailableToken = () => {
+        const cookies = document.cookie.split(';')
+        for (var i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i]
+            const searchName = cookie.includes("yyy")
+            const tokenCookie = cookie.split("=")[1]
+            if(searchName && !!tokenCookie) return tokenCookie
         }
         return false
     }
@@ -66,37 +78,82 @@ const inMemoryJwtManager = () => {
 
         const bodyJson = JSON.stringify({refreshToken: tokenCookie})
 
-        isRefreshing = fetch(refreshEndpoint, {
+        return fetch(refreshEndpoint, {
             method: 'POST',
             headers: new Headers({ 'Content-Type': 'application/json' }),
             body: bodyJson,
-        })
-            .then((response) => {
-                if (response.status !== 200) {
-                    ereaseToken()
-                    console.log(
-                        'Failed to renew the jwt from the refresh token.'
-                    )
-                    return { token: null }
-                }
-                return response.json()
-            })
-            .then(({ token, refreshToken }) => {
-                if (token) {
-                    setRefreshToken(refreshToken)
-                    setToken(token)
-                    const getTokenData = jwtDecode(token)
-                    setRoles(getTokenData.roles)
-                    return token
-                }
+        }).then((response) => {
+            if (response.status !== 200) {
                 ereaseToken()
-                return false
-            })
+                console.log(
+                    'Failed to renew the jwt from the refresh token.'
+                )
+                return Promise.reject(new Error("Failed to renew the jwt from the refresh token.", 401))
+            }
+            return response.json()
+        }).then(({ token, refreshToken }) => {
+            if (token) {
+                setRefreshToken(refreshToken)
+                setToken(token)
+                const getTokenData = jwtDecode(token)
+                setRoles(getTokenData.roles)
+                return Promise.resolve(token)
+            }
+            ereaseToken()
+            return Promise.reject(new Error("No token available, please try login again!.", 401))
+        }).catch(error => {
+            console.error("Token refresh failed", error)    
+            Promise.reject(error)
+        })
 
             return isRefreshing
     }
+    
+    // const getRefreshedToken = () => {
+        
+    //     const tokenCookie = checkAvailableRefreshToken()
 
-    const getToken = () => inMemoryJwt
+    //     if(!tokenCookie) return false
+
+    //     const bodyJson = JSON.stringify({refreshToken: tokenCookie})
+
+    //     isRefreshing = fetch(refreshEndpoint, {
+    //         method: 'POST',
+    //         headers: new Headers({ 'Content-Type': 'application/json' }),
+    //         body: bodyJson,
+    //     })
+    //         .then((response) => {
+    //             if (response.status !== 200) {
+    //                 ereaseToken()
+    //                 console.log(
+    //                     'Failed to renew the jwt from the refresh token.'
+    //                 )
+    //                 return { token: null }
+    //             }
+    //             return response.json()
+    //         })
+    //         .then(({ token, refreshToken }) => {
+    //             if (token) {
+    //                 setRefreshToken(refreshToken)
+    //                 setToken(token)
+    //                 const getTokenData = jwtDecode(token)
+    //                 setRoles(getTokenData.roles)
+    //                 return token
+    //             }
+    //             ereaseToken()
+    //             return false
+    //         })
+
+    //         return isRefreshing
+    // }
+
+    const getToken = () => {
+        if(inMemoryJwt ){
+            return inMemoryJwt
+        } else {
+            return checkAvailableToken() ?? false 
+        }
+    }
 
     const getRoles = () => inMemoryRoles
     
@@ -108,6 +165,10 @@ const inMemoryJwtManager = () => {
     }
 
     const setToken = (token) => {
+        const minutes = 7
+        const expireDate = new Date()
+        expireDate.setTime(expireDate.getTime()+(minutes*60*1000))
+        document.cookie = 'yyy=' + token + ';path=/;Secure=true;expires=' + expireDate.toUTCString()
         inMemoryJwt = token
         return true
     }
@@ -123,7 +184,7 @@ const inMemoryJwtManager = () => {
         const minutes = 10
         const expireDate = new Date()
         expireDate.setTime(expireDate.getTime()+(minutes*60*1000))
-        document.cookie = 'xxx=' + token + ';path=/; expires=' + expireDate.toUTCString()
+        document.cookie = 'xxx=' + token + ';path=/;Secure=true;expires=' + expireDate.toUTCString()
         return true
     }
 
@@ -133,12 +194,17 @@ const inMemoryJwtManager = () => {
 
         for (var i = 0; i < cookies.length; i++) {
             const cookie = cookies[i]
+            const searchName = cookie.includes("yyy")
+            const tokenCookie = cookie.split("=")[1]
             const eqPos = cookie.indexOf("=")
             const name = eqPos > -1 ? cookie.substring(0, eqPos) : cookie
-            // const expireDate = new Date()
-            // document.cookie = name + "=;expires=" + expireDate.toUTCString()
-            document.cookie = name + "=;path=/;expires=" + Date.now()
-            // document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT"
+
+            // if (searchName) {
+            //     document.cookie = name + "=;path=/dashboard;expires=" + Date.now()
+            //     continue
+            // }
+            
+            document.cookie = name + "=;path=/;expires=" + Date.now()            
         }
         localStorage.setItem('ra-logout', Date.now())
         return true
@@ -162,7 +228,8 @@ const inMemoryJwtManager = () => {
         waitForTokenRefresh,
         getValidSubscription,
         setValidSubscription,
-        checkAvailableRefreshToken
+        checkAvailableToken,
+        checkAvailableRefreshToken,
     }
 }
 

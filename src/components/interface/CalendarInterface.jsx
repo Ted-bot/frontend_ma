@@ -1,29 +1,32 @@
 import React, {useState} from 'react'
-import { Calendar, dateFnsLocalizer} from 'react-big-calendar'
-
+import { Calendar, dateFnsLocalizer, momentLocalizer} from 'react-big-calendar'
+import moment from 'moment'
 import IconBxCheck from '../../assets/IconBxCheck'
 
 import format from 'date-fns/format'
 import parse from 'date-fns/parse'
 import startOfWeek from 'date-fns/startOfWeek'
 import getDay from 'date-fns/getDay'
-import enUS from 'date-fns/locale/en-US'
-import moment from 'moment/moment'
+import nl from 'date-fns/locale/nl'
 
 import "react-big-calendar/lib/css/react-big-calendar.css"
 import "./CalendarInterface.css"
 
 const locales = {
-  'en-US': enUS,
+  'nl': nl,
 }
 
-const localizer = dateFnsLocalizer({
-  format,
-  parse,
-  startOfWeek,
-  getDay,
-  locales,
-})
+// const Datelocalizer = dateFnsLocalizer({
+// const localizer = dateFnsLocalizer({
+//   format,
+//   parse,
+//   startOfWeek,
+//   getDay,
+//   locales,
+// })
+
+const localizer = momentLocalizer(moment) 
+//'Europe/Amsterdam'
 
 const defaultPlannedEvents = [
   {

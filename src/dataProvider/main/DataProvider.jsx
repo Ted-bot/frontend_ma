@@ -8,6 +8,8 @@ import { ApiFetchGetOptions, deleteLocalStorageItem, getLocalStorageItem, setLoc
 import { parseHydraDocumentation } from "@api-platform/api-doc-parser"
 import inMemoryJwt from '../../js/util/inMemoryJwt.js'
 import { HttpError } from 'react-admin'
+import moment from 'moment-timezone'
+import { reformatSingleDateItem } from '../../js/util/dateUtil.js'
 
 const getAuthHeaders = () => {
     const token = inMemoryJwt.getToken()
@@ -99,7 +101,7 @@ export const baseDataProvider = ({
         options.headers = new Headers({'X-Authorization': `bearer ${token}`})
 
         console.log({GetListResourse: resource,params})
-        if(params){
+        if(params?.pagination?.page || params?.filter){
             const filter = params?.filter
             const operators = { '_gte': '>=', '_lte': '<=', '_neq': '!=' }
     
@@ -107,7 +109,7 @@ export const baseDataProvider = ({
                 const operator = operators[key.slice(-4)]
                 return operator
                     ? { field: key.slice(0, -4), operator, value: filter[key] }
-                    : { field: key, operator: '=', value: filter[key] };
+                    : { field: key, operator: '=', value: filter[key] }
             })
 
             changePagination = params?.pagination?.page
@@ -115,6 +117,7 @@ export const baseDataProvider = ({
             setQuery = !!changePagination ? `page=${changePagination}` : ""
 
             for (const item of filters){
+                if(!item.field && !item.value) continue
                 setQuery += `${!!setQuery ? '&' : ''}${item.field}=${item.value}`
             }
 
@@ -125,14 +128,14 @@ export const baseDataProvider = ({
         const response = await fetchUtils.fetchJson(`/api/${resource}${!!addParams ? '?' : ''}${addParams}`,options )
         
         const configurePagination = (response) => {
-            const currentPage = response["view"]["@id"]
-            const firstPage = response["view"]["first"]
-            const lastPage = response["view"]["last"]
+            const currentPage = response.view["@id"]
+            const firstPage = response.view.first
+            const lastPage = response.view.last
             let nextPage = undefined
 
-            for(const [key, value] of Object.entries(response["view"])){
+            for(const [key, value] of Object.entries(response.view)){
                 if(key === "next"){
-                    nextPage = response["view"]["next"]
+                    nextPage = response.view.next
                 }
             }            
 
@@ -145,8 +148,8 @@ export const baseDataProvider = ({
 
             return {hasPreviousPage: previousPageAvailable, hasNextPage:nextPageAvailable}
         }
-        const data = response.json["member"]
-        const pagination = Object.keys(response.json["view"]).find(key => key === 'first') && configurePagination(response.json)
+        const data = response.json.member
+        const pagination = Object.keys(response.json.view).find(key => key === 'first') && configurePagination(response.json)
         
 
         if(resource === "users") storeUsersData = data.map(user => ({id: user.id, email: user.email}))        
@@ -157,7 +160,7 @@ export const baseDataProvider = ({
 
         return {
             data: data, 
-            total: response.json["totalItems"], 
+            total: response.json.totalItems, 
             pageInfo:{
                 hasPreviousPage: !!pagination && pagination.hasPreviousPage,
                 hasNextPage: !!pagination && pagination.hasNextPage
@@ -187,16 +190,40 @@ export const baseDataProvider = ({
         const token = inMemoryJwt.getToken()
         console.log({getUser: resource, params: params})
         let query = resource
-        let addParam = undefined
+        let updateData = params.data
+        let addParam = undefined        
         let identifier = undefined
         let getUser = undefined
 
         if(!params.data?.password) {
             delete params.data?.password
         }
+        
+        if(resource === 'users') {
+            addParam = 'email'
+            getUser = getLocalStorageItem("users")?.find(user => user?.id === Number(params?.id))
+            identifier = getUser?.email
+            query = `${'user_by_email'}/${identifier}/email`
+        } else if (resource === 'trainingsessions') {
+            // set only IRI as related user data 
+            updateData = {...updateData, 'relatedUser': `/api/profiles/${updateData.relatedUser['id']}`}
+            
+            // set array with only IRI as subscribed profile data 
+            let subscribedTo = []
+            for (const [key, value] of Object.entries(updateData.subscribedTo)){
+                subscribedTo[key] = '/api/profiles/' + value.id
+            }
 
+            console.log({got_Subscribe_training: subscribedTo, original: updateData.subscribedTo})
+
+            updateData = {...updateData, 'subscribedTo': subscribedTo}
+            query = `${resource}/${params.id}`
+        } else{
+            query = `${resource}/${params.id}`
+        }
+// return
         const options = {
-            body: JSON.stringify(params.data),
+            body: JSON.stringify(updateData),
             method: 'PATCH',
             headers: null
         }
@@ -205,17 +232,13 @@ export const baseDataProvider = ({
             'Content-Type': 'application/merge-patch+json'
         })
 
-        if(resource === 'users') {
-            addParam = 'email'
-            getUser = getLocalStorageItem("users")?.find(user => user?.id === Number(params?.id))
-            identifier = getUser?.email
-            query = `${'user_by_email'}/${identifier}/email`
-        }
 
         const response = await fetchUtils.fetchJson(`/api/${query}`,options )
         const {headers, status, body, detail} = response
-
+        const responeData = response.json.member
         console.log({message: response})
+
+       
 
         if( 200 < response.status || response.status > 300) {
             throw Promise.reject(new HttpError(response?.json || detail, status, response.json))
@@ -284,15 +307,23 @@ export const baseDataProvider = ({
         return Promise.resolve({data: {...response.json, id:response.json.id}})
     },
     getManyReference: async (resource, params) => {
-        let query = undefined
-        let setupQuery = undefined 
-        let changePagination = undefined 
+        let query = ""
+        let setupQuery = "" 
+        let changePagination = "" 
         let setQuery = ""
         const token = inMemoryJwt.getToken()
         const options = {headers: null}
         options.headers = new Headers({'X-Authorization': `bearer ${token}`})
+        const filter = params?.filter
+        const operators = { '_gte': '>=', '_lte': '<=', '_neq': '!=' }
 
-        
+        const filters = Object.keys(filter).map(key => {
+            const operator = operators[key.slice(-4)]
+            return operator
+                ? { field: key.slice(0, -4), operator, value: filter[key] }
+                : { field: key, operator: '=', value: filter[key] }
+        })
+
         if(params){
             const target = params?.target
 
@@ -300,11 +331,11 @@ export const baseDataProvider = ({
     
             setQuery = !!changePagination ? `page=${changePagination}` : ""
 
-            // for (const item of filters){
-                setQuery += `${!!setQuery ? '&' : ''}${target}=${params.id}`
-            // }
-
-            query = target ? setQuery : undefined
+            for (const item of filters){
+                if(!item.field && !item.value) continue
+                setQuery += `${!!setQuery ? '&' : ''}${item.field}=${item.value}`
+            }
+            query = target ? setQuery : ""
         }           
         console.log({getManyReference:query,resource,params})
 
@@ -319,9 +350,9 @@ export const baseDataProvider = ({
             const lastPage = response["view"]["last"]
             let nextPage = undefined
 
-            for(const [key, value] of Object.entries(response["view"])){
+            for(const [key, value] of Object.entries(response.view)){
                 if(key === "next"){
-                    nextPage = response["view"]["next"]
+                    nextPage = response.view.next
                 }
             }            
 
@@ -334,15 +365,15 @@ export const baseDataProvider = ({
 
             return {hasPreviousPage: previousPageAvailable, hasNextPage:nextPageAvailable}
         }
-        const data = response.json["member"]
-        const pagination = Object.keys(response.json["view"]).find(key => key === 'first') && configurePagination(response.json)
+        const data = response.json.member
+        const pagination = Object.keys(response.json.view).find(key => key === 'first') && configurePagination(response.json)
+        
         const storeUsersData = data.map(user => ({id: user.id, email: user.email}))
-
-        // setLocalStorageItem(resource, storeUsersData)
+        setLocalStorageItem(resource, storeUsersData)
 
         return {
             data: data, 
-            total: response.json["totalItems"], 
+            total: response.json.totalItems, 
             pageInfo:{
                 hasPreviousPage: !!pagination && pagination.hasPreviousPage,
                 hasNextPage: !!pagination && pagination.hasNextPage
@@ -398,13 +429,17 @@ export const baseDataProvider = ({
             throw new HttpError('Shit, Black Dragon Events Not Found!', 404, response)              
         }   
 
-        const events = response['member'].map((response) => ({
-            id: response.id,
-            title: response.title,
-            start: new Date(response.startDate),
-            end: new Date(response.endDate),
-            resource: response.description,
-        }))
+        const events = response['member'].map((response) => {
+            const utcDate = reformatSingleDateItem({start: response.startDate, end: response.endDate})
+            console.log({start: utcDate.start, endDate:utcDate.end})
+            return {
+                id: response.id,
+                title: response.title,
+                start: utcDate.start,
+                end: utcDate.end,
+                resource: response.description
+            }
+        })
 
         const checkIfUserHasSelectedEvent = response['member'].find((selectedEvent) => selectedEvent?.selectedEvent !== 0)
 

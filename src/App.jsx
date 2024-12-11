@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider} from 'react-router-dom'
+import { createBrowserRouter, RouterProvider, redirect} from 'react-router-dom'
 import React from 'react'
 
 // import reactLogo from './assets/react.svg'
@@ -31,6 +31,7 @@ import { ErrorBoundary } from 'react-error-boundary'
 
 const theme = unstable_createMuiStrictModeTheme();
 
+
 function App() {
   const queryClient = new QueryClient()
 
@@ -43,10 +44,9 @@ function App() {
       children: [
         { path: '/', element: <HomePage /> },
         { path: '/sign-up', element: <SignUpPage />, loader: SignUpLoader },
-        { path: '/work', element: <LoginPage /> },
         { path: '/calendar', element: <PublicCalendarPage />, loader: CalendarLoader},
         { path: '/subscribe', element: <OrderPage />},
-        { path: '/payment', element: <ErrorBoundary fallback={<h1>Error</h1>} ><PaymentPage /></ErrorBoundary>}, //, loader: PaymentLoader
+        // { path: '/payment', element: <ErrorBoundary fallback={<h1>Error</h1>} ><PaymentPage /></ErrorBoundary>}, //, loader: PaymentLoader
         { path: '/dashboard/*', element: <DashboardPage />}, //,  loader: UserLoader
         { path: '/contact', element: <ContactPage />},
       ]  

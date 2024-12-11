@@ -8,6 +8,11 @@ import { Title, useGetIdentity } from 'react-admin'
 import { useNotify } from 'react-admin'
 import { useAuthenticated } from 'react-admin'
 import { Box } from '@mui/material'
+
+import { formatInTimeZone } from 'date-fns-tz'
+
+const timeZone = 'Europe/Amsterdam' // De
+// const timeZone = 'Europe/Paris' // De
 const dummyPlannedEvent = { 
     id: 1,
     title: 'title',
@@ -34,7 +39,7 @@ export default function CalendarPage(){
     const handleSelectEvent = useMemo(() => 
         (event) =>  { 
             const options = { month: 'short', day: 'numeric' }
-            const selectedDate = new Date(event.start).toLocaleDateString('en-us', options)
+            const selectedDate = new Date((event.start)).toLocaleDateString('nl', options)
             
             if(event.start < new Date()){
                 let text = `This ${event.title} on ${selectedDate} has already passed!\nPlease selected one of the upcoming available dates`
@@ -72,9 +77,9 @@ export default function CalendarPage(){
 
     useEffect(() => {
         dataProvider.allBlackDragonEvents('subscribe', userIdentity?.email).then((blackDragonEvents) =>{
-            console.log("userCalendar", blackDragonEvents) 
+            // console.log("userCalendar", blackDragonEvents) 
             setUserSelectedEvents(blackDragonEvents?.userSelectedEvents ?? [])
-             setPlannedEvents(blackDragonEvents?.events)
+            setPlannedEvents(blackDragonEvents?.events)
         }).catch(error => notify(`${error}`, {type: 'error'}))
     }, [])
 
