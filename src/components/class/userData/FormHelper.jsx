@@ -137,6 +137,16 @@ export function errorHandlerPostRequest(error, showErrors){
             const messageError = ifArrayErrors.message
             showErrors(arrayProperty,messageError)
             return true
+        } else if(typeof ifArrayErrors === 'string') {
+            //can only be email on signUp page
+            if(ifArrayErrors.includes('SQLSTATE[23505]')) //code for Unique violation: 7 ERROR:  duplicate key
+            {
+                showErrors('email','email already exist')
+            } else {
+                // note: set logger // send error somewhere to verify issue !important
+                showErrors('password','Unknown error')
+            }
+            return true
         } else {
             console.error('UnHandled Error', error)
             return false

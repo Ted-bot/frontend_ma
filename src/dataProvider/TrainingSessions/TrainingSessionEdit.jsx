@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useDataProvider, required, Edit,TextInput, Datagrid, TextField, EditButton, ReferenceManyField, AutocompleteInput,SelectInput, DateTimeInput, ArrayInput, SimpleFormIterator, BooleanInput, ReferenceInput,SimpleForm } from 'react-admin'
+import { useDataProvider, required, Edit,TextInput, AutocompleteInput, DateTimeInput, ArrayInput, SimpleFormIterator, BooleanInput, ReferenceInput,SimpleForm } from 'react-admin'
 import './TrainingSessionEdit.css'
 import { getLocalStorageItem } from '../../js/util/getUtil'
 import { reformatEditTimeUnit } from '../../js/util/dateUtil'
@@ -15,25 +15,27 @@ const resourceList = getLocalStorageItem("profiles")
 console.log({checkdata: resourceList})
 
 const TrainingSessionEdit = props => {
-    const dataProvider = useDataProvider();
+    // const dataProvider = useDataProvider();
 
-    const transform = (data) => {
-        const startDate = new Date(data.start); // User-selected date
-        const endDate = new Date(data.end); // User-selected date
-        return {
-            ...data,
-            // Convert the date to ISO 8601 format (UTC)
-            start: startDate.toISOString(),
-            end: endDate.toISOString(),
-        };
-    };
+    // const transform = (data) => {
+    //     const startDate = new Date(data.start); // User-selected date
+    //     const endDate = new Date(data.end); // User-selected date
+    //     return {
+    //         ...data,
+    //         // Convert the date to ISO 8601 format (UTC)
+    //         start: startDate.toISOString(),
+    //         end: endDate.toISOString(),
+    //     };
+    // };
 
    return <Edit resource="trainingsessions" {...props}>
         <section id="trainingsessionEdit">
-            <SimpleForm save={(values) => {
-                const transformedValues = transform(values);
-                dataProvider.update('trainingsessions', { id: transformedValues.id, data: transformedValues });
-            }}>
+            <SimpleForm 
+            // save={(values) => {
+            //     const transformedValues = transform(values);
+            //     dataProvider.update('trainingsessions', { id: transformedValues.id, data: transformedValues });
+            // }}
+            >
                 <TextInput label="title" source={"title"} validate={[required()]} />
                 <ReferenceInput source={"relatedUser.id"} reference="profiles" perPage={50}>
                     <AutocompleteInput  
@@ -47,15 +49,15 @@ const TrainingSessionEdit = props => {
                         validate={[required()]} />
                 </ReferenceInput>
                 <DateTimeInput label="start" source={"startDate"} validate={[required()]}  
-                    format={(value) =>
-                        value ? transformToLocalTimezone(value, 'Europe/Amsterdam') : ''
-                    }
+                    // format={(value) =>
+                    //     value ? transformToLocalTimezone(value, 'Europe/Amsterdam') : ''
+                    // }
                 /> 
                 {/* format={record => console.log("Shit man",record)} */}
                 <DateTimeInput label="end" source={"endDate"} validate={[required()]}
-                    format={(value) =>
-                        value ? transformToLocalTimezone(value, 'Europe/Amsterdam') : ''
-                    }
+                    // format={(value) =>
+                    //     value ? transformToLocalTimezone(value, 'Europe/Amsterdam') : ''
+                    // }
                 />
                 <BooleanInput label="publish" source={"isPublished"} validate={[required()]} />
                 <BooleanInput label="allday" source={"allDay"} validate={[required()]} />

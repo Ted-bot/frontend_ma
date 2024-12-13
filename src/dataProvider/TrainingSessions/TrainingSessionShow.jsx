@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { DateField, Show, SimpleShowLayout, TextField, ReferenceOneField, ArrayField} from 'react-admin'
-import { SubscribedTo } from '../ListProvider/SubscribeTo.jsx'
+import { DateField, Show, SimpleShowLayout, TextField, ArrayField} from 'react-admin'
+import { SubscribedBy } from '../ListProvider/SubscribeTo.jsx'
 import { reformatTimeUnit } from '../../js/util/dateUtil'
 
 const TrainingSessionShow = () => (
@@ -14,7 +14,7 @@ const TrainingSessionShow = () => (
                 <DateField label="start" source={"startDate"} showTime={true} transform={record => reformatTimeUnit(record).time} />,
                 <DateField label="end" source={"endDate"} showDate={false} showTime={true} transform={record => reformatTimeUnit(record).time}/>,
                 <ArrayField source="subscribedTo" label="students signed up">
-                    <SubscribedTo />
+                    <SubscribedBy />
                 </ArrayField>
             </SimpleShowLayout>
         </Show>

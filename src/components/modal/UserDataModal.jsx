@@ -83,7 +83,8 @@ export const UserDataModal = ({updateUserAddressEnteredInputState,  closeDialog,
     }
 
     
-    console.log("Got fucking Number", errors?.streetNumber,)
+    console.log({"Got user Number": enteredInput?.phoneNumber})
+    console.log("Got fucking Number", errors?.streetNumber)
     const addressForm = {
         name: 'Address',
         fields : [
@@ -182,6 +183,9 @@ export const UserDataModal = ({updateUserAddressEnteredInputState,  closeDialog,
                     </section>
                     <section className='mt-4'>
                         <h1 className={`flex w-full justify-center pt-3 pb-6 text-2xl`}>{userForm?.name}</h1>
+
+                        {errors?.unknown_payment_error && <div className="flex justify-center text-rose-300 text-lg italic">{errors.unknown_payment_error}</div>}
+                        
                         {userForm && <UserOrderInfoInterface array={userForm.fields} handleKeyDown={handleKeyDown} />}
                     </section>
                     <Divider sx={{marginRight: '1.2rem', marginLeft: '1.2rem' , borderBottomWidth: 2, marginTop: 2, marginBottom: 1, backgroundColor: alpha('#90caf9', 0.8) }} />

@@ -109,12 +109,13 @@ export default function SignUpForm({storageNameNewUser, userStoredFormData}) {
 
     const postRequest = async (data) => {        
         try {
-            const options = { url: '/api/v2/register', method: 'POST'}
+            const options = { url: `/api/users`, method: 'POST'}
+            // const options = { url: '/api/v2/register', method: 'POST'}
             const ApiOptions = ApiFetchPostOptions(options,data)            
             const request = await ApiFetch(ApiOptions)
             const response = await request.json()
         
-            if(!request.ok) throw {body: response.errors}
+            if(!request.ok) throw {body: response?.errors ?? response?.detail}
 
             setErrors(inputValidList)            
             deleteLocalStorageItem(storageNameNewUser)

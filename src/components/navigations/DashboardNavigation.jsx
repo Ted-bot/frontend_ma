@@ -20,7 +20,7 @@ const MyMenu = (roles) => (
             <Menu.Item to="/dashboard/users" primaryText="Users" leftIcon={<PeopleAltIcon />} />
             <Menu.Item to="/dashboard/trainingsessions" primaryText="Trainingsessions" leftIcon={<SportsMartialArtsIcon />} />
             <Menu.Item to="/dashboard/profiles" primaryText="Profiles" leftIcon={<RecentActorsIcon />} />
-            <Menu.Item to="/dashboard/classes" primaryText="Classes" leftIcon={<SchoolIcon />} />        
+            {/* <Menu.Item to="/dashboard/classes" primaryText="Classes" leftIcon={<SchoolIcon />} />         */}
         </div>}
         <Menu.Item to="/dashboard/notifications" primaryText="Notifications" leftIcon={<NotificationsNoneIcon />} />
         <Menu.Item to="/dashboard/settings" primaryText="Settings" leftIcon={<SettingsIcon />} />

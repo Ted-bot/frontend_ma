@@ -1,8 +1,8 @@
-import { List, Datagrid, TextField, useListContext, DateField, ReferenceManyField, ReferenceField, ReferenceOneField,ArrayField, SimpleFormIterator, BooleanField } from 'react-admin'
+import { List, Datagrid, TextField, DateField, ArrayField, BooleanField } from 'react-admin'
 import TrainingSessionFilters from './TrainingSessionFilters'
 import { NavLink } from 'react-router-dom'
 import './TrainingSessionList.css'
-import {SubscribedTo} from '../ListProvider/SubscribeTo.jsx'
+import {SubscribedBy} from '../ListProvider/SubscribeTo.jsx'
 
 const TrainingSessionList = (props) => (
 
@@ -27,7 +27,7 @@ const TrainingSessionList = (props) => (
                 <BooleanField label="published" source={"isPublished"}/>
                 <BooleanField label="allday" source={"allDay"}/>
                 <ArrayField source="subscribedTo" label="students">
-                    <SubscribedTo />
+                    <SubscribedBy />
                 </ArrayField>
                 {/* <ReferenceArrayField
                     source="profiles"

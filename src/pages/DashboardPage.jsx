@@ -44,6 +44,8 @@ import {MyMenu} from '../components/navigations/DashboardNavigation.jsx'
 
 import ProfileList from '../dataProvider/Profile/ProfileList.jsx'
 import ProfileShow from '../dataProvider/Profile/ProfileShow.jsx'
+import ProfileEdit from '../dataProvider/Profile/ProfileEdit.jsx'
+// import ProfileCreate from '../dataProvider/Profile/ProfileShow.jsx'
 
 import UserCreate from '../dataProvider/User/UserCreate.jsx'
 import UserList from '../dataProvider/User/UserList.jsx'
@@ -109,6 +111,7 @@ const myTheme = {
             secondary: {
                 main: "#E50000",
                 shadowColor: "#E50000",
+                shadowNickNmae: "#744700",
             },
             common: { // remove
                 white: '#E50000'
@@ -305,6 +308,18 @@ const myTheme = {
                     }
                 }
             },
+            MuiCardHeader: {
+                styleOverrides: {
+                    root: {
+                        '& .MuiCardHeader-subheader' : {
+                            fontSize: '1.5em',
+                            color: '#C45267',
+                            fontWeight: 400,
+                            // textShadow: '-2px 1px 5px #ffd086, -2px 2px 3px #474747',
+                        }
+                    }
+                }
+            },
             MuiPopper: { // main resource list background
                 styleOverrides: {
                     root: { 
@@ -386,8 +401,8 @@ export default function DashboardPage() {
                 authProvider={authProvider}
             >
                 <Resource name={"users"} list={adminRole && UserList} show={adminRole && UserShow} create={adminRole && UserCreate} edit={adminRole && UserEdit} />
-                <Resource name={"trainingsessions"} list={adminRole && TrainingSessionList} show={adminRole && TrainingSessionShow} create={adminRole && TrainingSessionCreate} edit={adminRole && TrainingSessionEdit}/>
-                <Resource name="profiles" recordRepresentation="username" list={adminRole && ProfileList} show={adminRole && ProfileShow} /> {/*  recordRepresentation={(record) => `${record.first_name} ${record.last_name}` */}
+                <Resource name={"trainingsessions"} recordRepresentation="title" list={adminRole && TrainingSessionList} show={adminRole && TrainingSessionShow} create={adminRole && TrainingSessionCreate} edit={adminRole && TrainingSessionEdit}/>
+                <Resource name="profiles" recordRepresentation="username" list={adminRole && ProfileList} show={adminRole && ProfileShow} edit={adminRole && ProfileEdit} /> {/*  recordRepresentation={(record) => `${record.first_name} ${record.last_name}` */}
                 {/* <ResourceGuesser name={"classes"} list={adminRole && ListGuesser} show={adminRole && ShowGuesser} create={adminRole && CreateGuesser} edit={adminRole && EditGuesser} />
                 <ResourceGuesser name={"trainingsessions"} list={adminRole && ListGuesser} show={adminRole && ShowGuesser} create={adminRole && CreateGuesser} edit={adminRole && EditGuesser} />
                 <ResourceGuesser name={"profiles"} list={adminRole && ProfileList} show={adminRole && ShowGuesser} create={adminRole && CreateGuesser} edit={adminRole && EditGuesser} />     */}

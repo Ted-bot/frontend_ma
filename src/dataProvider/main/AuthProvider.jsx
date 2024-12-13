@@ -175,7 +175,12 @@ export const myAuthProvider = {
     },
     getPermissions: () => {
         console.log({permissions_check: inMemoryJwt.getToken()})
+
+        // create function isPublicUrl() to check if valid public 
+        // e.g. use an array with valid public paths and check in comming patname
+        // instead of using window.location.pathname directly
         if(inMemoryJwt.getToken()) return Promise.resolve(inMemoryJwt.getRoles())
+        else if (window.location.pathname === "/dashboard/signup") return Promise.resolve() 
         else throw new HttpError('Permissions not found', 403)
     }
 }    

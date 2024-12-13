@@ -350,7 +350,7 @@ export const PaymentPage = () => {
             amount: amount,
             order_id: orderNumber.toString(),
             redirectUrl: 'http://localhost:5173/dashboard', // set user dashbpoard {id}
-            webhookUrl: 'https://35c5-95-96-151-55.ngrok-free.app',
+            webhookUrl: 'https://acc6-95-96-151-55.ngrok-free.app',
             billingAddress: billingAddress,
             shippingAddress: billingAddress,
             metadata: { order_id : orderNumber.toString()},
@@ -382,6 +382,19 @@ export const PaymentPage = () => {
 
         } catch (error) {
             console.log({API_payOrder:error})
+            // note: create logger or send error somewhere
+
+            if(typeof error.errors.errors === "string"){
+                setErrors(prevValues => ({
+                    ...prevValues,
+                    userAddress: {
+                        ...prevValues.userAddress,
+                        ['payment_error']: error.errors.errors
+                    }
+                }))
+                return
+            }
+
             for (const [key, value] of Object.entries(error.errors.errors)){
 
                 if(key === "errors") return
@@ -570,6 +583,7 @@ export const PaymentPage = () => {
     }
 
     console.log("error payment",errors)
+    console.log("enteredInput",enteredInput)
 
     return(
         <>     

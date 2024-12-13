@@ -11,6 +11,9 @@ import Grid from '@mui/material/Grid'
 import inMemoryJwt from '../../js/util/inMemoryJwt.js'
 import useStore from '../../hooks/store/useStore.jsx'
 import { styled } from '@mui/system'
+import { blue } from '@mui/material/colors'
+
+import "./UserProfilePage.css"
 
 const TitleComponent = styled('div',{
   name: 'CustomTitle',
@@ -36,7 +39,33 @@ const TitleComponent = styled('div',{
   marginRight: "5px",
   height: '8rem',
   fontSize: '1.25rem',
-  padding: '10px',
+  // padding: '10px',
+}))
+
+const SubHeaderComponent = styled('div',{
+  name: 'CustomTitle',
+  slot: 'Root',
+  overridesResolver: (props, styles) => [
+    styles.root,
+    props.color === 'primary' && styles.primary,
+    props.color === 'secondary' && styles.secondary,
+  ],
+})(({ theme }) => ({
+  border: theme.palette.secondary.main,
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "center",
+  textAlign: 'center',
+  // color: theme.palette.secondary.main,
+  fontWeight: '1rem',
+  fontSize: { xs: "1rem", md: "1.25rem", lg: "1.50rem" },
+  padding: { xs: "-5px", md: "5px", lg: "8px" },
+  boxShadow: `-2px 1px 5px ${theme.palette.secondary.shadowNickNmae}`,
+  borderRadius: '5px',
+  marginTop: '16px',
+  marginRight: "5px",
+  height: '3rem',
+  fontSize: '1.25rem',
 }))
 
 
@@ -73,10 +102,18 @@ const UserProfilePage = () => {
   },[data?.email])
 
   // console.log("roles user",inMemoryJwt.getRoles())
+  const SubHeaderContent = ({firstName, name}) =>  <SubHeaderComponent>
+    <span>
+      <span id="nickName">Nickname : </span>{name}
+    </span>
+  </SubHeaderComponent>
+
   return (
     <Card>
       <Title title="Dashboard" />
-      <CardHeader sx={{ mx: 2 }} title={`${data?.firstName} Dashboard`} />      
+      <CardHeader sx={{ mx: 2 }} title={`Welcome ${data?.firstName}`} subheader={<SubHeaderContent name={data?.username} />} />      
+      {/* <CardHeader sx={{ mx: 2 }} title={`${data?.firstName} Dashboard`} subheader={<SubHeaderComponent>{data?.username}</SubHeaderComponent>} />       */}
+      {/* <CardHeader sx={{ mx: 2 }} title={`${data?.username} `} />       */}
         {
           userData?.subscription?.start 
           ? <CardContent className='text-center border-none'><p className="text-red-500 text-3xl italic py-3 ">
@@ -158,6 +195,10 @@ const UserProfilePage = () => {
           {
                     userData?.subscription?.next_session.next_training_day
                     ? <>
+                        <p>
+                          <span id="trainerName"> Trainer: </span> {userData?.subscription?.next_session.trainerName}    
+                        </p>
+                        <br />
                         <p>
                           {userData?.subscription?.next_session.next_training_day}    
                         </p>

@@ -197,15 +197,17 @@ export const baseDataProvider = ({
     },
     update: async (resource, params) => {
         const token = inMemoryJwt.getToken()
-        console.log({getUser: resource, params: params})
+        console.log({getUser_update: resource, params: params})
         let query = resource
         let updateData = params.data
         let addParam = undefined        
         let identifier = undefined
         let getUser = undefined
 
-        if(!params.data?.password) {
-            delete params.data?.password
+        if(!updateData.password) {
+            delete updateData?.password
+        } else if (updateData.subscription){
+            // delete updateData.subscription
         }
         
         if(resource === 'users') {
@@ -213,21 +215,37 @@ export const baseDataProvider = ({
             getUser = getLocalStorageItem("users")?.find(user => user?.id === Number(params?.id))
             identifier = getUser?.email
             query = `${'user_by_email'}/${identifier}/email`
-        } else if (resource === 'trainingsessions') {
-            // set only IRI as related user data 
-            updateData = {...updateData, 'relatedUser': `/api/profiles/${updateData.relatedUser['id']}`}
-            
+        } else if (resource === 'trainingsessions' || resource === 'profiles') { //
+    
+            let property = ""
+            let setUriForArray = ""
             // set array with only IRI as subscribed profile data 
             let subscribedTo = []
-            for (const [key, value] of Object.entries(updateData.subscribedTo)){
-                subscribedTo[key] = '/api/profiles/' + value.id
+            
+            if(resource === 'trainingsessions'){
+                // set only IRI as related user data
+                updateData = {...updateData, 'relatedUser': `/api/profiles/${updateData.relatedUser['id']}`}
+                property = 'subscribedTo'
+                setUriForArray = 'profiles'
+            }
+            
+            if(resource === 'profiles'){
+                 property = 'subscribeToEvents'    
+                 setUriForArray = 'trainingsessions'    
             }
 
-            console.log({got_Subscribe_training: subscribedTo, original: updateData.subscribedTo})
+            // resource trainingsessions needs to set URI's for profiles down here
+            // for resource profiles, property subscribeToEvents has [@id] could be used instead of value set below
+            // -> like: subscribedTo[key] = value['@id'] first check if traningsessions resource has same case
+            for (const [key, value] of Object.entries(updateData[property])){
+                subscribedTo[key] = `/api/${setUriForArray}/` + value.id
+            }
 
-            updateData = {...updateData, 'subscribedTo': subscribedTo}
+            console.log({got_Subscribe_training_or_profiles: subscribedTo, original: updateData[property]})
+
+            updateData = {...updateData, [property]: subscribedTo}
             query = `${resource}/${params.id}`
-        } else{
+        } else {
             query = `${resource}/${params.id}`
         }
 // return
@@ -257,7 +275,7 @@ export const baseDataProvider = ({
     },
     delete: async (resource, params) => {
         const token = inMemoryJwt.getToken()
-        console.log({getUser: resource, params: params})
+        console.log({getUser_delete: resource, params: params})
         let query = resource
         let addParam = undefined
         let identifier = undefined

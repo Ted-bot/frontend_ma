@@ -43,7 +43,7 @@ function App() {
       id: 'root',
       children: [
         { path: '/', element: <HomePage /> },
-        { path: '/sign-up', element: <SignUpPage />, loader: SignUpLoader },
+        // { path: '/sign-up', element: <SignUpPage />, loader: SignUpLoader },
         { path: '/calendar', element: <PublicCalendarPage />, loader: CalendarLoader},
         { path: '/subscribe', element: <OrderPage />},
         // { path: '/payment', element: <ErrorBoundary fallback={<h1>Error</h1>} ><PaymentPage /></ErrorBoundary>}, //, loader: PaymentLoader
