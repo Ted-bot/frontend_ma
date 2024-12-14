@@ -1,7 +1,7 @@
 import { SearchInput,TextInput, DateInput, BooleanInput } from 'react-admin'
 
 const TrainingSessionFilters = [
-    <SearchInput source="q" alwaysOn/>, //resettable={false} 
+    // <SearchInput source="q" alwaysOn/>, //resettable={false} 
     <TextInput label="title" source={"title"} />,
     <TextInput label="trainer" source={"relatedUser"} />,
     <DateInput label="CreatedAt < Before" source={"createdAt_lte"}/>,

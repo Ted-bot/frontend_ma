@@ -10,7 +10,7 @@ export function paymentInputBlurHandle(identifier, event, type, setEnteredInputI
             
             setEnteredInputIsInvalid((prevValues) => ({
                 ...prevValues,
-                [identifier] : (tel.length >= 11) ? false : true
+                [identifier] : (tel.length >= 11) ? false : (tel.length <= 7) ? true : ""
             }))
             return
         }  

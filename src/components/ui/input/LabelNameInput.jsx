@@ -7,6 +7,7 @@ import { camelCaseToLoWithSpace } from '../../../js/util/postUtil'
 
 import LocationInput from './LocationInput.jsx'
 import { DatePickerNewUserInput } from './DatePickerNewUserInput.jsx'
+import { PasswordIsInvalidMessage } from '../../class/userData/FormHelper.jsx'
 
 export default function LabelNameInput({ 
     id = 0,
@@ -30,6 +31,10 @@ export default function LabelNameInput({
 }) {
     let checkBox = 0    
     const lowerCaseName = camelCaseToLoWithSpace(name)
+    
+    if(type === 'password'){
+        console.log({passwordInLabelNameInput: value})
+    }
     // const minDate = () => {
     //     let currentDate = moment()
     //     let minDate = currentDate.subtract(65, 'years')
@@ -165,7 +170,7 @@ export default function LabelNameInput({
                     }
                     </section>
                 </label>
-                {invalid && type == 'password' &&  <p className="text-red-500 text-xs italic">Please fill in a {lowerCaseName} </p>}
+                {invalid && type == 'password' &&  <p className="text-red-500 text-xs italic"><PasswordIsInvalidMessage value={value} /></p>}
                 {invalid && type == 'location' &&  <p className="text-red-500 text-xs italic">Please fill in a {lowerCaseName} </p>}
                 {invalid && type == 'text' &&  <p className="text-red-500 text-xs italic">Please fill in your {lowerCaseName} </p>}
                 {invalid && type == 'date' &&  <p className="text-red-500 text-xs italic text-center">Selected date cannot be processed</p>}

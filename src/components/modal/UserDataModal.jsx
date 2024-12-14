@@ -32,9 +32,11 @@ const DialogComponent = styled('div',{
 export const UserDataModal = ({updateUserAddressEnteredInputState,  closeDialog, handleKeyDown, errors, enteredInput, enteredInputIsInvalid, formSubmit, dialog}) => {
     
     const {updateUserInput, onBlur} = useContext(OrderContext)
-    const typeLocation = 'location'
-    const typeText = 'text'
-    const typeFirstAndLastName = 'firstAndLastName'
+    const typelocation = 'location'
+    const typetext = 'text'
+    const typeunitnumber = 'unitNumber'
+    const typestreetnumber = 'number'
+    const typefirstandlastname = 'firstAndLastName'
     const typeMixed = 'mixed'      
     
     console.log("ModalEnteredInput", enteredInput)
@@ -45,14 +47,14 @@ export const UserDataModal = ({updateUserAddressEnteredInputState,  closeDialog,
             {
                 name: 'First- and LastName', 
                 id: 'firstAndLastName', 
-                type: typeFirstAndLastName, 
+                type: typefirstandlastname, 
                 placeholder: 'type first and last name', 
                 value: enteredInput?.firstAndLastName,
                 invalid: enteredInputIsInvalid.firstAndLastName, 
                 error: errors?.firstAndLastName, 
                 required : true, 
                 onChange: (e) => updateUserInput('firstAndLastName', e), 
-                onBlur: (e) => onBlur('firstAndLastName', e, typeFirstAndLastName)
+                onBlur: (e) => onBlur('firstAndLastName', e, typefirstandlastname)
             },
             {
                 name: 'E-mail', 
@@ -90,18 +92,18 @@ export const UserDataModal = ({updateUserAddressEnteredInputState,  closeDialog,
         fields : [
             {
                 name: 'Unit Number',
-                id: 'unitNumber',
-                type: typeText,
+                id: typeunitnumber,
+                type: typeunitnumber,
                 placeholder: 'unit number',
                 value: enteredInput?.unitNumber,
                 invalid: enteredInputIsInvalid.unitNumber,
                 error: errors?.unitNumber,
-                onChange: (e) => updateUserInput('unitNumber', e),
-                onBlur: (e) => onBlur('unitNumber', e, typeText)},
+                onChange: (e) => updateUserInput(typeunitnumber, e),
+                onBlur: (e) => onBlur(typeunitnumber, e, typetext)},
             {
                 name: 'Street Number',
                 id: 'streetNumber',
-                type: 'number',
+                type: typestreetnumber,
                 placeholder: 'street number',
                 min: 0, 
                 value: enteredInput?.streetNumber,
@@ -113,14 +115,14 @@ export const UserDataModal = ({updateUserAddressEnteredInputState,  closeDialog,
             {
                 name: 'Street Name',
                 id: 'addressLine',
-                type: typeText,
+                type: typetext,
                 placeholder: 'address line',
                 value: enteredInput?.addressLine,
                 invalid: enteredInputIsInvalid.addressLine,
                 error: errors?.address_line,
                 required : true,
                 onChange: (e) => updateUserInput('addressLine', e),
-                onBlur: (e) => onBlur('addressLine', e, typeText)},
+                onBlur: (e) => onBlur('addressLine', e, typetext)},
             {
                 name: 'Postal Code',
                 id: 'postalCode',
@@ -135,14 +137,14 @@ export const UserDataModal = ({updateUserAddressEnteredInputState,  closeDialog,
             },
             {
                 name: 'Location',
-                id: typeLocation,
+                id: typelocation,
                 error: errors?.location,
                 cityId: enteredInput?.city_id,
                 stateId: enteredInput?.state_id,
                 errorRegion: errors?.region,
                 stateError: errors?.reactStateNr, 
                 cityError: errors?.reactCityNr,
-                type: typeLocation, 
+                type: typelocation, 
                 invalid: enteredInputIsInvalid.city,
                 required: true,
                 onChangeStateId: e => updateUserInput('state_id',e),
@@ -150,7 +152,7 @@ export const UserDataModal = ({updateUserAddressEnteredInputState,  closeDialog,
                 onChangeCityId: e => updateUserInput('city_id',e),
                 onChangeCity: e => updateUserInput('city',e),
                 // onChange: (e) => updateUserInput('city', e),
-                onBlur : (e) => onBlur('city_id', e, typeLocation)
+                onBlur : (e) => onBlur('city_id', e, typelocation)
             },
         ],
     }

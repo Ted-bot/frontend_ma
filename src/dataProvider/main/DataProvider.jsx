@@ -100,7 +100,7 @@ export const baseDataProvider = ({
         const options = {headers: null}
         options.headers = new Headers({'X-Authorization': `bearer ${token}`})
 
-        // console.log({GetListResourse: resource,params})
+        console.log({GetListResourse: resource,params})
 
         if(params?.pagination?.page || params?.filter){
             const filter = params?.filter

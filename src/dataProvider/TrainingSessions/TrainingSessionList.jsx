@@ -5,7 +5,6 @@ import './TrainingSessionList.css'
 import {SubscribedBy} from '../ListProvider/SubscribeTo.jsx'
 
 const TrainingSessionList = (props) => (
-
     
     <List {...props} 
         filters={TrainingSessionFilters}

@@ -1,7 +1,7 @@
 import { SearchInput,TextInput, DateInput} from 'react-admin'
 
 const UserFilters = [
-    <SearchInput source="q" alwaysOn/>, //resettable={false} 
+    // <SearchInput source="q" alwaysOn/>, //resettable={false} 
     <TextInput label="firstName" source={"firstName"} />,
     <TextInput label="lastName" source={"lastName"}/>,
     <TextInput label="email" source={"email"} />,

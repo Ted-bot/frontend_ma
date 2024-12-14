@@ -4,17 +4,66 @@ import { isObject } from "@mui/x-data-grid/internals"
 
 export const getStates = async () => {return await GetState(countryid)}
 
-export const checkForInvalidInputUser = (enteredInputIsInvalid) => {
+export const noInvalidInputUserFound = (enteredInputIsInvalid) => {
     for (const [key, value] of Object.entries(enteredInputIsInvalid)){
-        if(!value || key === 'undefined'){
+        if(!value && key && key != 'undefined'){
             return {bool: false, invalidField: key}
         }
     }
     return {bool: true, invalidField: null}
 }
 
+
+export const noInvalidFieldDetected = (enteredInputIsInvalid) => {
+    for (const [key, value] of Object.entries(enteredInputIsInvalid)){
+        if(value && key && key != 'undefined'){
+            return {bool: false, invalidField: key}
+        }
+    }
+    return {bool: true, invalidField: null}
+}
+
+const passwordCheckAtleastTwoSpecialChar = /^(?=(?:[^A-Za-z/\d\n]*[A-Za-z\d]){2})[A-Za-z\d]*[~!@#$%^&*()_+<>•`{}\\][~!@#$%^&*()_+<>•`{}\\A-Za-z\d]*$/
+const passwordCheckAtleastTwoUpperCaseChar = /^(?=(?:.*[A-Z]){2})/
+
+export const isPasswordValid = (value) => {
+    if(value.length < 6){
+        return true
+    } else if (value.length > 40){
+        return true
+    } 
+    else if (!passwordCheckAtleastTwoUpperCaseChar.test(value)){
+        return true
+    }
+    else if (!passwordCheckAtleastTwoSpecialChar.test(value)){
+        return true
+    } 
+    return false
+}
+
+export const PasswordIsInvalidMessage = ({value}) => {
+    console.log("is password check working", passwordCheckAtleastTwoUpperCaseChar.test(String(value)))
+    if(value && String(value).length < 6){
+        return "you password can not be lower than 6 characters"
+    } else if (value && String(value).length > 40){
+        return "you password can not be more than 40 characters"
+    } 
+    else if (!passwordCheckAtleastTwoUpperCaseChar.test(value)){
+        return "you password should have at least two upper case characters e.g. 'A A'"
+    } 
+    else if (!passwordCheckAtleastTwoSpecialChar.test(value)){
+        return "you password should have at least two special characters e.g. '~!@#$%^&*()_+<>•`{}\'"
+    }
+    return "you must set a strong password to signup"
+}
+
 export function inputBlurHandle(identifier, event, setEnteredInputIsInvalid) {
     const regexSearch = /^[A-Za-z]+$/
+    
+    if(!identifier){
+        console.log({undefined_identifier_found: event})
+        return
+    }
     
     if(identifier === 'gender')
         {
@@ -61,14 +110,28 @@ export function inputBlurHandle(identifier, event, setEnteredInputIsInvalid) {
         
     if(identifier === 'password' )
         {
+            console.log({testPassword: passwordCheckAtleastTwoSpecialChar.test(event)})
             setEnteredInputIsInvalid((prevValues) => ({
                 ...prevValues,
-                [identifier] : (event.length < 6)   ? true : false
+                // [identifier] : (event.length < 6)  ? true : false
+                [identifier] : isPasswordValid(event) ? true : false
             }))
             return
         }
 
-    if(identifier === 'phone_number' || identifier == 'conversion')
+    if(identifier === 'phone_number')
+        {
+            const tel = event
+            const cleanNumber = tel.replace(/ +/g, "")
+            
+            setEnteredInputIsInvalid((prevValues) => ({
+                ...prevValues,
+                [identifier] : (cleanNumber.length >= 16) ? true : (cleanNumber.length <= 12) ? true : false
+            }))
+            return
+        }  
+
+    if( identifier == 'conversion') // identifier === 'phone_number' ||
         {
             setEnteredInputIsInvalid((prevValues) => ({
                 ...prevValues,
@@ -77,13 +140,12 @@ export function inputBlurHandle(identifier, event, setEnteredInputIsInvalid) {
             return
         }
 
-        if(identifier != 'unit_number'){
-            setEnteredInputIsInvalid((prevValues) => ({
-                ...prevValues,
-                [identifier] : (event === '') ? true : false
-            }))
-        }
-        
+    if(identifier != 'unit_number'){
+        setEnteredInputIsInvalid((prevValues) => ({
+            ...prevValues,
+            [identifier] : (event === '') ? true : false
+        }))
+    }        
 }
 
 export function errorPayloadHandler(error, showErrors){

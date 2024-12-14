@@ -13,13 +13,12 @@ import {
 import { inputValidList, countryid } from '../../js/util/auth.js'
 import {setLocalStorageItem, deleteLocalStorageItem, getLocalStorageItem } from "../../js/util/getUtil.js"
 import { useErrorBoundary } from "react-error-boundary"
-import { inputBlurHandle, checkForInvalidInputUser } from '../class/userData/FormHelper.jsx'
+import { inputBlurHandle, noInvalidInputUserFound, noInvalidFieldDetected } from '../class/userData/FormHelper.jsx'
 import { errorHandlerPostRequest } from '../class/userData/FormHelper.jsx'
 import dayjs from 'dayjs'
 import { useLogin } from 'react-admin'
 
 import classes from "./SignUpForm.module.css"
-
 
 const typeText = 'text'
 const typePassword = 'password'
@@ -64,6 +63,7 @@ export default function SignUpForm({storageNameNewUser, userStoredFormData}) {
     }
     
     const handleGenderUserInput = (identifier, value) => {
+        console.log(identifier, value)
         if(identifier != 'gender') return            
         if(value != 'male' && value != 'female') return
         
@@ -96,7 +96,7 @@ export default function SignUpForm({storageNameNewUser, userStoredFormData}) {
             { name: 'Female', id: 'female', type: typeCheckBox, checked: (enteredInput?.gender === 'female' ? true : false), value: 'female',invalid: enteredInputIsInvalid.gender, required: genderStatusRequired, error: errors.gender, onChange: (e) => handleGenderUserInput('gender', e.target.value)},
             { name: 'DateOfBirth', id: 'date_of_birth', type: typeDate, value: enteredInput?.date_of_birth, invalid: enteredInputIsInvalid.date_of_birth, error: errors.date_of_birth, required:true, onChange: (e) => handleGeneralUserInput('date_of_birth', e), onBlur : (e) => inputBlurHandle('date_of_birth', e, setEnteredInputIsInvalid)},            
             { name: 'PhoneNumber', id: 'phone_number', type: typePhone, placeholder: 'phone number', value: enteredInput?.phone_number, error: errors.phone_number, invalid: enteredInputIsInvalid.phone_number, required:true, onChange: (value) => handleGeneralUserInput('phone_number', value), onBlur : (e) => inputBlurHandle('phone_number', e.target.value, setEnteredInputIsInvalid)},
-            { name: 'Password', id: 'password', type: typePassword, placeholder: 'passord', error: errors.password, invalid: enteredInputIsInvalid.password,autoComplete: 'current-password', required: true, onBlur : (e) => inputBlurHandle('password', e.target.value, setEnteredInputIsInvalid)}, // , onChange: (e) => handleUserPassword('password', e.target.value)
+            { name: 'Password', id: 'password', type: typePassword, placeholder: 'password', error: errors.password, invalid: enteredInputIsInvalid.password,autoComplete: 'current-password', required: true, value: enteredInput?.password, onChange: (e) => handleGeneralUserInput('password', e.target.value), onBlur : (e) => inputBlurHandle('password', e.target.value, setEnteredInputIsInvalid)}, // , onChange: (e) => handleUserPassword('password', e.target.value)
             { name: 'Location', id: 'location', type: typeLocation, cityId: enteredInput?.city_id, stateId: enteredInput?.state_id, stateError: errors?.state_id, cityError: errors?.city_id ?? errors?.location, invalid: enteredInputIsInvalid.city,
                 required:true , onChangeStateId: (e) => handleUserLocationInput('state_id', e),onChangeState: (e) => handleUserLocationInput('state', e),onChangeCity: (e) => handleUserLocationInput('city', e),onChangeCityId: (e) => handleUserLocationInput('city_id', e), onBlur : (e) => inputBlurHandle('city', e.target.value, setEnteredInputIsInvalid)},
         ] // onChangeState: (e) => handleStatelUserInput('state', e.target.value), 
@@ -161,15 +161,18 @@ export default function SignUpForm({storageNameNewUser, userStoredFormData}) {
             if(value.id === ':r1r:' ) continue // "02/03/1999"                   
             data = {...data, [value.id]: value.value}
         }
+
+        const checkNoInvalidUserInput = noInvalidInputUserFound(data)       
+        console.log({checkBeforeSend:enteredInputIsInvalid}) 
+        const noInvalidFieldError = noInvalidFieldDetected(enteredInputIsInvalid)        
         
-        const checkInputUser = checkForInvalidInputUser(data)        
-        
-        if(checkInputUser.bool){
+        if(checkNoInvalidUserInput.bool && noInvalidFieldError.bool){
             const requestBody = changeObjKeysToCamelCaseFields(data)
             console.log("SignupRequest", requestBody)
             postRequest(requestBody)            
-        } else {
-            const invalidField = checkInputUser.invalidField
+        } else if (!checkNoInvalidUserInput.bool || !noInvalidFieldError.bool) {
+            console.log({"NO Invalid User input found":checkNoInvalidUserInput,InvalidFieldFound : noInvalidFieldError })
+            const invalidField = !checkNoInvalidUserInput.bool ? checkNoInvalidUserInput.invalidField : !noInvalidFieldError.bool && noInvalidFieldError.invalidInput 
             setEnteredInputIsInvalid((prevValues) => ({
                 ...prevValues,
                 [invalidField] : true
@@ -177,9 +180,9 @@ export default function SignUpForm({storageNameNewUser, userStoredFormData}) {
         }
     }    
 
-    // console.log({ inValid_SignUp: enteredInputIsInvalid })
+    console.log({ inValid_SignUp: enteredInputIsInvalid })
     // console.log({ Errors_SignUp: errors })
-    // console.log({ Entered_Input_SignUp: enteredInput })
+    console.log({ Entered_Input_SignUp: enteredInput })
     return (
         <>
         <section className='flex justify-center max-h-full md:h-auto md:pt-14'> 
